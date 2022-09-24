@@ -1,0 +1,89 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import AuthHandler from "../Utils/AuthHandler";
+import { useHistory } from "react-router-dom";
+import Config from "../Utils/Config";
+
+const Headerpart = (props) => {
+  const user = AuthHandler.getUserCode();
+  const recentImageDataUrl = localStorage.getItem("recent-image");
+
+  function getImage() {
+    if (recentImageDataUrl) {
+      return (
+        <img
+          height={50}
+          width={50}
+          src={recentImageDataUrl}
+          alt=""
+          id="img"
+          className="img"
+        />
+      );
+    } else
+      return (
+        <img
+          height={50}
+          width={50}
+          src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+          alt=""
+          id="img"
+          className="img"
+        />
+      );
+  }
+
+  return (
+    <nav className="main-header navbar navbar-expand navbar-white navbar-light">
+      <ul className="navbar-nav">
+        <li className="nav-item">
+          <a className="nav-link" data-widget="pushmenu" href="#">
+            <i className="fas fa-bars"></i>
+          </a>
+        </li>
+        <li
+          className="nav-item d-none d-sm-inline-block"
+          style={{ marginTop: "6px" }}
+        >
+          Jalgaon Branch (2021-22)
+        </li>
+
+        <li className="nav-item d-none d-sm-inline-block">&nbsp;</li>
+      </ul>
+      <ul className="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+        <li style={{ marginRight: "20px" }}>{getImage()}</li>
+        <li className="nav-item dropdown">
+          <a className="nav-link" data-toggle="dropdown" href="#">
+            <i className="fa fa-user"></i>
+          </a>
+          <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span className="dropdown-header">
+              Welcome{" "}
+              <b>
+                <span id="lblLoginUName">{user}!</span>
+              </b>
+            </span>
+            <div className="dropdown-divider"></div>
+            <a href="#" className="dropdown-item">
+              <i className="fas fa-envelope mr-2"></i>{" "}
+              <span id="mnuopencall">4 new messages</span>
+            </a>
+
+            <li>
+              <Link
+                to={Config.logoutPageUrl}
+                className="dropdown-item dropdown-footer"
+              >
+                <center>
+                  <span>Log off!</span>
+                </center>
+              </Link>
+            </li>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
+export default Headerpart;

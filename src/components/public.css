@@ -1,0 +1,26 @@
+@media only screen and (min-width: 851px) {
+  .addButton {
+    /* background-color: rgb(0, 30, 255); */
+    display: flex;
+  }
+}
+@media only screen and (max-width: 850px) {
+  .addButton {
+    /* background-color: rgb(7, 250, 47); */
+    width: 20px;
+    padding: 0px;
+    font-size: 0;
+  }
+}
+@media only screen and (min-width: 561px) {
+  .toolbar {
+    display: flex;
+  }
+}
+
+@media only screen and (max-width: 560px) {
+  .toolbar {
+    width: 430px;
+    /* width: auto; */
+  }
+}

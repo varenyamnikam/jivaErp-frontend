@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import AuthHandler from "../../../Utils/AuthHandler";
+import Config from "../../../Utils/AuthHandler";
 import ReuseMaster from "../reusableMaster";
 export default function QT() {
   const user = AuthHandler.getUser();
   const initialValues = {
     vouNo: "X X X X",
     branchCode: user.defaultBranchCode,
-    docCode: "DC",
+    docCode: "CN",
     finYear: user.defaultYearCode,
     vno: "",
     manualNo: "",
@@ -40,13 +41,13 @@ export default function QT() {
     receivedCash: "",
     returnCash: "",
   };
-
+  console.log(Config.ledger);
   return (
     <ReuseMaster
-      title="D.C"
-      docCode="DC"
+      title="C.N"
+      docCode="CN"
       initialValues={initialValues}
-      route="dc"
+      route="ledger"
     />
   );
 }

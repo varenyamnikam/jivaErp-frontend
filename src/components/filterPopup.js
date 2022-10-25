@@ -20,9 +20,9 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: "16px",
     backgroundColor: "#e2e9f3",
   },
-  dialogContent: {
-    //paddingRight: "0px",
-  },
+  // dialogContent: {
+  //   paddingRight: "0px",
+  // },
 }));
 
 export default function Popup(props) {
@@ -42,6 +42,7 @@ export default function Popup(props) {
       open={openPopup}
       maxWidth={getSize()}
       classes={{ paper: classes.dialogWrapper }}
+      style={{ zIndex: 0 }}
     >
       <DialogTitle className={classes.dialogTitle}>
         <div style={{ display: "flex" }}>

@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
-import AuthHandler from "../../../Utils/AuthHandler";
+import AuthHandler from "../../Utils/AuthHandler";
 import axios from "axios";
-import Config from "../../../Utils/Config";
+import Config from "../../Utils/Config";
 import { makeStyles } from "@material-ui/core";
-import Controls from "../../../components/controls/Controls";
+import Controls from "../../components/controls/Controls";
 import { Grid } from "@material-ui/core";
-import { useForm, Form } from "../../../components/useForm";
-import StaticDatePickerLandscape from "../../../components/calendarLandscape";
-import UnusedAutosuggest from "../../../components/unusedautosuggest";
-import SmartAutoSuggest from "../../../components/smartAutoSuggest";
-import Calendar from "../../../components/calendar";
-import NotSmartAutoSuggest from "../../../components/haha";
-import DcValues from "./DcValues";
+import { useForm, Form } from "../../components/useForm";
+import StaticDatePickerLandscape from "../../components/calendarLandscape";
+import UnusedAutosuggest from "../../components/unusedautosuggest";
+import SmartAutoSuggest from "../../components/smartAutoSuggest";
+import Calendar from "../../components/calendar";
+import NotSmartAutoSuggest from "../../components/haha";
 import Divider from "@mui/material/Divider";
-import ItemForm from "./items";
-import Popup from "../../../components/Popup";
-import Percent from "../../../components/percentageNew";
+import ItemForm from "./generalItems";
+import Popup from "../../components/Popup";
+import Percent from "../../components/percentageNew";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -30,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   // input: { minWidth: "200px", flexGrow: 1 },
 }));
 
-export default function DcForm(props) {
+export default function GeneralForm(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
@@ -52,12 +51,11 @@ export default function DcForm(props) {
     openPopup,
     setOpenPopup,
     handleSubmit,
+    vouItems,
   } = props;
-  const { vouItems } = DcValues();
   const [input, setInput] = useState(values);
   const [itemList, setItemList] = useState([vouItems]);
 
-  const { convert } = DcValues();
   adress.filter((item) => item.acCode == input.partyCode);
   console.log(adress);
   const refOptions = records
@@ -75,7 +73,7 @@ export default function DcForm(props) {
     .map((item) => {
       return item.acName;
     });
-  console.log(input);
+
   if (input.vouNo.length > 8) {
     let arr = [];
     arr = voucherItems.filter((item) => item.vouNo == input.vouNo);
@@ -143,26 +141,26 @@ export default function DcForm(props) {
   ) {
     setInput({ ...input, roundOff: (k.toFixed(2) - Math.round(k)).toFixed(2) });
   }
+  let y = true;
   records.map((item) => {
+    console.log(item.vouNo, input.vouNo);
     if (item.vouNo == input.vouNo) {
-      x = false;
+      console.log(item);
+      y = false;
     }
   });
 
   function getVouNo() {
-    if (!x) {
+    if (y) {
       return " NEW ";
     } else {
       return input.vouNo;
     }
   }
+
   return (
     <>
-      <Grid
-        container
-        style={{ width: "98%", marginBottom: "10px" }}
-        spacing={2}
-      >
+      <Grid container style={{ marginBottom: "10px" }} spacing={2}>
         <Grid item xs={12} sm={3} className={classes.input}>
           <Controls.Input
             name="vouNo"
@@ -173,17 +171,15 @@ export default function DcForm(props) {
             disabled={true}
           />
         </Grid>
-        {input.docCode == "DC" && (
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Controls.Input
-              name="manualNo"
-              label="Manual No"
-              value={input.manualNo}
-              onChange={handleChange}
-              error={errors.manualNo}
-            />
-          </Grid>
-        )}
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Controls.Input
+            name="manualNo"
+            label="Manual No"
+            value={input.manualNo}
+            onChange={handleChange}
+            error={errors.manualNo}
+          />
+        </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
           <Controls.Input
             style={{ width: "100%" }}
@@ -369,6 +365,8 @@ export default function DcForm(props) {
         records={records}
         products={products}
         prodOptions={prodOptions}
+        vouItems={vouItems}
+        input={input}
       />
       <Divider variant="middle" color="blue" sx={{ borderBottomWidth: 2 }} />
       <Grid container spacing={2} style={{ marginTop: "10px" }}>

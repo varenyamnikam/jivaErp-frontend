@@ -89,7 +89,7 @@ export default function Settings() {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [save, setSave] = useState(true);
+  const [save, setSave] = useState(false);
 
   function handleInputChange(e) {
     const { value, name } = e.target;
@@ -132,6 +132,7 @@ export default function Settings() {
         setLoading(false);
         setSave(false);
         setValues(values);
+        localStorage.setItem("adm_softwareSettings", JSON.stringify(values));
       });
   }
   useEffect(() => {

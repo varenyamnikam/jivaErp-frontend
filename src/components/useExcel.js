@@ -1,0 +1,157 @@
+import React, { useState } from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  makeStyles,
+  TablePagination,
+  TableSortLabel,
+} from "@material-ui/core";
+import PropTypes from "prop-types";
+import { useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LastPageIcon from "@mui/icons-material/LastPage";
+import Pagination from "@mui/material/Pagination";
+import ReactHTMLTableToExcel from "react-html-table-to-excel";
+import { AiFillFileExcel } from "react-icons/ai";
+import { reactLocalStorage } from "reactjs-localstorage";
+const useStyles = makeStyles((theme) => ({
+  table: {
+    marginTop: theme.spacing(1),
+    "& thead th": {
+      fontWeight: "600",
+      color: theme.palette.primary.main,
+      backgroundColor: "#e2e9f3",
+    },
+    "& tbody td": {
+      fontWeight: "300",
+      fontSize: "16px",
+      padding: "3px",
+      // "&:nth-of-type(odd)": {
+      //   backgroundColor: "red",
+      // },
+    },
+    "& tbody tr": {
+      "&:nth-of-type(even)": {
+        backgroundColor: "#e3e0e0",
+      },
+    },
+    "& tbody tr:hover": {
+      backgroundColor: "#fffbf2",
+      // backgroundColor: "red",
+      cursor: "pointer",
+    },
+    "& .MuiTableCell-root": {
+      borderRight: "1px solid rgba(0,0,0,0.2)",
+    },
+    border: "1px solid rgba(0,0,0,0.2)",
+  },
+  excel: {
+    backgroundColor: "#28A745",
+    color: "white",
+    height: "40px",
+    padding: "0px",
+    margin: "0px",
+    marginTop: "4px",
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    borderTopLeftRadius: "5px",
+    borderBottomLeftRadius: "5px",
+  },
+}));
+
+export default function Excel(props) {
+  const {
+    TblContainer,
+    TblHead,
+    TblPagination,
+    recordsAfterSorting,
+    headCells,
+  } = props;
+  console.log(recordsAfterSorting());
+  const classes = useStyles();
+
+  let company = JSON.parse(reactLocalStorage.get("company"));
+  return (
+    <>
+      <ReactHTMLTableToExcel
+        id="test-table-xls-button"
+        className={classes.excel}
+        table="print"
+        filename="tablexls"
+        sheet="tablexls"
+        buttonText={<AiFillFileExcel size={20} style={{ bottom: 5 }} />}
+      />
+      <table className="table" id="print" style={{ display: "none" }}>
+        <TableContainer id="print">
+          <TblContainer>
+            <TableHead>
+              <TableRow
+                style={{
+                  fontWeight: "600",
+                  fontSize: "25px",
+                  color: "blue",
+                  backgroundColor: "#e2e9f3",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                {" "}
+                <h1>{company.companyName}</h1>
+              </TableRow>
+              <TableRow
+                style={{
+                  fontWeight: "600",
+                  fontSize: "25px",
+                  color: "blue",
+                  backgroundColor: "#e2e9f3",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                filter: x y z
+              </TableRow>
+              <TableRow>
+                {headCells.map((headCell) => (
+                  <TableCell
+                    key={headCell.id}
+                    style={{
+                      borderRight: "1px solid rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    {headCell.label == "Edit" ? "" : headCell.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {recordsAfterSorting().map((item) => (
+                <TableRow key={item._id}>
+                  {headCells.map((headCell) => (
+                    <TableCell
+                      key={headCell.id}
+                      style={{
+                        borderRight: "1px solid rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      {headCell.feild in item ? item[headCell.feild] : ""}
+                    </TableCell>
+                  ))}{" "}
+                </TableRow>
+              ))}
+            </TableBody>
+          </TblContainer>
+        </TableContainer>
+      </table>
+    </>
+  );
+}

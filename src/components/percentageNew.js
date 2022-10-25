@@ -94,6 +94,7 @@ export default function Percent(props) {
       value[name2],
       amtOfPercent(Number(value[name2]), Number(value[name3]))
     );
+
     setValue({
       ...value,
       [name1]: amtOfPercent(Number(value[name2]), Number(value[name3])),

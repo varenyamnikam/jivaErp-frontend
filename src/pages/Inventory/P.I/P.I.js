@@ -6,7 +6,7 @@ export default function QT() {
   const initialValues = {
     vouNo: "X X X X",
     branchCode: user.defaultBranchCode,
-    docCode: "DC",
+    docCode: "PI",
     finYear: user.defaultYearCode,
     vno: "",
     manualNo: "",
@@ -43,10 +43,10 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="D.C"
-      docCode="DC"
+      title="P.I"
+      docCode="PI"
       initialValues={initialValues}
-      route="dc"
+      route="both"
     />
   );
 }

@@ -31,6 +31,18 @@ import AccountTypesMaster from "./pages/MASTER/Accounts/accountTypesMaster";
 import DCMaster from "./pages/Inventory/D.C/dcMaster";
 import PayTermMaster from "./pages/Inventory/paymentTermMaster";
 import Settings from "./pages/Admin/SoftwareSetting";
+import GrMaster from "./pages/Inventory/G.R/newGr";
+import SIMaster from "./pages/Inventory/S.I/S.I";
+import QTMaster from "./pages/Inventory/QT/qt";
+import PIMaster from "./pages/Inventory/P.I/P.I";
+import SOMaster from "./pages/Inventory/S.O/S.O";
+import SRMaster from "./pages/Inventory/S.R/S.R";
+import POMaster from "./pages/Inventory/P.O/P.O";
+import PVMaster from "./pages/Inventory/P.V/P.V";
+import PRMaster from "./pages/Inventory/P.R/P.R";
+import CNMaster from "./pages/Inventory/C.N/C.N";
+import DNMaster from "./pages/Inventory/D.N/D.N";
+
 ReactDOM.render(
   <Router>
     <Switch>
@@ -120,17 +132,24 @@ ReactDOM.render(
         exact
         path="/Master/Products/ProductsMaster"
         page={<ProductMaster />}
-      ></PrivateRouteNew>
-      <PrivateRouteNew
-        exact
-        path="/Inventory/D.C"
-        page={<DCMaster />}
-      ></PrivateRouteNew>
+      />
+      <PrivateRouteNew exact path="/Inventory/D.C" page={<DCMaster />} />
+      <PrivateRouteNew exact path="/Inventory/Q.T" page={<QTMaster />} />
+      <PrivateRouteNew exact path="/Inventory/S.I" page={<SIMaster />} />
+      <PrivateRouteNew exact path="/Inventory/G.R" page={<GrMaster />} />
+      <PrivateRouteNew exact path="/Inventory/P.I" page={<PIMaster />} />
+      <PrivateRouteNew exact path="/Inventory/S.O" page={<SOMaster />} />
+      <PrivateRouteNew exact path="/Inventory/S.R" page={<SRMaster />} />
+      <PrivateRouteNew exact path="/Inventory/P.O" page={<POMaster />} />
+      <PrivateRouteNew exact path="/Inventory/P.V" page={<PVMaster />} />
+      <PrivateRouteNew exact path="/Inventory/P.R" page={<PRMaster />} />
+      <PrivateRouteNew exact path="/Inventory/C.N" page={<CNMaster />} />
+      <PrivateRouteNew exact path="/Inventory/D.N" page={<DNMaster />} />
       <PrivateRouteNew
         exact
         path="/Inventory/PaymentTerm"
         page={<PayTermMaster />}
-      ></PrivateRouteNew>
+      />
     </Switch>
   </Router>,
 

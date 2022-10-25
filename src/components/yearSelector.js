@@ -18,7 +18,9 @@ export default function ViewsDatePicker(props) {
           setValue({ ...value, [name]: newValue });
           console.log(newValue);
         }}
-        renderInput={(params) => <TextField {...params} helperText={null} />}
+        renderInput={(params) => (
+          <TextField {...params} size="small" helperText={null} />
+        )}
       />
     </LocalizationProvider>
   );

@@ -33,15 +33,13 @@ import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import ControlledAccordions from "../../components/accordions";
 import ViewsDatePicker from "../../components/yearSelector";
 import { useForm, Form } from "../../components/useForm";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import IconButton from "@material-ui/core/IconButton";
 import { reactLocalStorage } from "reactjs-localstorage";
 import Table from "@mui/material/Table";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import Filter from "../../components/filterButton";
 const headCells = [
   { id: "Code", label: "YearCode" },
   { id: "name", label: "Financial Year" },
@@ -320,43 +318,14 @@ export default function FinancialYearMaster(props) {
                           />
                         </Grid>
                         <Grid item sm={1} xs={4}>
-                          {filterIcon ? (
-                            <>
-                              <IconButton
-                                onClick={() => {
-                                  setFilterPopup(true);
-                                  setFilter(initialFilterValues);
-                                }}
-                                style={{
-                                  borderRadius: 0,
-                                  marginTop: "5px",
-                                  marginLeft: "10px",
-                                }}
-                              >
-                                <FilterAltOutlinedIcon color="success" />
-                              </IconButton>
-                            </>
-                          ) : (
-                            <>
-                              <IconButton
-                                onClick={() => {
-                                  setFilterFn({
-                                    fn: (items) => {
-                                      return items;
-                                    },
-                                  });
-                                  setFilterIcon(true);
-                                }}
-                                style={{
-                                  borderRadius: 0,
-                                  marginTop: "5px",
-                                  marginLeft: "10px",
-                                }}
-                              >
-                                <FilterAltOffOutlinedIcon color="error" />
-                              </IconButton>
-                            </>
-                          )}
+                          <Filter
+                            filterIcon={filterIcon}
+                            setFilterPopup={setFilterPopup}
+                            setFilter={setFilter}
+                            setFilterFn={setFilterFn}
+                            setFilterIcon={setFilterIcon}
+                            initialFilterValues={initialFilterValues}
+                          />
                         </Grid>
                         <Grid
                           item
@@ -369,6 +338,7 @@ export default function FinancialYearMaster(props) {
                         >
                           <Controls.Button
                             text="Add New"
+                            size="medium"
                             variant="outlined"
                             startIcon={<AddIcon />}
                             onClick={(e) => {

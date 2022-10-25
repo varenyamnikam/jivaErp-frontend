@@ -5,6 +5,8 @@ import Checkbox from "./Checkbox";
 import DatePicker from "./DatePicker";
 import Button from "./Button";
 import ActionButton from "./ActionButton";
+import LoadingActionButton from "./LoadingActionButton";
+
 import Percent from "./percentage";
 const Controls = {
   Input,
@@ -15,6 +17,7 @@ const Controls = {
   Button,
   ActionButton,
   Percent,
+  LoadingActionButton,
 };
 
 export default Controls;

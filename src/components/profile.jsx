@@ -23,11 +23,13 @@ const Profile = () => {
     <>
       <div>
         <div className="profile">
-          <figure>{getImage()} </figure>
-          <header>
-            <h3>{reactLocalStorage.get("userName")}</h3>{" "}
-            <small>{reactLocalStorage.get("userCompanyName")}</small>
-          </header>
+          <figure>
+            {getImage()}{" "}
+            <header>
+              <h3>{reactLocalStorage.get("userName")}</h3>{" "}
+              <small>{reactLocalStorage.get("userCompanyName")}</small>
+            </header>
+          </figure>
           <main>
             <dl>
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime

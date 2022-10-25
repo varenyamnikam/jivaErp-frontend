@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHead,
@@ -21,9 +21,21 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import Pagination from "@mui/material/Pagination";
+import MultipleSelectCheckmarks from "./multiSelect";
+import Excel from "./useExcel";
+import { Grid } from "@material-ui/core";
+import Controls from "./controls/Controls";
+import ClearIcon from "@mui/icons-material/Clear";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
+import CloseIcon from "@material-ui/icons/Close";
+import Print from "./print";
+import PrintOne from "./printOne";
+import CircularProgress, {
+  circularProgressClasses,
+} from "@mui/material/CircularProgress";
+
 const useStyles = makeStyles((theme) => ({
   table: {
-    marginTop: theme.spacing(1),
     "& thead th": {
       fontWeight: "600",
       color: theme.palette.primary.main,
@@ -42,19 +54,24 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#e3e0e0",
       },
     },
-    "& tbody tr:hover": {
-      backgroundColor: "#fffbf2",
-      // backgroundColor: "red",
-      cursor: "pointer",
-    },
-    "& .MuiTableCell-root": {
+    "MuiTableCell-root": {
       borderRight: "1px solid rgba(0,0,0,0.2)",
     },
     border: "1px solid rgba(0,0,0,0.2)",
   },
 }));
 
-export default function useTable(records, headCells, filterFn) {
+export default function useTable(
+  records,
+  initialHeadCells,
+  filterFn,
+  voucherItems,
+  adress,
+  accounts,
+  products,
+  payTerms,
+  loading
+) {
   const classes = useStyles();
 
   const pages = [10, 25, 50, 100, 500];
@@ -62,7 +79,8 @@ export default function useTable(records, headCells, filterFn) {
   const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
   const [order, setOrder] = useState();
   const [orderBy, setOrderBy] = useState();
-  ////////////////////////////////////////////////////
+  const [headcells, setheadcells] = useState(initialHeadCells);
+  const [selected, setSelected] = React.useState([]);
   function TablePaginationActions(props) {
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;
@@ -116,26 +134,7 @@ export default function useTable(records, headCells, filterFn) {
             <KeyboardArrowLeft />
           )}
         </IconButton>
-        {arr.map((item, index) => {
-          const getColor = index == page ? true : false;
-          console.log(getColor, index, page);
-          return (
-            <IconButton
-              style={{
-                fontSize: "20px",
-                color: { getColor },
-                backgroundColor: { getColor },
-                width: "20px",
-              }}
-              onClick={(e) => {
-                onPageChange(e, index);
-              }}
-              disabled={getColor}
-            >
-              {item}
-            </IconButton>
-          );
-        })}
+
         <IconButton
           onClick={handleNextButtonClick}
           disabled={page >= Math.ceil(count / rowsPerPage) - 1}
@@ -157,7 +156,10 @@ export default function useTable(records, headCells, filterFn) {
       </Box>
     );
   }
-
+  // setTimeout(function () {
+  //   console.log(headcells.length);
+  //   if (headcells.length >= 4) setheadcells(headcells.pop());
+  // }, 5000);
   TablePaginationActions.propTypes = {
     count: PropTypes.number.isRequired,
     onPageChange: PropTypes.func.isRequired,
@@ -175,24 +177,55 @@ export default function useTable(records, headCells, filterFn) {
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(cellId);
   };
-
+  const Buttons = (props) => (
+    <>
+      <Grid container style={{ width: "100%" }}>
+        <Excel
+          buttonText="Export Data to Excel"
+          TblContainer={TblContainer}
+          TblHead={TblHead}
+          TblPagination={TblPagination}
+          headCells={initialHeadCells}
+          recordsAfterSorting={recordsAfterSorting}
+        />
+        <Print
+          buttonText="Export Data to Excel"
+          TblContainer={TblContainer}
+          TblHead={TblHead}
+          TblPagination={TblPagination}
+          headCells={headcells}
+          recordsAfterSorting={recordsAfterSorting}
+        />
+        <MultipleSelectCheckmarks
+          headcells={headcells}
+          setheadcells={setheadcells}
+          initialHeadCells={initialHeadCells}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      </Grid>{" "}
+    </>
+  );
   const TblHead = (props) => {
+    console.log(headcells);
     return (
-      <TableHead>
-        <TableRow>
-          {headCells.map((headCell) => (
-            <TableCell
-              key={headCell.id}
-              // sortDirection={orderBy === headCell.id ? order : false}
-              style={{
-                borderRight: "1px solid rgba(0,0,0,0.2)",
-              }}
-            >
-              {headCell.label}
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
+      <>
+        <TableHead>
+          <TableRow>
+            {headcells.map((headcell) => (
+              <TableCell
+                key={headcell.id}
+                // sortDirection={orderBy === headcell.id ? order : false}
+                style={{
+                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                }}
+              >
+                {headcell.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+      </>
     );
   };
 
@@ -257,26 +290,125 @@ export default function useTable(records, headCells, filterFn) {
     }
     return 0;
   }
-  useCallback(() => {}, [records]);
 
-  function recordsAfterPagingAndSorting() {
+  const recordsAfterPagingAndSorting = () => {
     console.log(filterFn.fn(records));
     return stableSort(
       filterFn.fn(records),
       getComparator(order, orderBy)
     ).slice(page * rowsPerPage, (page + 1) * rowsPerPage);
-  }
-
-  const recordsAfterAndSorting = () => {
+  };
+  const recordsAfterSorting = () => {
     console.log(filterFn.fn(records));
     return stableSort(filterFn.fn(records), getComparator(order, orderBy));
   };
+  console.log("hi");
+  const TblBody = (props) => {
+    const { onClick1, onClick2 } = props;
 
+    return (
+      <>
+        {recordsAfterPagingAndSorting().map((item) => (
+          <TableRow>
+            {headcells.map((headcell, i) => (
+              <TableCell
+                key={headcell.id}
+                // sortDirection={orderBy === headcell.id ? order : false}
+                style={{
+                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                }}
+              >
+                {headcell.label == "Edit" ? (
+                  <>
+                    <Controls.ActionButton
+                      color="primary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClick1(item);
+                      }}
+                    >
+                      {loading !== item.vouNo && (
+                        <EditOutlinedIcon fontSize="small" />
+                      )}
+
+                      {loading == item.vouNo && (
+                        <CircularProgress
+                          variant="indeterminate"
+                          disableShrink
+                          sx={{
+                            color: "blue",
+                            animationDuration: "550ms",
+
+                            [`& .${circularProgressClasses.circle}`]: {
+                              strokeLinecap: "round",
+                            },
+                          }}
+                          size={18}
+                          thickness={4}
+                          {...props}
+                        />
+                      )}
+                    </Controls.ActionButton>
+                    <Controls.ActionButton
+                      color="secondary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClick2(item);
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </Controls.ActionButton>
+                    <Controls.ActionButton>
+                      {" "}
+                      <PrintOne
+                        key={i}
+                        values={item}
+                        voucherItems={voucherItems}
+                        adress={adress}
+                        accounts={accounts}
+                        products={products}
+                        payTerms={payTerms}
+                      />
+                    </Controls.ActionButton>
+                  </>
+                ) : (
+                  item[headcell.feild]
+                )}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    );
+  };
   return {
     TblContainer,
     TblHead,
     TblPagination,
     recordsAfterPagingAndSorting,
-    recordsAfterAndSorting,
+    headcells,
+    Buttons,
+    TblBody,
+    recordsAfterSorting,
   };
 }
+// {arr.map((item, index) => {
+//   const getColor = index == page ? true : false;
+//   console.log(getColor, index, page);
+//   return (
+//     <IconButton
+//       style={{
+//         fontSize: "20px",
+//         color: { getColor },
+//         backgroundColor: { getColor },
+//         width: "20px",
+//       }}
+//       onClick={(e) => {
+//         onPageChange(e, index);
+//       }}
+//       disabled={getColor}
+//     >
+//       {item}
+//     </IconButton>
+//   );
+// })}

@@ -24,6 +24,14 @@ class AuthHandler {
             "adm_userrights",
             JSON.stringify(response.data.adm_userrights)
           );
+          localStorage.setItem(
+            "adm_userrights",
+            JSON.stringify(response.data.adm_userrights)
+          );
+          localStorage.setItem(
+            "adm_softwareSettings",
+            JSON.stringify(response.data.adm_softwareSettings)
+          );
           reactLocalStorage.set("user", JSON.stringify(response.data.user));
           localStorage.setItem(
             "userCompanyCode",
@@ -38,6 +46,11 @@ class AuthHandler {
             "adm_screen",
             JSON.stringify(response.data.result)
           );
+          reactLocalStorage.set(
+            "company",
+            JSON.stringify(response.data.company)
+          );
+
           //reactLocalStorage.set("refresh", response.data.refresh)
           if (response.data.Status == "Active")
             callback({ error: false, message: "Login Successfull..." });

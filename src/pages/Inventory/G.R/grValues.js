@@ -5,7 +5,7 @@ export default function DcValues() {
   const initialValues = {
     vouNo: "X X X X",
     branchCode: user.defaultBranchCode,
-    docCode: "DC",
+    docCode: "GR",
     finYear: user.defaultYearCode,
     vno: "",
     manualNo: "",
@@ -135,12 +135,12 @@ export default function DcValues() {
   };
   const initialCommonValues = {
     accounts: [initialAc],
+    records: [initialValues],
     voucherItems: [vouItems],
     adress: [initialAdress],
     payTerms: [initialPayValues],
     products: [initialProdValues],
   };
-
   const docOptions = ["DC", "QT", "GR", "SI"];
   return {
     initialValues,

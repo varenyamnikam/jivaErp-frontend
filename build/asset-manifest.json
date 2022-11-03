@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.8805a693.css",
+    "main.js": "/static/js/main.c9548af1.js",
+    "static/media/Checklist.jpg": "/static/media/Checklist.55ad5df04f7dab3a4f9b.jpg",
+    "static/media/bg-1.jpg": "/static/media/bg-1.ec87802457fd934b4edd.jpg",
+    "static/media/loginimage.jpg": "/static/media/loginimage.ec87802457fd934b4edd.jpg",
+    "static/media/loginman.jpg": "/static/media/loginman.38cf808951dfde87dc80.jpg",
+    "static/media/manonlaptop.jpg": "/static/media/manonlaptop.358c7a64d1d01091aae1.jpg",
+    "static/media/ERP.jpg": "/static/media/ERP.05574bb5e6c9fdbaee1b.jpg",
+    "static/media/JivaLogo.png": "/static/media/JivaLogo.40647b1e41c9c6c1b5e7.png",
+    "static/media/footer.jpg": "/static/media/footer.767942ca8ae1068e7715.jpg",
+    "static/media/cool-background.png": "/static/media/cool-background.91247931ac2e8e2e1add.png",
+    "index.html": "/index.html",
+    "static/media/admin.svg": "/static/media/admin.6ec22a8ef868eded06c837b1a4b82f34.svg",
+    "main.8805a693.css.map": "/static/css/main.8805a693.css.map",
+    "main.c9548af1.js.map": "/static/js/main.c9548af1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8805a693.css",
+    "static/js/main.c9548af1.js"
+  ]
+}

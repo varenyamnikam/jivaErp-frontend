@@ -369,16 +369,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableHead>
-            <TableRow>
+          <TableHead style={{ backgroundColor: "blue", color: "white" }}>
+            <TableRow style={{ backgroundColor: "blue", color: "white" }}>
               <TableCell
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "20%",
+                  backgroundColor: "blue",
+                  color: "white",
                 }}
               >
-                Product
+                Products
               </TableCell>
               <TableCell
                 align="right"

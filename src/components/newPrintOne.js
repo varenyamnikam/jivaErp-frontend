@@ -339,7 +339,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
 
                 <Grid container style={{ color: "black" }}>
                   <Grid Item xs={4} sm={4}>
-                    From
+                    <Grid
+                      Item
+                      sm={9}
+                      xs={9}
+                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                    >
+                      <h5> From</h5>
+                    </Grid>
                     <h4>{company.companyName}</h4>
                     <span>{company.adressLine1}</span>
                     <br></br>
@@ -350,7 +357,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                     <span>GST In: {company.gstInNo}</span>
                   </Grid>
                   <Grid Item sm={4} xs={4}>
-                    Bill To
+                    <Grid
+                      Item
+                      sm={9}
+                      xs={9}
+                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                    >
+                      <h5>Bill To</h5>
+                    </Grid>
                     <h4>{getParty(values) && getParty(values).acName}</h4>
                     {getAd(values) && (
                       <>
@@ -363,7 +377,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                     )}
                   </Grid>
                   <Grid Item sm={4} xs={4}>
-                    Ship To
+                    <Grid
+                      Item
+                      sm={9}
+                      xs={9}
+                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                    >
+                      <h5> Ship To</h5>
+                    </Grid>
                     <h4>{getParty(values) && getParty(values).acName}</h4>
                     {getAd(values) && (
                       <>
@@ -379,13 +400,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableHead>
-            <TableRow>
+          <TableHead style={{ backgroundColor: "#79A9C5EB", color: "white" }}>
+            <TableRow style={{ backgroundColor: "#79A9C5EB", color: "white" }}>
               <TableCell
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "20%",
+                  color: "white",
                 }}
               >
                 Product
@@ -395,6 +417,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "5%",
+                  color: "white",
                 }}
               >
                 Quantity
@@ -403,6 +426,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 Rate
@@ -411,6 +435,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 Amount
@@ -419,6 +444,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 Discount
@@ -427,6 +453,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 cgst
@@ -435,6 +462,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 sgst
@@ -443,6 +471,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                 }}
               >
                 igst
@@ -452,6 +481,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                   align="right"
                   style={{
                     border: "1px solid rgba(0,0,0,0.2)",
+                    color: "white",
                   }}
                 >
                   cess
@@ -461,6 +491,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
+                  color: "white",
                   width: "10%",
                 }}
               >

@@ -1,0 +1,8 @@
+jivaerp.oajinfotech.com:80 {
+  root * /srv
+  route {
+    reverse_proxy /api* api-server:3001
+    try_files {path} {path}/ /index.html
+    file_server
+  }
+}

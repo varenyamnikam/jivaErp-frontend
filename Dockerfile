@@ -1,7 +1,7 @@
 ### First Stage ###
 FROM node:16.14.2 AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY ./package.json ./
 COPY ./package-lock.json ./
@@ -16,11 +16,11 @@ COPY . .
 RUN npm run build
 
 ### Second Stage ###
-FROM caddy:2.1.1
+FROM nginx
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/build /usr/share/nginx.html
+EXPOSE 3000
 
-COPY Caddyfile /etc/caddy/Caddyfile
-
-COPY --from=builder /usr/src/app/build/ /srv
-
-EXPOSE 80
-
+# FROM caddy:2.1.1
+# COPY Caddyfile /etc/caddy/Caddyfile
+# COPY --from=builder /usr/src/app/build/ /srv

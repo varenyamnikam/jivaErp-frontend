@@ -13,7 +13,8 @@ import Calculate from "../../components/calculate";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import Popup from "../../components/Popup";
 import Percent from "../../components/percentageNew";
-
+import Grouped from "../../components/grouped";
+import Notification from "../../components/Notification";
 import {
   Paper,
   makeStyles,
@@ -51,6 +52,8 @@ export default function GeneralItemForm(props) {
     prodOptions,
     vouItems,
     input,
+    setCommon,
+    common,
   } = props;
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
@@ -58,7 +61,11 @@ export default function GeneralItemForm(props) {
   const [errors, setErrors] = useState({});
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
-  const [disabled2, setDisabled2] = useState(false);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
 
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
@@ -70,6 +77,9 @@ export default function GeneralItemForm(props) {
     },
   });
   const [popup, setPopup] = useState(false);
+  const useBatch = JSON.parse(
+    localStorage.getItem("adm_softwareSettings")
+  ).userBatchNo;
 
   const classes = useStyles();
   const { totalBeforeDs, totalAfterDs, Final } = Calculate(
@@ -85,6 +95,9 @@ export default function GeneralItemForm(props) {
     "cess",
     "itemAmount"
   );
+  const token = AuthHandler.getLoginToken();
+  const userCode = localStorage.getItem("userCode");
+  const userCompanyCode = localStorage.getItem("userCompanyCode");
 
   console.log(totalBeforeDs(), totalAfterDs());
   if (totalBeforeDs()) {
@@ -99,15 +112,12 @@ export default function GeneralItemForm(props) {
     setItem({ ...item, itemAmount: parseFloat(Final()).toFixed(2) });
   }
 
-  // console.log("0".toFixed(2));
   function getDisable(vouNo) {
     let x = true;
     records.map((items) => {
       if (items.vouNo == vouNo) {
         console.log(items);
         x = false;
-        if (headCells.length == 11)
-          setHeadCells(headCells.filter((item) => item.id !== "Delete"));
       }
     });
     return x;
@@ -137,6 +147,28 @@ export default function GeneralItemForm(props) {
         }
       });
     });
+  function getBatchlist() {
+    if ("batchList" in item) {
+      console.log(item);
+      return item.batchList;
+    } else {
+      console.log(item);
+      return [{ batchNo: 0, qty: 0, sell: 0 }];
+    }
+  }
+  const [batchList, setBatchlist] = useState(getBatchlist());
+  // useEffect(() => {
+  //   if ("batchList" in item) {
+  //     let x = true;
+  //     if (batchList.length == item.batchList.length)
+  //       batchList.map((batch, i) => {
+  //         if (batch.sell == item.batchList[i].sell) x = false;
+  //       });
+  //     if (x) setBatchlist(item.batchList);
+  //   }
+  // });
+  console.log(batchList);
+
   function rnd(no) {
     return Number(no)
       .toFixed(2)
@@ -158,24 +190,22 @@ export default function GeneralItemForm(props) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(itemList, headCells, filterFn);
-  console.log(item, itemList, recordsAfterPagingAndSorting());
   if (itemList.length == 1 && itemList[0].vouSrNo == 0 && item.vouSrNo !== 1)
     setItem({
       ...item,
       vouSrNo: 1,
     });
-
   const handleSubmit = (e) => {
     e.preventDefault();
     let x = true;
     itemList.map((ite) => {
-      if (ite.vouSrNo == item.vouSrNo) {
+      if (ite.vouSrNo == item.vouSrNo && ite.vouNo == item.vouNo) {
         console.log(ite, item);
         x = false;
       }
     });
-    const newNo = itemList[itemList.length - 1].vouSrNo + 1;
-    console.log(item, itemList, newNo);
+    const newNo = Number(itemList[itemList.length - 1].vouSrNo) + 1;
+    console.log(item, itemList, newNo, x);
     // if (item.cgst || item.sgst) {
     //   console.log("hi", item.cgst || item.sgst);
     //   setDisabled2(true);
@@ -194,123 +224,54 @@ export default function GeneralItemForm(props) {
     // }
 
     if (x) {
-      setItemList([...itemList, { ...item, vouSrNo: newNo }]);
-      // setItem((prev) => ({
-      //   ...vouItems,
-      //   vouSrNo: prev.vouSrNo + 1,
-      // }));
+      setItemList([
+        ...itemList,
+        { ...item, vouSrNo: newNo, vouNo: input.vouNo, batchList: batchList },
+      ]);
+      console.log({ ...item, vouSrNo: newNo, vouNo: input.vouNo }, itemList);
       setItem({
         ...vouItems,
-        vouSrNo: newNo + 1,
+        vouNo: "",
       });
     } else {
       const updatedRecords = itemList.map((ite) =>
-        ite.vouSrNo == item.vouSrNo ? item : ite
+        ite.vouSrNo == item.vouSrNo ? { ...item, batchList: batchList } : ite
       );
       setItemList(updatedRecords);
       setItem({
         ...vouItems,
-        vouSrNo: newNo,
+        vouNo: "",
       });
     }
   };
-  function getTax() {
-    if (item.cgst || item.sgst) {
-      return (
-        <>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="cgst"
-              name2="cgstP"
-              disabled={disabled1}
-              name3="dqr"
-              label="cgst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.cgst}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="sgst"
-              name2="sgstP"
-              disabled={disabled1}
-              name3="dqr"
-              label="sgst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.sgst}
-            />
-          </Grid>
-        </>
-      );
-    }
-    if (item.igst) {
-      return (
-        <>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="igst"
-              name2="igstP"
-              disabled={true}
-              name3="dqr"
-              label="igst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.igst}
-            />
-          </Grid>
-        </>
-      );
-    }
-    if (!item.cgst && !item.sgst && !item.igst) {
-      return (
-        <>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="cgst"
-              name2="cgstP"
-              disabled={disabled1}
-              name3="dqr"
-              label="cgst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.cgst}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="sgst"
-              name2="sgstP"
-              disabled={disabled1}
-              name3="dqr"
-              label="sgst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.sgst}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="igst"
-              name2="igstP"
-              disabled={true}
-              name3="dqr"
-              label="igst"
-              value={item}
-              setValue={setItem}
-              onChange={handleChange}
-              error={errors.igst}
-            />
-          </Grid>
-        </>
-      );
-    }
+  function getStock(e) {
+    let y = true;
+    let Data = 0;
+
+    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${item.prodCode}&vouNo=${item.vouNo}&useBatch=${useBatch}`;
+    axios
+      .get(Config.batch + query, {
+        headers: {
+          authorization: "Bearer" + token,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((res) => {
+        Data = res.data.stock;
+        if (Data < Number(item.qty)) {
+          setNotify({
+            isOpen: true,
+            message: `not enough stock only ${Data} quantity available`,
+            type: "warning",
+          });
+          y = false;
+        }
+        if (y) handleSubmit(e);
+        console.log(Data, y);
+      });
+    return y;
   }
   console.log(itemList, recordsAfterAndSorting());
   return (
@@ -348,27 +309,29 @@ export default function GeneralItemForm(props) {
               />
             </Grid>
           )}
-          {settings.userBatchNo == "Yes" && (
-            <>
-              <Grid item xs={12} sm={2} className={classes.input}>
-                <Controls.Input
-                  name="batchNo"
-                  label="Batch No"
-                  value={item.batchNo}
-                  onChange={handleChange}
-                  error={errors.batchNo}
-                />
-              </Grid>
-              <Grid item xs={12} sm={3} className={classes.input}>
-                <StaticDatePickerLandscape
-                  name="expDate"
-                  label="Expiry Date"
-                  value={item}
-                  setValue={setItem}
-                />
-              </Grid>
-            </>
-          )}
+          {input.docCode !== "DC" &&
+            input.docCode !== "SI" &&
+            settings.userBatchNo == "Yes" && (
+              <>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="batchNo"
+                    label="Batch No"
+                    value={item.batchNo}
+                    onChange={handleChange}
+                    error={errors.batchNo}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={3} className={classes.input}>
+                  <StaticDatePickerLandscape
+                    name="expDate"
+                    label="Expiry Date"
+                    value={item}
+                    setValue={setItem}
+                  />
+                </Grid>
+              </>
+            )}
           {settings.useSerialNo == "Yes" && (
             <Grid item xs={12} sm={2} className={classes.input}>
               <Controls.Input
@@ -381,15 +344,27 @@ export default function GeneralItemForm(props) {
             </Grid>
           )}
 
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Controls.Input
-              name="qty"
-              label="Quantity"
-              value={item.qty}
-              onChange={handleChange}
-              error={errors.qty}
-            />
-          </Grid>
+          {(input.docCode == "DC" || input.docCode == "SI") &&
+          settings.userBatchNo == "Yes" ? (
+            <Grid item xs={12} sm={3} className={classes.input}>
+              <Grouped
+                values={item}
+                setValues={setItem}
+                batchList={batchList}
+                setBatchlist={setBatchlist}
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={3} className={classes.input}>
+              <Controls.Input
+                name="qty"
+                label="Quantity"
+                value={item.qty}
+                onChange={handleChange}
+                error={errors.qty}
+              />{" "}
+            </Grid>
+          )}
           <Grid item xs={12} sm={3} className={classes.input}>
             <Controls.Input
               name="rate"
@@ -497,11 +472,19 @@ export default function GeneralItemForm(props) {
               type="submit"
               text="Submit"
               onClick={(e) => {
-                handleSubmit(e);
+                if (useBatch == "NO" && item.prodCode) {
+                  console.log("hi");
+                  getStock(e);
+                } else {
+                  console.log("hi else");
+                  handleSubmit(e);
+                }
               }}
             />
           </Grid>
         </Grid>
+
+        <Notification notify={notify} setNotify={setNotify} />
       </Popup>
       <Grid
         container
@@ -537,58 +520,60 @@ export default function GeneralItemForm(props) {
                       {rnd(item.cess)} ({rnd(item.cessP)}%)
                     </TableCell>{" "}
                     <TableCell>{item.itemAmount}</TableCell>
-                    {getDisable(item.vouNo) && (
-                      <TableCell>
-                        <Controls.ActionButton
-                          color="primary"
-                          onClick={() => {
-                            setItem(item);
-                            setPopup(true);
-                          }}
-                        >
-                          <EditOutlinedIcon fontSize="small" />
-                        </Controls.ActionButton>
-                        <Controls.ActionButton
-                          color="secondary"
-                          onClick={() => {
-                            setItemList(
-                              itemList.filter(
-                                (ite) => ite.vouSrNo !== item.vouSrNo
-                              )
-                            );
-                          }}
-                        >
-                          <DeleteIconOutline fontSize="small" />
-                        </Controls.ActionButton>
-                      </TableCell>
-                    )}
+                    <TableCell>
+                      <Controls.ActionButton
+                        color="primary"
+                        onClick={() => {
+                          setItem(item);
+                          setPopup(true);
+                          if (useBatch == "Yes") {
+                            setBatchlist(item.batchList);
+                          }
+                        }}
+                      >
+                        <EditOutlinedIcon fontSize="small" />
+                      </Controls.ActionButton>
+                      <Controls.ActionButton
+                        color="secondary"
+                        onClick={() => {
+                          const arr = itemList.filter(
+                            (ite) => ite.vouSrNo !== item.vouSrNo
+                          );
+                          if (arr.length !== 0) setItemList(arr);
+                          else {
+                            setItemList([vouItems]);
+                          }
+                        }}
+                      >
+                        <DeleteIconOutline fontSize="small" />
+                      </Controls.ActionButton>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </TblContainer>
           </TableContainer>
         </Grid>
-        {getDisable(input.vouNo) && (
-          <Grid
-            item
-            sm={12}
-            xs={12}
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
+        <Grid
+          item
+          sm={12}
+          xs={12}
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Controls.Button
+            text="Add"
+            variant="outlined"
+            startIcon={<AddIcon />}
+            style={{ marginTop: "10px" }}
+            onClick={(e) => {
+              setPopup(true);
+              setBatchlist([{ batchNo: 0, qty: 0, sell: 0 }]);
             }}
-          >
-            <Controls.Button
-              text="Add"
-              variant="outlined"
-              startIcon={<AddIcon />}
-              style={{ marginTop: "10px" }}
-              onClick={(e) => {
-                setPopup(true);
-              }}
-            />
-          </Grid>
-        )}
+          />
+        </Grid>
       </Grid>
     </>
   );

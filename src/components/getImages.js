@@ -1,8 +1,8 @@
 import React, { Component } from "react";
+import { Grid } from "@material-ui/core";
 export class ImageUpload extends Component {
   state = {
-    profileImg:
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    profileImg: this.props.recentImage,
   };
   imageHandler = (e) => {
     const reader = new FileReader();
@@ -17,28 +17,42 @@ export class ImageUpload extends Component {
   render() {
     const { profileImg } = this.state;
     return (
-      <div className="page">
-        <div className="container">
-          <h6 className="heading">Add your company logo</h6>
-          <div className="img-holder">
-            <img
-              height={100}
-              width={100}
-              src={profileImg}
-              alt=""
-              id="img"
-              className="img"
-            />
-          </div>
+      <Grid container>
+        <Grid Item sm={4}>
+          <img
+            style={{
+              minWidth: "125px",
+              minHeight: "125px",
+              borderRadius: "50%",
+              padding: "10px",
+              boxShadow: "0px 0px 20px rgba(#151515, 0.15)",
+              display: "flex",
+            }}
+            src={profileImg}
+            alt=""
+            id="img"
+            className="img"
+          />
+        </Grid>
+        <Grid
+          Item
+          sm={8}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <input
             type="file"
             accept="image/*"
             name="image-upload"
             id="input"
             onChange={this.imageHandler}
+            style={{ width: "200px" }}
           />
-        </div>
-      </div>
+        </Grid>
+      </Grid>
     );
   }
 }

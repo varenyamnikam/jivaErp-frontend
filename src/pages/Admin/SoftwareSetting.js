@@ -16,17 +16,7 @@ import {
 } from "@material-ui/core";
 import useTable from "../../components/useTable";
 import Controls from "../../components/controls/Controls";
-import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
-import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
-import { RestaurantRounded, Search } from "@material-ui/icons";
-import AddIcon from "@material-ui/icons/Add";
-import Usermasterpopup from "../../components/userMasterPopup";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
-import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
-import Notification from "../../components/Notification";
-import ConfirmDialog from "../../components/ConfirmDialog";
-import Popup from "../../components/Popup";
+import { reactLocalStorage } from "reactjs-localstorage";
 import { Grid } from "@material-ui/core";
 import { Form } from "../../components/useForm";
 import BasicSelect from "../Usermaster/basicselect";
@@ -89,7 +79,7 @@ export default function Settings() {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [save, setSave] = useState(false);
+  const [save, setSave] = useState(true);
 
   function handleInputChange(e) {
     const { value, name } = e.target;
@@ -130,7 +120,6 @@ export default function Settings() {
       )
       .then((response) => {
         setLoading(false);
-        setSave(false);
         setValues(values);
         localStorage.setItem("adm_softwareSettings", JSON.stringify(values));
       });
@@ -138,6 +127,8 @@ export default function Settings() {
   useEffect(() => {
     !save && setSave(true);
   }, [values]);
+  let company = JSON.parse(reactLocalStorage.get("company"));
+
   return (
     <>
       <div className="hold-transition sidebar-mini">
@@ -149,18 +140,12 @@ export default function Settings() {
             />
             <section className="content">
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={5}>
-                  <div className="card">
-                    <div className="card-body" style={{ padding: "0px" }}>
-                      <section className="content">
-                        <Grid container>
-                          <Profile />
-                        </Grid>
-                      </section>
-                    </div>
-                  </div>
+                <Grid item xs={12} sm={12}>
+                  <Grid container>
+                    <Profile />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={7}>
+                <Grid item xs={12} sm={12}>
                   <div className="card">
                     <div className="card-body">
                       <section className="content">
@@ -268,17 +253,18 @@ export default function Settings() {
                               error={errors.purcStockUpdateUsing}
                             />
                           </Grid>{" "}
+                          <Grid item sm={3} xs={12}></Grid>
                           <Grid
                             item
-                            sm={6}
+                            sm={3}
                             xs={12}
                             style={{
                               display: "flex",
-                              justifyContent: "flex-end",
+                              justifyContent: "center",
                             }}
                           >
                             <ButtonLoader
-                              style={{ width: "50%" }}
+                              style={{ width: "100%" }}
                               loading={loading}
                               setLoading={setLoading}
                               onClick={handleSubmit}

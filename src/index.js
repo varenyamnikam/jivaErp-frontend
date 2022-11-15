@@ -130,7 +130,7 @@ ReactDOM.render(
       ></PrivateRouteNew>
       <PrivateRouteNew
         exact
-        path="/Master/Products/ProductsMaster"
+        path="/Inventory/ProductMaster"
         page={<ProductMaster />}
       />
       <PrivateRouteNew exact path="/Inventory/D.C" page={<DCMaster />} />

@@ -337,7 +337,7 @@ export default function RegisterForm() {
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <ImageUpload />
+                        <ImageUpload recentImage="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" />
                       </Grid>
                       <Grid
                         item

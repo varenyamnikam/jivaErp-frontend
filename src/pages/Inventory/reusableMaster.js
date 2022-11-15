@@ -97,7 +97,10 @@ export default function ReuseMaster(props) {
 
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}`;
+  const useBatch = JSON.parse(
+    localStorage.getItem("adm_softwareSettings")
+  ).userBatchNo;
+  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
   const {
     initialAc,
     vouItems,
@@ -137,7 +140,7 @@ export default function ReuseMaster(props) {
   const [common, setCommon] = useState(initialCommonValues);
   const [records, setRecords] = useState([initialValues]);
   const [filter, setFilter] = useState(initialFilterValues);
-
+  const [itemList, setItemList] = useState([vouItems]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -168,6 +171,7 @@ export default function ReuseMaster(props) {
     });
     return name;
   }
+  console.log(Config[route]);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}`;
     const token = AuthHandler.getLoginToken();
@@ -250,7 +254,8 @@ export default function ReuseMaster(props) {
       })
       .finally(() => {});
   }
-  console.log(records);
+
+  console.log(records, common);
   function onDelete(item) {
     // roleService.deleteBranch(item);
     let newRecord = [];
@@ -328,7 +333,7 @@ export default function ReuseMaster(props) {
       }
     });
 
-    console.log(input, new Date(input.vouDate));
+    console.log(input, itemList, new Date(input.vouDate), x);
     const token = AuthHandler.getLoginToken();
     // setButtonPopup(false);
     if (x) {
@@ -340,10 +345,6 @@ export default function ReuseMaster(props) {
             obj: {
               input: input,
               itemList: itemList,
-              date: new Date(
-                input.vouDate.getTime() +
-                  Math.abs(input.vouDate.getTimezoneOffset() * 60000)
-              ),
             },
           },
           {
@@ -374,7 +375,12 @@ export default function ReuseMaster(props) {
         .patch(
           // Config.addUser,
           Config[route] + query,
-          { input: input },
+          {
+            obj: {
+              input: input,
+              itemList: itemList,
+            },
+          },
           {
             headers: {
               authorization: "Bearer" + token,
@@ -386,6 +392,14 @@ export default function ReuseMaster(props) {
             item.vouNo == input.vouNo ? response.data.values : item
           );
           setRecords(updatedRecords);
+          const newVouItems = common.voucherItems.filter(
+            (item) => item.vouNo !== input.vouNo
+          );
+          setCommon({
+            ...common,
+            voucherItems: [...newVouItems, ...itemList],
+          });
+
           setNotify({
             isOpen: true,
             message: "Voucher updated  successfully",
@@ -411,12 +425,7 @@ export default function ReuseMaster(props) {
       .then((response) => {
         console.log(response.data);
         setValues(response.data.values);
-        if (signal == "v") {
-          setButtonPopup(true);
-          // setLoading("X X X X");
-        } else {
-          setPrint(true);
-        }
+
         newValue = response.data.values;
       })
       .catch((err) => {
@@ -426,11 +435,29 @@ export default function ReuseMaster(props) {
           message: "unable to fetch entry",
           type: "warn",
         });
+      })
+      .finally(() => {
+        getProducts(code);
+        if (signal == "v") {
+          setButtonPopup(true);
+          // setLoading("X X X X");
+        } else {
+          setPrint(true);
+        }
       });
     return newValue;
   }
   let componentRef = React.useRef();
-
+  function getProducts(voucherNumber) {
+    let arr = [];
+    arr = common.voucherItems.filter((item) => item.vouNo == voucherNumber);
+    console.log(arr, common.voucherItems, itemList, voucherNumber);
+    if (arr.length !== 0) {
+      setItemList(arr);
+    } else {
+      setItemList([vouItems]);
+    }
+  }
   return (
     <>
       <div className="hold-transition sidebar-mini">
@@ -666,6 +693,10 @@ export default function ReuseMaster(props) {
                       setOpenPopup={setButtonPopup}
                       handleSubmit={handleSubmit}
                       vouItems={vouItems}
+                      setCommon={setCommon}
+                      common={common}
+                      itemList={itemList}
+                      setItemList={setItemList}
                     />
                   </Popup>
 

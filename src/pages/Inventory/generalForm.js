@@ -47,14 +47,16 @@ export default function GeneralForm(props) {
     payTerms,
     products,
     voucherItems,
-    setVoucherItems,
+    setCommon,
     openPopup,
     setOpenPopup,
     handleSubmit,
     vouItems,
+    common,
+    itemList,
+    setItemList,
   } = props;
   const [input, setInput] = useState(values);
-  const [itemList, setItemList] = useState([vouItems]);
 
   adress.filter((item) => item.acCode == input.partyCode);
   console.log(adress);
@@ -73,23 +75,23 @@ export default function GeneralForm(props) {
     .map((item) => {
       return item.acName;
     });
-
-  if (input.vouNo.length > 8) {
-    let arr = [];
-    arr = voucherItems.filter((item) => item.vouNo == input.vouNo);
-    console.log(arr, voucherItems, itemList);
-    if (
-      arr[0] &&
-      arr[arr.length - 1].vouNo !== itemList[itemList.length - 1].vouNo
-    )
-      setItemList(arr);
-  }
+  console.log(itemList);
+  // if (input.vouNo.length > 8) {
+  //   let arr = [];
+  //   arr = voucherItems.filter((item) => item.vouNo == input.vouNo);
+  //   console.log(arr, voucherItems, itemList);
+  //   if (arr.length !== 0) {
+  //     console.log(arr);
+  //     if (arr[arr.length - 1].vouNo !== itemList[itemList.length - 1].vouNo)
+  //       setItemList(arr);
+  //   }
+  // }
   const agentOptions = accounts
     .filter((item) => item.preFix == "E")
     .map((item) => {
       return item.acName;
     });
-
+  console.log(input);
   const classes = useStyles();
   const ad1 = adress
     .filter(
@@ -143,7 +145,6 @@ export default function GeneralForm(props) {
   }
   let y = true;
   records.map((item) => {
-    console.log(item.vouNo, input.vouNo);
     if (item.vouNo == input.vouNo) {
       console.log(item);
       y = false;
@@ -367,6 +368,8 @@ export default function GeneralForm(props) {
         prodOptions={prodOptions}
         vouItems={vouItems}
         input={input}
+        setCommon={setCommon}
+        common={common}
       />
       <Divider variant="middle" color="blue" sx={{ borderBottomWidth: 2 }} />
       <Grid container spacing={2} style={{ marginTop: "10px" }}>

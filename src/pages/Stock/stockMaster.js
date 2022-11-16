@@ -83,16 +83,23 @@ function getD() {
   );
   return oneMonthAgo;
 }
-
-export default function ReuseMaster(props) {
-  const { docCode, title, initialValues, route } = props;
+const initialValues = {
+  userCompanyCode: "",
+  prodCode: "",
+  batchNo: "",
+  inwardQty: "",
+  outwardQty: "",
+  rate: "",
+  refType: "",
+  refNo: "",
+  entryBy: "",
+  entryOn: "",
+};
+export default function ReuseMaster() {
   const headCells = [
-    { id: `${title} NO`, label: `${title} NO`, feild: "vouNo" },
-    { id: "MANUAL NO", label: "MANUAL NO", feild: "manualNo" },
+    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "refNo" },
+    { id: "Product", label: "Product", feild: "prodCode" },
     { id: "DATE", label: "DATE", feild: "getDate" },
-    { id: "PARTY", label: "PARTY", feild: "getName" },
-    { id: "AMOUNT", label: "AMOUNT", feild: "netAmount" },
-    { id: "Edit", label: "Edit" },
   ];
 
   const userCode = localStorage.getItem("userCode");
@@ -137,10 +144,8 @@ export default function ReuseMaster(props) {
   const [selected, setSelected] = React.useState([]);
   const [loading1, setLoading1] = useState(true);
   const [refresh, setRefresh] = useState(false);
-  const [common, setCommon] = useState(initialCommonValues);
   const [records, setRecords] = useState([initialValues]);
   const [filter, setFilter] = useState(initialFilterValues);
-  const [itemList, setItemList] = useState([vouItems]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -148,7 +153,7 @@ export default function ReuseMaster(props) {
   });
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
-    title: "",
+    Stock: "",
     subTitle: "",
   });
   // const [count, setCount] = useState(records[records.length - 1].branchCode);
@@ -162,88 +167,22 @@ export default function ReuseMaster(props) {
   } = useTable(records, headcells, filterFn);
   console.log(values);
   console.log("filter=>", filter);
-  function getName(code) {
-    let name = "";
-    common.accounts.map((item) => {
-      if (code == item.acCode) {
-        name = item.acName;
-      }
-    });
-    return name;
-  }
-  console.log(Config[route]);
+  console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=0&useBatch="idk"&vouN=${values.vouNo}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
-      .get(Config[route] + query, {
+      .get(Config.batch + query, {
         headers: {
           authorization: "Bearer" + token,
         },
-        data: initialValues,
       })
       .then((response) => {
-        console.log(response.data);
-        if (refresh) setRefresh(false);
-
-        const gr = response.data.inv_voucher.map((item) => {
-          return {
-            ...item,
-            getDate: getDate(item.vouDate),
-            getName: getName(item.partyCode),
-          };
-        });
-
-        function getAccounts(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialAc];
-          }
+        if (response.length !== 0) setRecords(gr);
+        else {
+          setRecords([{ ...initialValues, vouNo: "X X X" }]);
         }
-        function getVouItems(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [vouItems];
-          }
-        }
-        function getAdress(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialAdress];
-          }
-        }
-        function getPayterms(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialPayValues];
-          }
-        }
-        function getProd(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialProdValues];
-          }
-        }
-        setCommon({
-          accounts: getAccounts(response.data.mst_accounts),
-          voucherItems: getVouItems(response.data.inv_voucherItems),
-          adress: getAdress(response.data.mst_acadress),
-          payTerms: getPayterms(response.data.mst_paymentTerm),
-          products: getProd(response.data.mst_prodMaster),
-        });
-
-        if (gr.length !== 0) {
-          setRecords(gr);
-        } else {
-          setRecords([{ ...initialValues, vouNo: "" }]);
-        }
-        if (loading1) setLoading1(false);
       })
       .catch((error) => {
         setNotify({
@@ -274,7 +213,7 @@ export default function ReuseMaster(props) {
     });
     const token = AuthHandler.getLoginToken();
     axios
-      .delete(Config[route] + query, {
+      .delete(Config.batch + query, {
         headers: {
           authorization: "Bearer" + token,
         },
@@ -310,11 +249,7 @@ export default function ReuseMaster(props) {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (
-            item.vouNo.toLowerCase().includes(allfields.toLowerCase()) ||
-            item.manualNo.toLowerCase().includes(allfields.toLowerCase()) ||
-            getDate(item.vouDate).includes(allfields.toLowerCase())
-          )
+          if (item.vouNo.toLowerCase().includes(allfields.toLowerCase()))
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -336,127 +271,116 @@ export default function ReuseMaster(props) {
     console.log(input, itemList, new Date(input.vouDate), x);
     const token = AuthHandler.getLoginToken();
     // setButtonPopup(false);
-    if (x) {
-      axios
-        .put(
-          // Config.addUser,
-          Config[route] + query,
-          {
-            obj: {
-              input: input,
-              itemList: itemList,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data);
-          setRecords([...records, response.data.values]);
-          // setVoucherItems([...voucherItems, ...response.data.items]);
-          setCommon({
-            ...common,
-            voucherItems: [...common.voucherItems, ...response.data.items],
-          });
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err.err);
-        });
-    } else {
-      axios
-        .patch(
-          // Config.addUser,
-          Config[route] + query,
-          {
-            obj: {
-              input: input,
-              itemList: itemList,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          const updatedRecords = records.map((item) =>
-            item.vouNo == input.vouNo ? response.data.values : item
-          );
-          setRecords(updatedRecords);
-          const newVouItems = common.voucherItems.filter(
-            (item) => item.vouNo !== input.vouNo
-          );
-          setCommon({
-            ...common,
-            voucherItems: [...newVouItems, ...itemList],
-          });
+    // if (x) {
+    //   axios
+    //     .put(
+    //       // Config.addUser,
+    //       Config.batch + query,
+    //       {
+    //         obj: {
+    //           input: input,
+    //           itemList: itemList,
+    //         },
+    //       },
+    //       {
+    //         headers: {
+    //           authorization: "Bearer" + token,
+    //         },
+    //       }
+    //     )
+    //     .then((response) => {
+    //       console.log(response.data);
+    //       setRecords([...records, response.data.values]);
+    //       // setVoucherItems([...voucherItems, ...response.data.items]);
+    //       setCommon({
+    //         ...common,
+    //         voucherItems: [...common.voucherItems, ...response.data.items],
+    //       });
+    //       setNotify({
+    //         isOpen: true,
+    //         message: "Voucher created  successfully",
+    //         type: "success",
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       console.log(err.err);
+    //     });
+    // } else {
+    //   axios
+    //     .patch(
+    //       // Config.addUser,
+    //       Config.batch + query,
+    //       {
+    //         obj: {
+    //           input: input,
+    //           itemList: itemList,
+    //         },
+    //       },
+    //       {
+    //         headers: {
+    //           authorization: "Bearer" + token,
+    //         },
+    //       }
+    //     )
+    //     .then((response) => {
+    //       const updatedRecords = records.map((item) =>
+    //         item.vouNo == input.vouNo ? response.data.values : item
+    //       );
+    //       setRecords(updatedRecords);
+    //       const newVouItems = common.voucherItems.filter(
+    //         (item) => item.vouNo !== input.vouNo
+    //       );
+    //       setCommon({
+    //         ...common,
+    //         voucherItems: [...newVouItems, ...itemList],
+    //       });
 
-          setNotify({
-            isOpen: true,
-            message: "Voucher updated  successfully",
-            type: "success",
-          });
-        });
-    }
+    //       setNotify({
+    //         isOpen: true,
+    //         message: "Voucher updated  successfully",
+    //         type: "success",
+    //       });
+    //     });
+    // }
   };
   function getEntry(code, signal, type) {
     const token = AuthHandler.getLoginToken();
     let newValue = values;
-    axios
-      .post(
-        // Config.addUser,
-        Config[route] + query,
-        { code: code, type: "entry" },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setValues(response.data.values);
+    // axios
+    //   .post(
+    //     // Config.addUser,
+    //     Config.batch + query,
+    //     { code: code, type: "entry" },
+    //     {
+    //       headers: {
+    //         authorization: "Bearer" + token,
+    //       },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setValues(response.data.values);
 
-        newValue = response.data.values;
-      })
-      .catch((err) => {
-        console.log(err);
-        setNotify({
-          isOpen: true,
-          message: "unable to fetch entry",
-          type: "warn",
-        });
-      })
-      .finally(() => {
-        getProd(code);
-        if (signal == "v") {
-          setButtonPopup(true);
-          // setLoading("X X X X");
-        } else {
-          setPrint(true);
-        }
-      });
+    //     newValue = response.data.values;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     setNotify({
+    //       isOpen: true,
+    //       message: "unable to fetch entry",
+    //       type: "warn",
+    //     });
+    //   })
+    //   .finally(() => {
+    //     getProd(code);
+    //     if (signal == "v") {
+    //       setButtonPopup(true);
+    //       // setLoading("X X X X");
+    //     } else {
+    //       setPrint(true);
+    //     }
+    //   });
     return newValue;
-  }
-  let componentRef = React.useRef();
-  function getProd(voucherNumber) {
-    let arr = [];
-    arr = common.voucherItems.filter((item) => item.vouNo == voucherNumber);
-    console.log(arr, common.voucherItems, itemList, voucherNumber);
-    if (arr.length !== 0) {
-      setItemList(arr);
-    } else {
-      setItemList([vouItems]);
-    }
   }
   return (
     <>
@@ -464,7 +388,7 @@ export default function ReuseMaster(props) {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title={title}
+              Stock={Stock}
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -583,7 +507,7 @@ export default function ReuseMaster(props) {
                             onClick={(e) => {
                               setButtonPopup(true);
                               setValues({ ...initialValues, vouNo: "" });
-                              setItemList([vouItems])
+                              setItemList([vouItems]);
                             }}
                           />
                         </Grid>
@@ -641,21 +565,6 @@ export default function ReuseMaster(props) {
                                         >
                                           <CloseIcon fontSize="small" />
                                         </Controls.ActionButton>
-                                        <Controls.ActionButton>
-                                          <PrintOne
-                                            key={i}
-                                            values={values}
-                                            item={item}
-                                            voucherItems={common.voucherItems}
-                                            adress={common.adress}
-                                            accounts={common.accounts}
-                                            products={common.products}
-                                            payTerms={common.payTerms}
-                                            getEntry={getEntry}
-                                            setopen={setPrint}
-                                            printPopup={print}
-                                          />
-                                        </Controls.ActionButton>
                                       </>
                                     ) : (
                                       item[headcell.feild]
@@ -685,19 +594,7 @@ export default function ReuseMaster(props) {
                       initialFilterValues={initialFilterValues}
                       setButtonPopup={setButtonPopup}
                       setNotify={setNotify}
-                      accounts={common.accounts}
-                      adress={common.adress}
-                      payTerms={common.payTerms}
-                      products={common.products}
-                      voucherItems={common.voucherItems}
                       openPopup={buttonPopup}
-                      setOpenPopup={setButtonPopup}
-                      handleSubmit={handleSubmit}
-                      vouItems={vouItems}
-                      setCommon={setCommon}
-                      common={common}
-                      itemList={itemList}
-                      setItemList={setItemList}
                     />
                   </Popup>
 
@@ -705,21 +602,7 @@ export default function ReuseMaster(props) {
                     title="Filter"
                     openPopup={filterPopup}
                     setOpenPopup={setFilterPopup}
-                  >
-                    <FilterForm
-                      filterIcon={filterIcon}
-                      setFilterPopup={setFilterPopup}
-                      setFilterIcon={setFilterIcon}
-                      setFilter={setFilter}
-                      filter={filter}
-                      accounts={common.accounts}
-                      products={common.products}
-                      setFilterFn={setFilterFn}
-                      voucherItems={common.voucherItems}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
-                    />
-                  </Popup>
+                  ></Popup>
 
                   <Notification notify={notify} setNotify={setNotify} />
                   <ConfirmDialog

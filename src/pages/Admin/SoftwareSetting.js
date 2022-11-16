@@ -154,7 +154,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="userBatchNo"
-                              label="userBatchNo"
+                              label="use Batch No?"
                               value={values.userBatchNo}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -165,7 +165,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="useSerialNo"
-                              label="useSerialNo"
+                              label="Use Serial No?"
                               value={values.useSerialNo}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -176,7 +176,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="itemDescription"
-                              label="itemDescription"
+                              label="Use Item Description?"
                               value={values.itemDescription}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -202,7 +202,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="useintraStateSale"
-                              label="useintraStateSale"
+                              label="Use Intra State Sale?"
                               value={values.useintraStateSale}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -213,7 +213,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="usePesticideSale"
-                              label="usePesticideSale"
+                              label="Use Pesticide Sale?"
                               value={values.usePesticideSale}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -224,7 +224,7 @@ export default function Settings() {
                             <Controls.RadioGroup
                               size="small"
                               name="useCessitem"
-                              label="useCessitem"
+                              label="Use Cess Item"
                               value={values.useCessitem}
                               onChange={handleInputChange}
                               items={statusItems}
@@ -235,7 +235,7 @@ export default function Settings() {
                             <UnusedAutosuggest
                               style={{ width: "100%" }}
                               name="saleStockUpdateUsing"
-                              label="saleStockUpdateUsing"
+                              label="Sale Stock Update Using-"
                               value={values}
                               setValue={setValues}
                               options={["DC", "Invoice"]}
@@ -246,7 +246,7 @@ export default function Settings() {
                             <UnusedAutosuggest
                               style={{ width: "100%" }}
                               name="purcStockUpdateUsing"
-                              label="purcStockUpdateUsing"
+                              label="Purchase Stock Update Using-"
                               value={values}
                               setValue={setValues}
                               options={["GRN", "Invoice"]}

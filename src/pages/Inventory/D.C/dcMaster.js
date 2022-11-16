@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AuthHandler from "../../../Utils/AuthHandler";
 import ReuseMaster from "../reusableMaster";
 export default function QT() {
+  const company = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   const user = AuthHandler.getUser();
   const initialValues = {
     vouNo: "X X X X",
@@ -46,7 +47,7 @@ export default function QT() {
       title="D.C"
       docCode="DC"
       initialValues={initialValues}
-      route="dc"
+      route={company.saleStockUpdateUsing == "SI" ? "ledger" : "dc"}
     />
   );
 }

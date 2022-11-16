@@ -3,9 +3,7 @@ import PageHeader from "../../components/PageHeader";
 import AuthHandler from "../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../Utils/Config";
-import * as roleService from "../../services/roleService";
 import {
-  Paper,
   makeStyles,
   TableBody,
   TableRow,
@@ -16,37 +14,23 @@ import {
 } from "@material-ui/core";
 import useTable from "../../components/useTable";
 import Controls from "../../components/controls/Controls";
-import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
 import { RestaurantRounded, Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
-import Usermasterpopup from "../../components/userMasterPopup";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
 import Notification from "../../components/Notification";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import Popup from "../../components/Popup";
 import { Grid } from "@material-ui/core";
-import StaticDatePickerLandscape from "../../components/calendarLandscape";
-import ControlledAccordions from "../../components/accordions";
-import ViewsDatePicker from "../../components/yearSelector";
-import { useForm, Form } from "../../components/useForm";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import IconButton from "@material-ui/core/IconButton";
-import { reactLocalStorage } from "reactjs-localstorage";
-import Table from "@mui/material/Table";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
-import DcFilterForm from "./D.C/dcFilterForm";
-import DcForm from "./generalForm";
-import DcValues from "./D.C/DcValues";
+import StockForm from "./stockForm";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
-import PrintOne from "../../components/newPrintOne";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
-import FilterForm from "./generalFilterForm";
 import Filter from "../../components/filterButton";
 
 const useStyles = makeStyles((theme) => ({
@@ -91,15 +75,32 @@ const initialValues = {
   outwardQty: "",
   rate: "",
   refType: "",
-  refNo: "",
+  refNo: "X X X X",
   entryBy: "",
   entryOn: "",
 };
-export default function ReuseMaster() {
+const initialProducts = {
+  prodCode: "",
+  barcode: "",
+  itemType: "",
+  prodCompany: "",
+  prodName: "",
+  prodDesc: "",
+  UOM: "",
+  MRP: "",
+  HSNNo: "",
+  reorderLevel: "",
+  maintainStock: "",
+  useBatchNo: "",
+  prodStatus: "",
+  userCompanyCode: "",
+};
+export default function StockMaster() {
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "refNo" },
     { id: "Product", label: "Product", feild: "prodCode" },
     { id: "DATE", label: "DATE", feild: "getDate" },
+    { id: "Edit", label: "Edit", feild: "getDate" },
   ];
 
   const userCode = localStorage.getItem("userCode");
@@ -108,18 +109,9 @@ export default function ReuseMaster() {
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
   let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
-  const {
-    initialAc,
-    vouItems,
-    initialAdress,
-    initialPayValues,
-    initialProdValues,
-    initialCommonValues,
-  } = DcValues();
-
   const initialFilterValues = {
     ...initialValues,
-    vouNo: "",
+    refNo: "",
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
@@ -127,7 +119,7 @@ export default function ReuseMaster() {
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.vouNo !== "") return item;
+        if (item.refNo !== "") return item;
       });
       console.log(newRecords);
       return newRecords;
@@ -146,6 +138,7 @@ export default function ReuseMaster() {
   const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
   const [filter, setFilter] = useState(initialFilterValues);
+  const [products, setProducts] = useState([initialProducts]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -168,8 +161,8 @@ export default function ReuseMaster() {
   console.log(values);
   console.log("filter=>", filter);
   console.log(Config.batch);
-  if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=0&useBatch="idk"&vouN=${values.vouNo}`;
+  if ((records[0] && records[0].refNo == "X X X X") || refresh) {
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=0&useBatch=idk&vouN=${values.refNo}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
@@ -179,9 +172,18 @@ export default function ReuseMaster() {
         },
       })
       .then((response) => {
-        if (response.length !== 0) setRecords(gr);
-        else {
-          setRecords([{ ...initialValues, vouNo: "X X X" }]);
+        if (response.length !== 0) {
+          let arr = response.data.raw.map((item) => {
+            return { ...item };
+          });
+          console.log(arr);
+          setRecords(arr);
+        } else {
+          setRecords([{ ...initialValues, refNo: "X X X" }]);
+        }
+
+        if (response.data.prod.length !== 0) {
+          setProducts(response.data.prod);
         }
       })
       .catch((error) => {
@@ -194,12 +196,11 @@ export default function ReuseMaster() {
       .finally(() => {});
   }
 
-  console.log(records, common);
   function onDelete(item) {
     // roleService.deleteBranch(item);
     let newRecord = [];
     newRecord = records.filter((record) => {
-      return record.vouNo !== item.vouNo;
+      return record.refNo !== item.refNo;
     });
     if (newRecord.length == 0) {
       setRecords([initialFilterValues]);
@@ -224,7 +225,7 @@ export default function ReuseMaster() {
       });
   }
 
-  // console.log(count);
+  console.log(products);
   function handleFilter(e) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
@@ -249,7 +250,7 @@ export default function ReuseMaster() {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (item.vouNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -263,7 +264,7 @@ export default function ReuseMaster() {
   const handleSubmit = (input, itemList) => {
     let x = true;
     records.map((item) => {
-      if (item.vouNo == input.vouNo) {
+      if (item.refNo == input.refNo) {
         x = false;
       }
     });
@@ -324,11 +325,11 @@ export default function ReuseMaster() {
     //     )
     //     .then((response) => {
     //       const updatedRecords = records.map((item) =>
-    //         item.vouNo == input.vouNo ? response.data.values : item
+    //         item.refNo == input.refNo ? response.data.values : item
     //       );
     //       setRecords(updatedRecords);
     //       const newVouItems = common.voucherItems.filter(
-    //         (item) => item.vouNo !== input.vouNo
+    //         (item) => item.refNo !== input.refNo
     //       );
     //       setCommon({
     //         ...common,
@@ -388,7 +389,7 @@ export default function ReuseMaster() {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              Stock={Stock}
+              Stock="StockMaster"
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -506,8 +507,7 @@ export default function ReuseMaster() {
                             startIcon={<AddIcon />}
                             onClick={(e) => {
                               setButtonPopup(true);
-                              setValues({ ...initialValues, vouNo: "" });
-                              setItemList([vouItems]);
+                              setValues({ ...initialValues, refNo: "" });
                             }}
                           />
                         </Grid>
@@ -516,7 +516,7 @@ export default function ReuseMaster() {
                     <TableContainer>
                       <TblContainer>
                         <TblHead />
-                        {loading1 ? (
+                        {records[0] == "X X X X" ? (
                           <MuiSkeleton />
                         ) : (
                           <TableBody>
@@ -537,8 +537,8 @@ export default function ReuseMaster() {
                                           color="primary"
                                           onClick={(e) => {
                                             e.preventDefault();
-                                            getEntry(item.vouNo, "v");
-                                            // setLoading(item.vouNo);
+                                            setValues(item);
+                                            setButtonPopup(true);
                                           }}
                                         >
                                           <EditOutlinedIcon fontSize="small" />
@@ -585,7 +585,7 @@ export default function ReuseMaster() {
                     setOpenPopup={setButtonPopup}
                     size="md"
                   >
-                    <DcForm
+                    <StockForm
                       records={records}
                       setRecords={setRecords}
                       values={values}
@@ -595,6 +595,7 @@ export default function ReuseMaster() {
                       setButtonPopup={setButtonPopup}
                       setNotify={setNotify}
                       openPopup={buttonPopup}
+                      products={products}
                     />
                   </Popup>
 

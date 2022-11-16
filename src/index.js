@@ -42,7 +42,7 @@ import PVMaster from "./pages/Inventory/P.V/P.V";
 import PRMaster from "./pages/Inventory/P.R/P.R";
 import CNMaster from "./pages/Inventory/C.N/C.N";
 import DNMaster from "./pages/Inventory/D.N/D.N";
-
+import StockMaster from "./pages/Stock/stockMaster";
 ReactDOM.render(
   <Router>
     <Switch>
@@ -149,6 +149,11 @@ ReactDOM.render(
         exact
         path="/Inventory/PaymentTerm"
         page={<PayTermMaster />}
+      />
+      <PrivateRouteNew
+        exact
+        path="/Inventory/StockMaster"
+        page={<StockMaster />}
       />
     </Switch>
   </Router>,

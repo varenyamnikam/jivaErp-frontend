@@ -34,7 +34,7 @@ const headcells = [
   { id: "Discount", label: "Discount" },
   { id: "C-GST", label: "C-GST" },
   { id: "S-GST", label: "S-GST" },
-  { id: "I-GST", label: "igst" },
+  { id: "I-GST", label: "I-GST" },
   { id: "CESS", label: "CESS" },
   { id: "Item Total", label: "Item Total" },
   { id: "Delete", label: "Delete" },

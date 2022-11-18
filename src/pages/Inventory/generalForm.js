@@ -332,7 +332,7 @@ export default function GeneralForm(props) {
             code1="paymentTermsCode"
             name2="paymentTerms"
             code2="paymentTermsCode"
-            label="payment"
+            label="Payment Terms"
             value={input}
             setValue={setInput}
             options1={payOptions}
@@ -343,7 +343,7 @@ export default function GeneralForm(props) {
         <Grid item xs={12} sm={3} className={classes.input}>
           <Controls.Input
             name="transportation"
-            label="transportation"
+            label="Transportation"
             value={input.transportation}
             onChange={handleChange}
             error={errors.transportation}
@@ -396,7 +396,7 @@ export default function GeneralForm(props) {
             name1="billDis"
             name2="billDisPer"
             name3="itemTotal"
-            label="billDis"
+            label="Discount"
             value={input}
             setValue={setInput}
             onChange={handleChange}

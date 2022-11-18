@@ -46,7 +46,7 @@ export default function QT() {
       title="P.R"
       docCode="PR"
       initialValues={initialValues}
-      route="dc"
+      route="both"
     />
   );
 }

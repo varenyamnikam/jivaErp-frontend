@@ -32,10 +32,10 @@ const headcells = [
   { id: "Rate", label: "Rate" },
   { id: "AMOUNT", label: "AMOUNT" },
   { id: "Discount", label: "Discount" },
-  { id: "cgst", label: "cgst" },
-  { id: "sgst", label: "sgst" },
-  { id: "igst", label: "igst" },
-  { id: "cess", label: "cess" },
+  { id: "C-GST", label: "C-GST" },
+  { id: "S-GST", label: "S-GST" },
+  { id: "I-GST", label: "igst" },
+  { id: "CESS", label: "CESS" },
   { id: "Item Total", label: "Item Total" },
   { id: "Delete", label: "Delete" },
 ];
@@ -379,7 +379,7 @@ export default function GeneralItemForm(props) {
               name1="discount"
               name2="disPer"
               name3="qr"
-              label="discount"
+              label="Discount"
               value={item}
               setValue={setItem}
               onChange={handleChange}
@@ -392,7 +392,7 @@ export default function GeneralItemForm(props) {
               name2="cgstP"
               disabled={true}
               name3="dqr"
-              label="cgst"
+              label="C-GST"
               value={item}
               setValue={setItem}
               onChange={handleChange}
@@ -405,7 +405,7 @@ export default function GeneralItemForm(props) {
               name2="sgstP"
               disabled={true}
               name3="dqr"
-              label="sgst"
+              label="S-GST"
               value={item}
               setValue={setItem}
               onChange={handleChange}
@@ -418,7 +418,7 @@ export default function GeneralItemForm(props) {
               name2="igstP"
               disabled={true}
               name3="dqr"
-              label="igst"
+              label="I-GST"
               value={item}
               setValue={setItem}
               onChange={handleChange}
@@ -433,7 +433,7 @@ export default function GeneralItemForm(props) {
                 name2="cessP"
                 name3="dqr"
                 disabled={true}
-                label="cess"
+                label="CESS"
                 value={item}
                 setValue={setItem}
                 onChange={handleChange}
@@ -479,6 +479,7 @@ export default function GeneralItemForm(props) {
                   console.log("hi else");
                   handleSubmit(e);
                 }
+                setPopup(false);
               }}
             />
           </Grid>

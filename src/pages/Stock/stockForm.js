@@ -34,7 +34,6 @@ export default function GeneralForm(props) {
     adress,
     products,
     handleSubmit,
-    itemList,
   } = props;
   const [input, setInput] = useState(values);
 
@@ -66,6 +65,17 @@ export default function GeneralForm(props) {
       return input.refNo;
     }
   }
+  const user = AuthHandler.getUser();
+
+  if (
+    !input.refNo.includes(
+      user.defaultBranchCode + input.refType + user.defaultYearCode
+    )
+  )
+    setInput({
+      ...input,
+      refNo: user.defaultBranchCode + input.refType + user.defaultYearCode,
+    });
 
   return (
     <>
@@ -82,7 +92,7 @@ export default function GeneralForm(props) {
         <Grid item xs={12} sm={3} className={classes.input}>
           <UnusedAutosuggest
             style={{ width: "100%" }}
-            name="docCode"
+            name="refType"
             label="Doc Code"
             value={input}
             setValue={setInput}
@@ -111,7 +121,7 @@ export default function GeneralForm(props) {
             onChange={handleChange}
           />
         </Grid>
-        {input.docCode !== "OP" && (
+        {input.refType !== "OP" && (
           <Grid item xs={12} sm={3} className={classes.input}>
             <Controls.Input
               name="outwardQty"
@@ -134,7 +144,7 @@ export default function GeneralForm(props) {
               type="submit"
               text="Submit"
               onClick={(e) => {
-                handleSubmit(input, itemList);
+                handleSubmit(input);
               }}
             />
           </div>

@@ -172,14 +172,21 @@ export default function StockMaster() {
         },
       })
       .then((response) => {
-        if (response.length !== 0) {
+        if (response.data.raw.length !== 0) {
           let arr = response.data.raw.map((item) => {
-            return { ...item };
+            return { ...item, prodName: "", getDate: getDate(item.entryOn) };
           });
           console.log(arr);
           setRecords(arr);
         } else {
-          setRecords([{ ...initialValues, refNo: "X X X" }]);
+          setRecords([
+            {
+              ...initialValues,
+              refNo: "X X X",
+              prodName: "",
+              getDate: null,
+            },
+          ]);
         }
 
         if (response.data.prod.length !== 0) {
@@ -261,7 +268,7 @@ export default function StockMaster() {
     });
   }
 
-  const handleSubmit = (input, itemList) => {
+  const handleSubmit = (input) => {
     let x = true;
     records.map((item) => {
       if (item.refNo == input.refNo) {
@@ -269,80 +276,70 @@ export default function StockMaster() {
       }
     });
 
-    console.log(input, itemList, new Date(input.vouDate), x);
     const token = AuthHandler.getLoginToken();
-    // setButtonPopup(false);
-    // if (x) {
-    //   axios
-    //     .put(
-    //       // Config.addUser,
-    //       Config.batch + query,
-    //       {
-    //         obj: {
-    //           input: input,
-    //           itemList: itemList,
-    //         },
-    //       },
-    //       {
-    //         headers: {
-    //           authorization: "Bearer" + token,
-    //         },
-    //       }
-    //     )
-    //     .then((response) => {
-    //       console.log(response.data);
-    //       setRecords([...records, response.data.values]);
-    //       // setVoucherItems([...voucherItems, ...response.data.items]);
-    //       setCommon({
-    //         ...common,
-    //         voucherItems: [...common.voucherItems, ...response.data.items],
-    //       });
-    //       setNotify({
-    //         isOpen: true,
-    //         message: "Voucher created  successfully",
-    //         type: "success",
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       console.log(err.err);
-    //     });
-    // } else {
-    //   axios
-    //     .patch(
-    //       // Config.addUser,
-    //       Config.batch + query,
-    //       {
-    //         obj: {
-    //           input: input,
-    //           itemList: itemList,
-    //         },
-    //       },
-    //       {
-    //         headers: {
-    //           authorization: "Bearer" + token,
-    //         },
-    //       }
-    //     )
-    //     .then((response) => {
-    //       const updatedRecords = records.map((item) =>
-    //         item.refNo == input.refNo ? response.data.values : item
-    //       );
-    //       setRecords(updatedRecords);
-    //       const newVouItems = common.voucherItems.filter(
-    //         (item) => item.refNo !== input.refNo
-    //       );
-    //       setCommon({
-    //         ...common,
-    //         voucherItems: [...newVouItems, ...itemList],
-    //       });
+    setButtonPopup(false);
+    if (x) {
+      axios
+        .put(
+          Config.batch + query,
+          {
+            obj: {
+              input: input,
+            },
+          },
+          {
+            headers: {
+              authorization: "Bearer" + token,
+            },
+          }
+        )
+        .then((response) => {
+          const res = response.data.values;
+          console.log(response.data);
+          setRecords([
+            ...records,
+            {
+              ...res,
+              getDate: getDate(res.entryOn),
+            },
+          ]);
+          setNotify({
+            isOpen: true,
+            message: "Voucher created  successfully",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          console.log(err.err);
+        });
+    } else {
+      axios
+        .patch(
+          Config.batch + query,
+          {
+            obj: {
+              input: input,
+            },
+          },
+          {
+            headers: {
+              authorization: "Bearer" + token,
+            },
+          }
+        )
+        .then((response) => {
+          const updatedRecords = records.map((item) =>
+            item.refNo == input.refNo ? response.data.values : item
+          );
+          setRecords(updatedRecords);
 
-    //       setNotify({
-    //         isOpen: true,
-    //         message: "Voucher updated  successfully",
-    //         type: "success",
-    //       });
-    //     });
-    // }
+          setNotify({
+            isOpen: true,
+            message: "Voucher updated  successfully",
+            type: "success",
+          });
+        });
+    }
   };
   function getEntry(code, signal, type) {
     const token = AuthHandler.getLoginToken();
@@ -596,6 +593,7 @@ export default function StockMaster() {
                       setNotify={setNotify}
                       openPopup={buttonPopup}
                       products={products}
+                      handleSubmit={handleSubmit}
                     />
                   </Popup>
 

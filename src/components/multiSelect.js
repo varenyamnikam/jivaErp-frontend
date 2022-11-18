@@ -55,7 +55,7 @@ export default function MultipleSelectPlaceholder({
     const {
       target: { value },
     } = event;
-    console.log(typeof value === "string" ? value.split(",") : value);
+    console.log(event.target.value);
     setSelected(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value

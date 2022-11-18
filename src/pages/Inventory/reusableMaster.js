@@ -171,6 +171,15 @@ export default function ReuseMaster(props) {
     });
     return name;
   }
+  if (records[0].vouNo == "X X X X") {
+    let temp = "MANUAL NO";
+    let arr = headCells.filter((item) => !temp.includes(item.label));
+    console.log(temp, arr);
+    if (arr.length !== headcells.length) {
+      setSelected(["MANUAL NO"]);
+      setheadcells(arr);
+    }
+  }
   console.log(Config[route]);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}`;
@@ -355,7 +364,15 @@ export default function ReuseMaster(props) {
         )
         .then((response) => {
           console.log(response.data);
-          setRecords([...records, response.data.values]);
+          const res = response.data.values;
+          setRecords([
+            ...records,
+            {
+              ...res,
+              getDate: getDate(res.vouDate),
+              getName: getName(res.partyCode),
+            },
+          ]);
           // setVoucherItems([...voucherItems, ...response.data.items]);
           setCommon({
             ...common,
@@ -583,7 +600,7 @@ export default function ReuseMaster(props) {
                             onClick={(e) => {
                               setButtonPopup(true);
                               setValues({ ...initialValues, vouNo: "" });
-                              setItemList([vouItems])
+                              setItemList([vouItems]);
                             }}
                           />
                         </Grid>

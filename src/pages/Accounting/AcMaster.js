@@ -15,7 +15,7 @@ import {
 import useTable from "../../components/useTable";
 import Controls from "../../components/controls/Controls";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
-import { RestaurantRounded, Search } from "@material-ui/icons";
+import { Edit, RestaurantRounded, Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
@@ -27,12 +27,11 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
-import StockForm from "./stockForm";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
 import Filter from "../../components/filterButton";
-
+import AcForm from "./AcForm";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -67,40 +66,41 @@ function getD() {
   );
   return oneMonthAgo;
 }
-const initialValues = {
+const initialAccounts = {
+  acCode: "",
+  acc: "",
+  preFix: "",
+  acGroupCode: "",
+  acGroupName: "",
+  acType: "",
+  acName: "",
+  fatherName: "",
+  propritorName: "",
+  tradeName: "",
+  creditDays: "",
+  creditAmount: "",
+  panNo: "",
+  aadharNo: "",
+  gstNo: "",
+  seedLicenNo: "",
+  bankName: "",
+  ifscCode: "",
+  bankAcNo: "",
+  acRegMob: "",
+  mktArea: "",
+  mktAreaCode: "",
+  parentAreaCode: "",
+  prdAreaCode: "",
+  acStatus: "",
   userCompanyCode: "",
-  prodCode: "",
-  batchNo: "",
-  inwardQty: "",
-  outwardQty: "",
-  rate: "",
-  refType: "",
-  refNo: "X X X X",
-  entryBy: "",
-  entryOn: "",
 };
-const initialProducts = {
-  prodCode: "",
-  barcode: "",
-  itemType: "",
-  prodCompany: "",
-  prodName: "",
-  prodDesc: "",
-  UOM: "",
-  MRP: "",
-  HSNNo: "",
-  reorderLevel: "",
-  maintainStock: "",
-  useBatchNo: "",
-  prodStatus: "",
-  userCompanyCode: "",
-};
-export default function StockMaster() {
+export default function AcMaster(props) {
+  const { title, initialValues } = props;
   const headCells = [
-    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "refNo" },
-    { id: "Product", label: "Product", feild: "prodCode" },
-    { id: "DATE", label: "DATE", feild: "getDate" },
-    { id: "Edit", label: "Edit", feild: "getDate" },
+    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
+    { id: "Account", label: "Account", feild: "vouNo" },
+    { id: "Date", label: "Date", feild: "vouNo" },
+    { id: "Edit", label: "Edit", feild: "vouNo" },
   ];
 
   const userCode = localStorage.getItem("userCode");
@@ -108,10 +108,10 @@ export default function StockMaster() {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
+  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}`;
   const initialFilterValues = {
     ...initialValues,
-    refNo: "",
+    vouNo: "",
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
@@ -119,7 +119,7 @@ export default function StockMaster() {
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.refNo !== "") return item;
+        if (item.vouNo !== "" && item.srNo == 1) return item;
       });
       console.log(newRecords);
       return newRecords;
@@ -131,14 +131,13 @@ export default function StockMaster() {
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [print, setPrint] = useState(false);
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
-  const [loading1, setLoading1] = useState(true);
+  const [itemList, setItemList] = useState([initialValues]);
   const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
+  const [accounts, setAccounts] = useState([initialAccounts]);
   const [filter, setFilter] = useState(initialFilterValues);
-  const [products, setProducts] = useState([initialProducts]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -158,39 +157,31 @@ export default function StockMaster() {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values);
+  console.log(values, records);
   console.log("filter=>", filter);
   console.log(Config.batch);
-  if ((records[0] && records[0].refNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=0&useBatch=idk&vouN=${values.refNo}`;
+  if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
-      .get(Config.batch + query, {
+      .get(Config.accounting + query, {
         headers: {
           authorization: "Bearer" + token,
         },
       })
       .then((response) => {
-        if (response.data.raw.length !== 0) {
-          let arr = response.data.raw.map((item) => {
-            return { ...item, prodName: "", getDate: getDate(item.entryOn) };
-          });
-          console.log(arr);
-          setRecords(arr);
-        } else {
-          setRecords([
-            {
-              ...initialValues,
-              refNo: "X X X",
-              prodName: "",
-              getDate: null,
-            },
-          ]);
-        }
-
-        if (response.data.prod.length !== 0) {
-          setProducts(response.data.prod);
+        console.log(response.data);
+        const temp = response.data.inv_voucher;
+        setRecords(function () {
+          if (temp.length !== 0) {
+            return temp;
+          } else {
+            return [initialFilterValues];
+          }
+        });
+        if (response.data.mst_accounts !== 0) {
+          setAccounts(response.data.mst_accounts);
         }
       })
       .catch((error) => {
@@ -199,15 +190,14 @@ export default function StockMaster() {
           message: "Unable to connect to servers",
           type: "warning",
         });
-      })
-      .finally(() => {});
+      });
   }
 
   function onDelete(item) {
     // roleService.deleteBranch(item);
     let newRecord = [];
     newRecord = records.filter((record) => {
-      return record.refNo !== item.refNo;
+      return record.vouNo !== item.vouNo;
     });
     if (newRecord.length == 0) {
       setRecords([initialFilterValues]);
@@ -232,7 +222,6 @@ export default function StockMaster() {
       });
   }
 
-  console.log(products);
   function handleFilter(e) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
@@ -257,7 +246,7 @@ export default function StockMaster() {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (item.vouNo.toLowerCase().includes(allfields.toLowerCase()))
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -267,118 +256,32 @@ export default function StockMaster() {
       },
     });
   }
-
-  const handleSubmit = (input) => {
-    let x = true;
-    records.map((item) => {
-      if (item.refNo == input.refNo) {
-        x = false;
-      }
+  function getDate(code) {
+    const date = new Date(code);
+    return (
+      String(date.getDate()) +
+      "/" +
+      String(date.getMonth() + 1) +
+      "/" +
+      String(date.getFullYear()).slice(-2)
+    );
+  }
+  function getName(code) {
+    let name = "";
+    accounts.map((item) => {
+      if (item.acCode == code) name = item.acName;
     });
-
-    const token = AuthHandler.getLoginToken();
-    setButtonPopup(false);
-    if (x) {
-      axios
-        .put(
-          Config.batch + query,
-          {
-            obj: {
-              input: input,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          const res = response.data.values;
-          console.log(response.data);
-          setRecords([
-            ...records,
-            {
-              ...res,
-              getDate: getDate(res.entryOn),
-            },
-          ]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err.err);
-        });
-    } else {
-      axios
-        .patch(
-          Config.batch + query,
-          {
-            obj: {
-              input: input,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          const updatedRecords = records.map((item) =>
-            item.refNo == input.refNo ? response.data.values : item
-          );
-          setRecords(updatedRecords);
-
-          setNotify({
-            isOpen: true,
-            message: "Voucher updated  successfully",
-            type: "success",
-          });
-        });
-    }
-  };
-  function getEntry(code, signal, type) {
-    const token = AuthHandler.getLoginToken();
-    let newValue = values;
-    // axios
-    //   .post(
-    //     // Config.addUser,
-    //     Config.batch + query,
-    //     { code: code, type: "entry" },
-    //     {
-    //       headers: {
-    //         authorization: "Bearer" + token,
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     setValues(response.data.values);
-
-    //     newValue = response.data.values;
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     setNotify({
-    //       isOpen: true,
-    //       message: "unable to fetch entry",
-    //       type: "warn",
-    //     });
-    //   })
-    //   .finally(() => {
-    //     getProd(code);
-    //     if (signal == "v") {
-    //       setButtonPopup(true);
-    //       // setLoading("X X X X");
-    //     } else {
-    //       setPrint(true);
-    //     }
-    //   });
-    return newValue;
+    return name;
+  }
+  function edit(e, ite) {
+    e.preventDefault();
+    const arr = records.filter(
+      (item) =>
+        item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo !== "X X X X"
+    );
+    setItemList(arr);
+    setValues(ite);
+    setButtonPopup(true);
   }
   return (
     <>
@@ -386,7 +289,7 @@ export default function StockMaster() {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title="StockMaster"
+              title={title}
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -504,7 +407,8 @@ export default function StockMaster() {
                             startIcon={<AddIcon />}
                             onClick={(e) => {
                               setButtonPopup(true);
-                              setValues({ ...initialValues, refNo: "" });
+                              setValues({ ...initialValues, vouNo: "" });
+                              setItemList([initialValues]);
                             }}
                           />
                         </Grid>
@@ -519,55 +423,64 @@ export default function StockMaster() {
                           <TableBody>
                             {recordsAfterPagingAndSorting().map((item) => (
                               <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
+                                <TableCell
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  {item.vouNo}
+                                </TableCell>
+                                <TableCell
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  {getName(item.acCode)}
+                                </TableCell>
+                                <TableCell
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  {new Date(item.vouDate).toLocaleDateString()}
+                                </TableCell>
+
+                                <TableCell
+                                  // sortDirection={orderBy === headcell.id ? order : false}
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  <Controls.LoadingActionButton
+                                    value={values}
+                                    color="primary"
+                                    onClick={(e) => {
+                                      edit(e, item);
                                     }}
                                   >
-                                    {headcell.label == "Edit" ? (
-                                      <>
-                                        <Controls.LoadingActionButton
-                                          value={values}
-                                          color="primary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            setValues(item);
-                                            setButtonPopup(true);
-                                          }}
-                                        >
-                                          <EditOutlinedIcon fontSize="small" />
-                                        </Controls.LoadingActionButton>
-                                        <Controls.ActionButton
-                                          color="secondary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
+                                    <EditOutlinedIcon fontSize="small" />
+                                  </Controls.LoadingActionButton>
+                                  <Controls.ActionButton
+                                    color="secondary"
+                                    onClick={(e) => {
+                                      e.preventDefault();
 
-                                            setConfirmDialog({
-                                              isOpen: true,
-                                              title:
-                                                "Are you sure to delete this record?",
-                                              subTitle:
-                                                "You can't undo this operation",
-                                              onConfirm: (e) => {
-                                                onDelete(item);
-                                                console.log(
-                                                  "records:" + records
-                                                );
-                                              },
-                                            });
-                                          }}
-                                        >
-                                          <CloseIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                      </>
-                                    ) : (
-                                      item[headcell.feild]
-                                    )}
-                                  </TableCell>
-                                ))}
+                                      setConfirmDialog({
+                                        isOpen: true,
+                                        title:
+                                          "Are you sure to delete this record?",
+                                        subTitle:
+                                          "You can't undo this operation",
+                                        onConfirm: (e) => {
+                                          onDelete(item);
+                                          console.log("records:" + records);
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    <CloseIcon fontSize="small" />
+                                  </Controls.ActionButton>
+                                </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
@@ -577,23 +490,23 @@ export default function StockMaster() {
                     <TblPagination />
                   </section>
                   <Popup
-                    title="Filter"
+                    title={`${initialValues.docCode} form`}
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
                     size="md"
                   >
-                    <StockForm
+                    {" "}
+                    <AcForm
                       records={records}
                       setRecords={setRecords}
-                      values={values}
-                      setValues={setValues}
+                      accounts={accounts}
+                      bankValues={values}
+                      setBankValues={setValues}
+                      itemList={itemList}
+                      setItemList={setItemList}
                       initialValues={initialValues}
-                      initialFilterValues={initialFilterValues}
-                      setButtonPopup={setButtonPopup}
+                      notify={notify}
                       setNotify={setNotify}
-                      openPopup={buttonPopup}
-                      products={products}
-                      handleSubmit={handleSubmit}
                     />
                   </Popup>
 

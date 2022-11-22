@@ -206,22 +206,6 @@ export default function GeneralItemForm(props) {
     });
     const newNo = Number(itemList[itemList.length - 1].vouSrNo) + 1;
     console.log(item, itemList, newNo, x);
-    // if (item.cgst || item.sgst) {
-    //   console.log("hi", item.cgst || item.sgst);
-    //   setDisabled2(true);
-    // }
-    // if (!item.cgst || !item.sgst) {
-    //   console.log("hi", item.cgst || item.sgst);
-    //   setDisabled2(false);
-    // }
-    // if (item.igst) {
-    //   console.log("hi", item.cgst || item.sgst);
-    //   setDisabled1(true);
-    // }
-    // if (!item.igst) {
-    //   console.log("hi", item.cgst || item.sgst);
-    //   setDisabled1(false);
-    // }
 
     if (x) {
       setItemList([

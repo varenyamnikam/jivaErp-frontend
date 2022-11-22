@@ -43,6 +43,13 @@ import PRMaster from "./pages/Inventory/P.R/P.R";
 import CNMaster from "./pages/Inventory/C.N/C.N";
 import DNMaster from "./pages/Inventory/D.N/D.N";
 import StockMaster from "./pages/Stock/stockMaster";
+import BR from "./pages/Accounting/BR/BrMaster";
+import BP from "./pages/Accounting/BP/BpMaster";
+import CR from "./pages/Accounting/CR/CrMaster";
+import CP from "./pages/Accounting/CP/CpMaster";
+import JV from "./pages/Accounting/JV/JvMaster";
+import CV from "./pages/Accounting/CV/CvMaster";
+
 ReactDOM.render(
   <Router>
     <Switch>
@@ -155,6 +162,12 @@ ReactDOM.render(
         path="/Inventory/StockMaster"
         page={<StockMaster />}
       />
+      <PrivateRouteNew exact path="/AcTransaction/BR" page={<BR />} />
+      <PrivateRouteNew exact path="/AcTransaction/BP" page={<BP />} />
+      <PrivateRouteNew exact path="/AcTransaction/CR" page={<CR />} />
+      <PrivateRouteNew exact path="/AcTransaction/CP" page={<CP />} />
+      <PrivateRouteNew exact path="/AcTransaction/JV" page={<JV />} />
+      <PrivateRouteNew exact path="/AcTransaction/CV" page={<CV />} />
     </Switch>
   </Router>,
 

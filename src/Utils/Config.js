@@ -52,6 +52,7 @@ class Config {
   // static both = "http://localhost:3001/api/inv_both";
   // static register = "http://localhost:3001/api/register";
   // static batch = "http://localhost:3001/api/batch";
+  // static accounting = "http://localhost:3001/api/accounting";
 
   static loginUrl = "http://134.209.144.44:3001/api/login";
   static registerUrl = "http://134.209.144.44:3001/api/register";
@@ -101,6 +102,7 @@ class Config {
   static both = "http://134.209.144.44:3001/api/inv_both";
   static soft = "http://134.209.144.44:3001/api/soft";
   static batch = "http://134.209.144.44:3001/api/batch";
+  static accounting = "http://134.209.144.44:3001/api/accounting";
 
   static sidebarItem = [
     { index: "0", title: "Home", url: "/home", icons: "home" },

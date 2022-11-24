@@ -32,6 +32,11 @@ const statusItems = [
   { id: "Yes", title: "Yes" },
   { id: "NO", title: "NO" },
 ];
+const Colors = [
+  { id: "blue", title: "blue" },
+  { id: "green", title: "green" },
+];
+
 const groupTypes = ["ASSET", "LIABILITY", "INCOME", "EXPENSE"];
 
 const useStyles = makeStyles((theme) => ({
@@ -70,6 +75,7 @@ const initialValues = {
   useCessitem: "",
   saleStockUpdateUsing: "",
   purcStockUpdateUsing: "",
+  color: "blue",
 };
 
 export default function Settings() {
@@ -243,6 +249,17 @@ export default function Settings() {
                             />
                           </Grid>{" "}
                           <Grid item sm={6} xs={12}>
+                            <Controls.RadioGroup
+                              size="small"
+                              name="color"
+                              label="THEME"
+                              value={values.color}
+                              onChange={handleInputChange}
+                              items={Colors}
+                              error={errors.color}
+                            />
+                          </Grid>{" "}
+                          <Grid item sm={6} xs={12}>
                             <UnusedAutosuggest
                               style={{ width: "100%" }}
                               name="purcStockUpdateUsing"
@@ -252,7 +269,7 @@ export default function Settings() {
                               options={["GRN", "Invoice"]}
                               error={errors.purcStockUpdateUsing}
                             />
-                          </Grid>{" "}
+                          </Grid>
                           <Grid item sm={3} xs={12}></Grid>
                           <Grid
                             item

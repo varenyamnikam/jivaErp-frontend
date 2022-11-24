@@ -112,7 +112,14 @@ export default function GeneralForm(props) {
             options2={products}
           />
         </Grid>
-
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Controls.Input
+            name="batchNo"
+            label="Batch No"
+            value={input.batchNo}
+            onChange={handleChange}
+          />
+        </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
           <Controls.Input
             name="inwardQty"
@@ -121,6 +128,16 @@ export default function GeneralForm(props) {
             onChange={handleChange}
           />
         </Grid>
+        {input.refType !== "OP" && (
+          <Grid item xs={12} sm={3} className={classes.input}>
+            <Controls.Input
+              name="outwardQty"
+              label="Outward Quantity"
+              value={input.outwardQty}
+              onChange={handleChange}
+            />
+          </Grid>
+        )}
         {input.refType !== "OP" && (
           <Grid item xs={12} sm={3} className={classes.input}>
             <Controls.Input

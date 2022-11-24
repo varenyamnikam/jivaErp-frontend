@@ -490,7 +490,7 @@ export default function AcMaster(props) {
                     <TblPagination />
                   </section>
                   <Popup
-                    title={`${initialValues.docCode} form`}
+                    title={`${title} form`}
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
                     size="md"

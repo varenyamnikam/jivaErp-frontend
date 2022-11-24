@@ -76,8 +76,10 @@ const initialValues = {
   rate: "",
   refType: "",
   refNo: "X X X X",
+
   entryBy: "",
   entryOn: "",
+  vouDate: "",
 };
 const initialProducts = {
   prodCode: "",
@@ -174,7 +176,7 @@ export default function StockMaster() {
       .then((response) => {
         if (response.data.raw.length !== 0) {
           let arr = response.data.raw.map((item) => {
-            return { ...item, prodName: "", getDate: getDate(item.entryOn) };
+            return { ...item, prodName: "", getDate: getDate(item.vouDate) };
           });
           console.log(arr);
           setRecords(arr);
@@ -300,7 +302,7 @@ export default function StockMaster() {
             ...records,
             {
               ...res,
-              getDate: getDate(res.entryOn),
+              getDate: getDate(res.vouDate),
             },
           ]);
           setNotify({

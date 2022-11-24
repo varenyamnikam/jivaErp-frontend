@@ -55,6 +55,13 @@ const useStyles = makeStyles((theme) => ({
   },
   center: { alignItems: "center", justifyContent: "flex-end" },
 }));
+function getTheme() {
+  if (localStorage.getItem("color") == "blue") {
+    return "#79A9C5EB";
+  } else {
+    return "green";
+  }
+}
 
 export default function (props) {
   const {
@@ -123,7 +130,10 @@ export default function (props) {
         {/* button to trigger printing of target component */}
         <ReactToPrint
           trigger={() => (
-            <PrintIcon backgroundColor="blue" style={{ color: "#7A5299" }} />
+            <PrintIcon
+              backgroundColor={getTheme()}
+              style={{ color: "#7A5299" }}
+            />
           )}
           content={() => componentRef.current}
           onBeforeGetContent={function hi() {
@@ -232,6 +242,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
       String(date.getFullYear())
     );
   }
+  console.log(getTheme());
   function getTax(values) {
     let arr = voucherItems.filter((item) => item.vouNo == values.vouNo);
     let cgstArr = [];
@@ -369,14 +380,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableHead style={{ backgroundColor: "blue", color: "white" }}>
-            <TableRow style={{ backgroundColor: "blue", color: "white" }}>
+          <TableHead style={{ backgroundColor: getTheme(), color: "white" }}>
+            <TableRow style={{ backgroundColor: getTheme(), color: "white" }}>
               <TableCell
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "20%",
-                  backgroundColor: "blue",
+                  backgroundColor: getTheme(),
                   color: "white",
                 }}
               >

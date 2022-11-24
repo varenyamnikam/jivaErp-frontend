@@ -55,6 +55,14 @@ const useStyles = makeStyles((theme) => ({
   },
   center: { alignItems: "center", justifyContent: "flex-end" },
 }));
+function getTheme() {
+  const color = JSON.parse(localStorage.getItem("adm_softwareSettings")).color;
+  if (color == "blue") {
+    return "#79A9C5EB";
+  } else {
+    return "green";
+  }
+}
 
 export default function (props) {
   const {
@@ -98,6 +106,7 @@ export default function (props) {
         />
       );
   }
+  console.log(getTheme(), localStorage.getItem("color"));
   let componentRef = React.useRef();
   let company = JSON.parse(reactLocalStorage.get("company"));
   function getDate(code) {
@@ -138,7 +147,7 @@ export default function (props) {
         {/* button to trigger printing of target component */}
 
         <PrintIcon
-          backgroundColor="blue"
+          backgroundColor={getTheme()}
           style={{ color: "#7A5299" }}
           onClick={hi}
         />
@@ -343,7 +352,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                      style={{ backgroundColor: getTheme(), color: "white" }}
                     >
                       <h5> From</h5>
                     </Grid>
@@ -361,7 +370,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                      style={{ backgroundColor: getTheme(), color: "white" }}
                     >
                       <h5>Bill To</h5>
                     </Grid>
@@ -381,7 +390,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: "#79A9C5EB", color: "white" }}
+                      style={{ backgroundColor: getTheme(), color: "white" }}
                     >
                       <h5> Ship To</h5>
                     </Grid>
@@ -400,8 +409,8 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableHead style={{ backgroundColor: "#79A9C5EB", color: "white" }}>
-            <TableRow style={{ backgroundColor: "#79A9C5EB", color: "white" }}>
+          <TableHead style={{ backgroundColor: getTheme(), color: "white" }}>
+            <TableRow style={{ backgroundColor: getTheme(), color: "white" }}>
               <TableCell
                 align="right"
                 style={{

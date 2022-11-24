@@ -46,16 +46,16 @@ export default function AcForm(props) {
   let headcells =
     bankValues.docCode == "JV"
       ? [
-          { id: "acName", label: "acName" },
-          { id: "narration", label: "narration" },
+          { id: "A/c Name", label: "A/c Name" },
+          { id: "Narration", label: "Narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
         ]
       : [
-          { id: "BankName", label: "BankName" },
-          { id: "acName", label: "acName" },
-          { id: "narration", label: "narration" },
+          { id: "Bank Name", label: "Bank Name" },
+          { id: "A/c Name", label: "A/c Name" },
+          { id: "Narration", label: "Narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
@@ -126,6 +126,7 @@ export default function AcForm(props) {
     setOtherValues({
       ...otherValues,
       [name]: value,
+      narration: bankValues.narration,
     });
   };
 
@@ -283,6 +284,7 @@ export default function AcForm(props) {
         console.log(ite, otherValues);
         x = false;
       }
+      ite.narration = bankValues.narration;
     });
     if (x) {
       const latest = [
@@ -369,17 +371,6 @@ export default function AcForm(props) {
               />
             </Grid>
           )}
-          {bankValues.docCode !== "JV" && (
-            <Grid item xs={12} sm={6}>
-              <Controls.Input
-                name="narration"
-                label="Narration for Bank A/C"
-                value={bankValues.narration}
-                onChange={handleChange}
-                error={errors.narration}
-              />
-            </Grid>
-          )}
           <Grid item xs={12} sm={6}>
             <SmartAutoSuggest
               name1="acName"
@@ -393,7 +384,18 @@ export default function AcForm(props) {
               options2={others}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          {bankValues.docCode !== "JV" && (
+            <Grid item xs={12} sm={12}>
+              <Controls.Input
+                name="narration"
+                label="Narration"
+                value={bankValues.narration}
+                onChange={handleChange}
+                error={errors.narration}
+              />
+            </Grid>
+          )}
+          <Grid item xs={12} sm={4}>
             <Controls.Input
               name="credit"
               label="Credit"
@@ -403,7 +405,7 @@ export default function AcForm(props) {
               error={errors.credit}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <Controls.Input
               name="debit"
               type="number"
@@ -413,18 +415,9 @@ export default function AcForm(props) {
               error={errors.debit}
             />
           </Grid>
-          <Grid item xs={12} sm={9}>
-            <Controls.Input
-              name="narration"
-              label="Narration"
-              value={otherValues.narration}
-              onChange={handleOtherChange}
-              error={errors.narration}
-            />
-          </Grid>
           <Grid
             item
-            sm={3}
+            sm={4}
             xs={12}
             style={{
               display: "flex",

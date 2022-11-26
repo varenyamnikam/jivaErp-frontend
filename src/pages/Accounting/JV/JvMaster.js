@@ -26,5 +26,5 @@ export default function JV() {
     entryBy: "",
     entryOn: "",
   };
-  return <AcMaster title="Bank Reciept" initialValues={initialValues} />;
+  return <AcMaster title="Journal voucher" initialValues={initialValues} />;
 }

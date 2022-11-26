@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function StaticDatePickerLandscape(props) {
-  const { value, setValue, name, label } = props;
+  const { value, setValue, name, label, disabled = false } = props;
   // const {value, setValue} = React.useState(new Date());
   console.log(value[name]);
   const classes = useStyles();
@@ -68,6 +68,7 @@ export default function StaticDatePickerLandscape(props) {
         renderInput={(params) => (
           <TextField className={classes.root} size="small" {...params} />
         )}
+        disabled={disabled}
       />
     </LocalizationProvider>
   );

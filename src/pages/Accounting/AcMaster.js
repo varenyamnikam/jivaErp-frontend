@@ -98,9 +98,9 @@ export default function AcMaster(props) {
   const { title, initialValues } = props;
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
-    { id: "Account", label: "Account", feild: "vouNo" },
-    { id: "Date", label: "Date", feild: "vouNo" },
-    { id: "Edit", label: "Edit", feild: "vouNo" },
+    { id: "Account", label: "Account", feild: "getName" },
+    { id: "Date", label: "Date", feild: "getDate" },
+    { id: "Edit", label: "Edit", feild: "" },
   ];
 
   const userCode = localStorage.getItem("userCode");
@@ -157,7 +157,7 @@ export default function AcMaster(props) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values, records);
+  console.log(values, recordsAfterAndSorting());
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
@@ -172,7 +172,18 @@ export default function AcMaster(props) {
       })
       .then((response) => {
         console.log(response.data);
-        const temp = response.data.inv_voucher;
+
+        if (response.data.mst_accounts !== 0) {
+          setAccounts(response.data.mst_accounts);
+        }
+        let temp = response.data.inv_voucher;
+        if (temp.length !== 0) {
+          temp = temp.map((item) => ({
+            ...item,
+            getName: getName(item.acCode, response.data.mst_accounts),
+            getDate: new Date(item.vouDate).toLocaleDateString(),
+          }));
+        }
         setRecords(function () {
           if (temp.length !== 0) {
             return temp;
@@ -180,9 +191,6 @@ export default function AcMaster(props) {
             return [initialFilterValues];
           }
         });
-        if (response.data.mst_accounts !== 0) {
-          setAccounts(response.data.mst_accounts);
-        }
       })
       .catch((error) => {
         setNotify({
@@ -266,9 +274,9 @@ export default function AcMaster(props) {
       String(date.getFullYear()).slice(-2)
     );
   }
-  function getName(code) {
+  function getName(code, arr) {
     let name = "";
-    accounts.map((item) => {
+    arr.map((item) => {
       if (item.acCode == code) name = item.acName;
     });
     return name;
@@ -435,7 +443,7 @@ export default function AcMaster(props) {
                                     borderRight: "1px solid rgba(0,0,0,0.2)",
                                   }}
                                 >
-                                  {getName(item.acCode)}
+                                  {getName(item.acCode, accounts)}
                                 </TableCell>
                                 <TableCell
                                   style={{

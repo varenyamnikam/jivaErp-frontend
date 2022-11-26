@@ -22,6 +22,7 @@ const docOptions = ["DC", "QT", "GR", "SI"];
 const useStyles = makeStyles((theme) => ({
   // input: { minWidth: "200px", flexGrow: 1 },
 }));
+const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
 
 export default function GeneralForm(props) {
   const userCode = localStorage.getItem("userCode");
@@ -57,7 +58,12 @@ export default function GeneralForm(props) {
       y = false;
     }
   });
-
+  const userDate = new Date(
+    JSON.parse(localStorage.getItem("user")).defaultYearStart
+  );
+  const newDate = new Date(
+    new Date().setFullYear(userDate.getFullYear(), 2, 31)
+  );
   function getVouNo() {
     if (y) {
       return " NEW ";
@@ -76,7 +82,10 @@ export default function GeneralForm(props) {
       ...input,
       refNo: user.defaultBranchCode + input.refType + user.defaultYearCode,
     });
-
+  if (input.refType == "OP" && String(input.vouDate) !== String(newDate)) {
+    console.log(newDate, String(input.vouDate) !== String(newDate));
+    setInput({ ...input, vouDate: newDate });
+  }
   return (
     <>
       <Grid container style={{ marginBottom: "10px" }} spacing={2}>
@@ -112,14 +121,37 @@ export default function GeneralForm(props) {
             options2={products}
           />
         </Grid>
+        {settings.userBatchNo == "Yes" && (
+          <>
+            <Grid item xs={12} sm={3} className={classes.input}>
+              <Controls.Input
+                name="batchNo"
+                label="Batch No"
+                value={input.batchNo}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={3} className={classes.input}>
+              <StaticDatePickerLandscape
+                name="expDate"
+                label="Expiry Date"
+                value={input}
+                setValue={setInput}
+              />
+            </Grid>
+          </>
+        )}
         <Grid item xs={12} sm={3} className={classes.input}>
-          <Controls.Input
-            name="batchNo"
-            label="Batch No"
-            value={input.batchNo}
-            onChange={handleChange}
+          <StaticDatePickerLandscape
+            name="vouDate"
+            label="Voucher Date"
+            value={input}
+            setValue={setInput}
+            disabled={input.refType == "OP"}
           />
         </Grid>
+
         <Grid item xs={12} sm={3} className={classes.input}>
           <Controls.Input
             name="inwardQty"
@@ -138,23 +170,11 @@ export default function GeneralForm(props) {
             />
           </Grid>
         )}
-        {input.refType !== "OP" && (
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Controls.Input
-              name="outwardQty"
-              label="Outward Quantity"
-              value={input.outwardQty}
-              onChange={handleChange}
-            />
-          </Grid>
-        )}
-        <Grid item xs={12} sm={6} className={classes.input}>
+        <Grid item xs={12} sm={12} className={classes.input}>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              marginRight: "50px",
-              marginTop: "40px",
             }}
           >
             <Controls.Button

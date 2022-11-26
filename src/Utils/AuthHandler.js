@@ -25,10 +25,6 @@ class AuthHandler {
             JSON.stringify(response.data.adm_userrights)
           );
           localStorage.setItem(
-            "adm_userrights",
-            JSON.stringify(response.data.adm_userrights)
-          );
-          localStorage.setItem(
             "adm_softwareSettings",
             JSON.stringify(response.data.adm_softwareSettings)
           );

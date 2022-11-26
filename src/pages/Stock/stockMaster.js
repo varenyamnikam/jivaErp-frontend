@@ -76,10 +76,10 @@ const initialValues = {
   rate: "",
   refType: "",
   refNo: "X X X X",
-
+  vouDate: new Date(),
   entryBy: "",
   entryOn: "",
-  vouDate: "",
+  expDate: new Date(),
 };
 const initialProducts = {
   prodCode: "",
@@ -160,7 +160,7 @@ export default function StockMaster() {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values);
+  console.log(values, recordsAfterAndSorting);
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].refNo == "X X X X") || refresh) {
@@ -184,7 +184,7 @@ export default function StockMaster() {
           setRecords([
             {
               ...initialValues,
-              refNo: "X X X",
+              refNo: "",
               prodName: "",
               getDate: null,
             },

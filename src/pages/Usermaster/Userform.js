@@ -235,6 +235,8 @@ export default function Userform(props) {
       }
     });
   }
+  if (values.defaultFinYear) {
+  }
   // if (values.defaultBranchName && values.defaultBranchCode) {
   //   console.log("hi...update name");
   //   branchNames.map((item) => {
@@ -262,6 +264,7 @@ export default function Userform(props) {
         setValues({
           ...values,
           defaultYearCode: item.yearCode,
+          defaultYearStart: item.yearStartDate,
         });
       }
     });

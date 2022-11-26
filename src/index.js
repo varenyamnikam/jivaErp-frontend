@@ -49,6 +49,7 @@ import CR from "./pages/Accounting/CR/CrMaster";
 import CP from "./pages/Accounting/CP/CpMaster";
 import JV from "./pages/Accounting/JV/JvMaster";
 import CV from "./pages/Accounting/CV/CvMaster";
+import OB from "./pages/Accounting/OB/ObMaster";
 
 ReactDOM.render(
   <Router>
@@ -168,6 +169,7 @@ ReactDOM.render(
       <PrivateRouteNew exact path="/AcTransaction/CP" page={<CP />} />
       <PrivateRouteNew exact path="/AcTransaction/JV" page={<JV />} />
       <PrivateRouteNew exact path="/AcTransaction/CV" page={<CV />} />
+      <PrivateRouteNew exact path="/AcTransaction/OB" page={<OB />} />
     </Switch>
   </Router>,
 

@@ -31,7 +31,7 @@ import Excel from "../../../components/useExcel";
 import Print from "../../../components/print";
 import MultipleSelectCheckmarks from "../../../components/multiSelect";
 import Filter from "../../../components/filterButton";
-import CvForm from "./Cvform";
+import CvForm from "./ObForm";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -70,7 +70,7 @@ const initialValues = {
   userCompanyCode: "",
   vouNo: "X X X X",
   branchCode: "",
-  docCode: "CV",
+  docCode: "OB",
   finYear: "",
   vno: "",
   manualNo: "",
@@ -117,10 +117,11 @@ const initialAccounts = {
   acStatus: "",
   userCompanyCode: "",
 };
-export default function AcMaster({ title = "Contra Voucher" }) {
+export default function AcMaster({ title = "Opening Balance" }) {
   const headCells = [
-    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
     { id: "Account", label: "Account", feild: "getName" },
+    { id: "Credit", label: "Credit", feild: "credit" },
+    { id: "Debit", label: "Debit", feild: "debit" },
     { id: "Date", label: "Date", feild: "getDate" },
     { id: "Edit", label: "Edit", feild: "" },
   ];
@@ -141,7 +142,7 @@ export default function AcMaster({ title = "Contra Voucher" }) {
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.vouNo !== "" && item.srNo == 1) return item;
+        if (item.vouNo !== "") return item;
       });
       console.log(newRecords);
       return newRecords;
@@ -201,6 +202,8 @@ export default function AcMaster({ title = "Contra Voucher" }) {
         if (temp.length !== 0) {
           temp = temp.map((item) => ({
             ...item,
+            credit: Number(item.credit),
+            debit: Number(item.debit),
             getName: getName(item.acCode, response.data.mst_accounts),
             getDate: new Date(item.vouDate).toLocaleDateString(),
           }));
@@ -295,9 +298,9 @@ export default function AcMaster({ title = "Contra Voucher" }) {
       String(date.getFullYear()).slice(-2)
     );
   }
-  function getName(code, arr) {
+  function getName(code) {
     let name = "";
-    arr.map((item) => {
+    accounts.map((item) => {
       if (item.acCode == code) name = item.acName;
     });
     return name;
@@ -457,14 +460,21 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                                     borderRight: "1px solid rgba(0,0,0,0.2)",
                                   }}
                                 >
-                                  {item.vouNo}
+                                  {getName(item.acCode)}
                                 </TableCell>
                                 <TableCell
                                   style={{
                                     borderRight: "1px solid rgba(0,0,0,0.2)",
                                   }}
                                 >
-                                  {getName(item.acCode, accounts)}
+                                  {item.credit}
+                                </TableCell>{" "}
+                                <TableCell
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  {item.debit}
                                 </TableCell>
                                 <TableCell
                                   style={{
@@ -473,7 +483,6 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                                 >
                                   {new Date(item.vouDate).toLocaleDateString()}
                                 </TableCell>
-
                                 <TableCell
                                   // sortDirection={orderBy === headcell.id ? order : false}
                                   style={{

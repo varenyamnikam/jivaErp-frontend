@@ -47,7 +47,6 @@ export default function AcForm(props) {
     bankValues.docCode == "JV"
       ? [
           { id: "acName", label: "acName" },
-          { id: "narration", label: "narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
@@ -55,7 +54,6 @@ export default function AcForm(props) {
       : [
           { id: "BankName", label: "BankName" },
           { id: "acName", label: "acName" },
-          { id: "narration", label: "narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },

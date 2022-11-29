@@ -32,6 +32,7 @@ import Print from "../../components/print";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
 import Filter from "../../components/filterButton";
 import AcForm from "./AcForm";
+import PrintAcc from "../../components/prinAcc";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -108,7 +109,11 @@ export default function AcMaster(props) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}`;
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&yearStart=${
+    user.yearStartDate
+  }`;
   const initialFilterValues = {
     ...initialValues,
     vouNo: "",
@@ -161,7 +166,8 @@ export default function AcMaster(props) {
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}`;
+
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
@@ -468,6 +474,7 @@ export default function AcMaster(props) {
                                   >
                                     <EditOutlinedIcon fontSize="small" />
                                   </Controls.LoadingActionButton>
+
                                   <Controls.ActionButton
                                     color="secondary"
                                     onClick={(e) => {
@@ -487,6 +494,15 @@ export default function AcMaster(props) {
                                     }}
                                   >
                                     <CloseIcon fontSize="small" />
+                                  </Controls.ActionButton>
+                                  <Controls.ActionButton>
+                                    <PrintAcc
+                                      values={item}
+                                      accounts={accounts}
+                                      itemList={itemList}
+                                      records={records}
+                                      title={title}
+                                    />
                                   </Controls.ActionButton>
                                 </TableCell>
                               </TableRow>
@@ -515,6 +531,7 @@ export default function AcMaster(props) {
                       initialValues={initialValues}
                       notify={notify}
                       setNotify={setNotify}
+                      setButtonPopup={setButtonPopup}
                     />
                   </Popup>
 

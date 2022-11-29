@@ -42,12 +42,12 @@ export default function AcForm(props) {
     vouItems,
     notify,
     setNotify,
+    setButtonPopup,
   } = props;
   let headcells =
     bankValues.docCode == "JV"
       ? [
           { id: "A/c Name", label: "A/c Name" },
-          { id: "Narration", label: "Narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
@@ -55,7 +55,6 @@ export default function AcForm(props) {
       : [
           { id: "Bank Name", label: "Bank Name" },
           { id: "A/c Name", label: "A/c Name" },
-          { id: "Narration", label: "Narration" },
           { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
@@ -172,6 +171,7 @@ export default function AcForm(props) {
   }
   const handleSubmit = (e) => {
     e.preventDefault();
+    setButtonPopup(false);
     let x = true;
     records.map((ite) => {
       if (ite.vouNo == bankValues.vouNo) {
@@ -194,7 +194,8 @@ export default function AcForm(props) {
     }
     const userCode = localStorage.getItem("userCode");
     const userCompanyCode = localStorage.getItem("userCompanyCode");
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+    const user = JSON.parse(localStorage.getItem("user"));
+    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearStart=${user.yearStartDate}`;
     if (x) {
       axios
         .put(
@@ -213,7 +214,12 @@ export default function AcForm(props) {
         )
         .then((response) => {
           console.log(response.data.itemList);
-          setRecords([...records, ...response.data.itemList]);
+          let max = response.data.max;
+          let Fil = response.data.itemList;
+          Fil = Fil.filter((item) => item.srNo !== 1);
+          console.log(Fil, { ...bankValues, vouNo: max });
+
+          setRecords([...records, ...Fil, { ...bankValues, vouNo: max }]);
           setNotify({
             isOpen: true,
             message: "Voucher created  successfully",
@@ -245,7 +251,8 @@ export default function AcForm(props) {
             (item) => item.vouNo !== bankValues.vouNo
           );
           console.log(Fil);
-          setRecords([...newArr, ...Fil]);
+          Fil = Fil.filter((item) => item.srNo !== 1);
+          setRecords([...newArr, ...Fil, { ...bankValues }]);
           setNotify({
             isOpen: true,
             message: "Voucher created  successfully",
@@ -371,6 +378,17 @@ export default function AcForm(props) {
               />
             </Grid>
           )}
+          {bankValues.docCode !== "JV" && (
+            <Grid item xs={12} sm={6}>
+              <Controls.Input
+                name="narration"
+                label="Narration"
+                value={bankValues.narration}
+                onChange={handleChange}
+                error={errors.narration}
+              />
+            </Grid>
+          )}
           <Grid item xs={12} sm={6}>
             <SmartAutoSuggest
               name1="acName"
@@ -384,18 +402,7 @@ export default function AcForm(props) {
               options2={others}
             />
           </Grid>
-          {bankValues.docCode !== "JV" && (
-            <Grid item xs={12} sm={12}>
-              <Controls.Input
-                name="narration"
-                label="Narration"
-                value={bankValues.narration}
-                onChange={handleChange}
-                error={errors.narration}
-              />
-            </Grid>
-          )}
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={2}>
             <Controls.Input
               name="credit"
               label="Credit"
@@ -405,7 +412,7 @@ export default function AcForm(props) {
               error={errors.credit}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={2}>
             <Controls.Input
               name="debit"
               type="number"
@@ -417,7 +424,7 @@ export default function AcForm(props) {
           </Grid>
           <Grid
             item
-            sm={4}
+            sm={2}
             xs={12}
             style={{
               display: "flex",
@@ -452,7 +459,6 @@ export default function AcForm(props) {
                         <TableCell>{bankValues.acName}</TableCell>
                       )}
                       <TableCell>{getName(item.acCode)}</TableCell>
-                      <TableCell>{item.narration}</TableCell>
                       <TableCell>{Number(item.credit)}</TableCell>
                       <TableCell>{Number(item.debit)}</TableCell>
 

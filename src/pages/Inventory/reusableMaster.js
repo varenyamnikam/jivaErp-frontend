@@ -94,13 +94,15 @@ export default function ReuseMaster(props) {
     { id: "AMOUNT", label: "AMOUNT", feild: "netAmount" },
     { id: "Edit", label: "Edit" },
   ];
-
+  const user = JSON.parse(localStorage.getItem("user"));
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
+  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}&yearStart=${
+    user.yearStartDate
+  }`;
   const {
     initialAc,
     vouItems,
@@ -182,7 +184,7 @@ export default function ReuseMaster(props) {
   }
   console.log(Config[route]);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}yearStart=${user.yearStartDate}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios

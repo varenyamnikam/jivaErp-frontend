@@ -14,7 +14,7 @@ class Config {
   // static userRightsUrl = "http://localhost:3001/api/adm_userrights";
   // static showRights = "http://localhost:3001/api/post_userrights";
   // static deleteUserRoleUrl = "http://localhost:3001/api/delete_adm_userrole";
-  // static logoutPageUrl = "http://localhost:3001/api/login";
+  // static logoutPageUrl = "/";
   // static resetUrl = "http://localhost:3001/api/delete_adm_userrights";
   // static usermasterUrl = "http://localhost:3001/api/adm_usermaster";
   // static addUser = "http://localhost:3001/api/post_adduser";

@@ -36,6 +36,10 @@ const Colors = [
   { id: "blue", title: "blue" },
   { id: "green", title: "green" },
 ];
+const template = [
+  { id: "oaj", title: "oaj" },
+  { id: "tally", title: "tally" },
+];
 
 const groupTypes = ["ASSET", "LIABILITY", "INCOME", "EXPENSE"];
 
@@ -76,6 +80,7 @@ const initialValues = {
   saleStockUpdateUsing: "",
   purcStockUpdateUsing: "",
   color: "blue",
+  useAcc: "",
 };
 
 export default function Settings() {
@@ -236,7 +241,7 @@ export default function Settings() {
                               items={statusItems}
                               error={errors.useCessitem}
                             />
-                          </Grid>{" "}
+                          </Grid>
                           <Grid item sm={6} xs={12}>
                             <UnusedAutosuggest
                               style={{ width: "100%" }}
@@ -247,7 +252,7 @@ export default function Settings() {
                               options={["DC", "Invoice"]}
                               error={errors.saleStockUpdateUsing}
                             />
-                          </Grid>{" "}
+                          </Grid>
                           <Grid item sm={6} xs={12}>
                             <Controls.RadioGroup
                               size="small"
@@ -258,7 +263,7 @@ export default function Settings() {
                               items={Colors}
                               error={errors.color}
                             />
-                          </Grid>{" "}
+                          </Grid>
                           <Grid item sm={6} xs={12}>
                             <UnusedAutosuggest
                               style={{ width: "100%" }}
@@ -270,14 +275,25 @@ export default function Settings() {
                               error={errors.purcStockUpdateUsing}
                             />
                           </Grid>
-                          <Grid item sm={3} xs={12}></Grid>
+                          <Grid item sm={6} xs={12}>
+                            <Controls.RadioGroup
+                              size="small"
+                              name="useAcc"
+                              label="Account Print Format"
+                              value={values.useAcc}
+                              onChange={handleInputChange}
+                              items={template}
+                              error={errors.useAcc}
+                            />
+                          </Grid>
                           <Grid
                             item
-                            sm={3}
+                            sm={6}
                             xs={12}
                             style={{
                               display: "flex",
                               justifyContent: "center",
+                              padding: "20px",
                             }}
                           >
                             <ButtonLoader

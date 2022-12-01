@@ -87,6 +87,11 @@ const initialValues = {
   favouringName: "",
   entryBy: "",
   entryOn: "",
+  fromName: "",
+  fromCode: "",
+  toName: "",
+  toCode: "",
+  amount: "",
 };
 
 const initialAccounts = {
@@ -137,6 +142,8 @@ export default function AcMaster({ title = "Contra Voucher" }) {
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
+    vouDate: "",
+    docCode: "",
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -536,6 +543,7 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                       initialValues={initialValues}
                       notify={notify}
                       setNotify={setNotify}
+                      initialFilterValues={initialFilterValues}
                     />
                   </Popup>
 

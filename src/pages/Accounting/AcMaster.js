@@ -34,6 +34,7 @@ import Filter from "../../components/filterButton";
 import AcForm from "./AcForm";
 import PrintAcc from "../../components/prinAcc";
 import { getTime } from "date-fns";
+import DateCalc from "../../components/dateCalc";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -90,48 +91,7 @@ const initialAccounts = {
 export default function AcMaster(props) {
   const { title, initialValues } = props;
   const user = JSON.parse(localStorage.getItem("user"));
-  function currentFinyear() {
-    const today = new Date();
-    console.log(user);
-    console.log(
-      new Date(user.defaultYearStart),
-      new Date(today.getFullYear(), 3, 1),
-      new Date(user.defaultYearStart).setHours(0, 0, 0, 0) <=
-        new Date(today.getFullYear(), 3, 1).setHours(0, 0, 0, 0)
-    );
-
-    if (
-      new Date(user.defaultYearStart).setHours(0, 0, 0, 0) <=
-      new Date(today.getFullYear(), 3, 1).setHours(0, 0, 0, 0)
-    )
-      return true;
-    else {
-      return false;
-    }
-  }
-
-  function getD() {
-    const today = new Date();
-    let oneMonthAgo = new Date();
-    if (currentFinyear()) {
-      oneMonthAgo = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        today.getDate()
-      );
-      console.log("current");
-    } else {
-      const endDate = new Date(user.defaultYearEnd);
-      oneMonthAgo = new Date(
-        endDate.getFullYear(),
-        endDate.getMonth() - 1,
-        endDate.getDate()
-      );
-      console.log("prev");
-    }
-    console.log(oneMonthAgo);
-    return oneMonthAgo;
-  }
+  const { getD } = DateCalc(user);
 
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
@@ -155,6 +115,8 @@ export default function AcMaster(props) {
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
+    vouDate: "",
+    docCode: "",
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -201,8 +163,7 @@ export default function AcMaster(props) {
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}`;
-
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
@@ -229,7 +190,7 @@ export default function AcMaster(props) {
           if (temp.length !== 0) {
             return temp;
           } else {
-            return [initialFilterValues];
+            return [{ ...initialValues, vouNo: "" }];
           }
         });
       })
@@ -567,6 +528,7 @@ export default function AcMaster(props) {
                       notify={notify}
                       setNotify={setNotify}
                       setButtonPopup={setButtonPopup}
+                      initialFilterValues={initialFilterValues}
                     />
                   </Popup>
 

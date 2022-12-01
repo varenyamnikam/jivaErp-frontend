@@ -87,12 +87,12 @@ export default function UnusedAutosuggest(props) {
     setValue,
     options1,
     options2,
-    error,
     name1,
     label,
     code1,
     name2,
     code2,
+    error = null,
   } = props;
   const [inputValue, setInputValue] = React.useState("");
   const classes = useStyles();

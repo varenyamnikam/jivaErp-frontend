@@ -13,7 +13,7 @@ import Calculate from "../../components/calculate";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import Divider from "@mui/material/Divider";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
-
+import Validate from "./Validate";
 import {
   Paper,
   makeStyles,
@@ -39,11 +39,24 @@ export default function AcForm(props) {
     bankValues,
     setBankValues,
     initialValues,
+    initialFilterValues,
     vouItems,
     notify,
     setNotify,
     setButtonPopup,
   } = props;
+  const [otherErrors, setOtherErrors] = useState(initialFilterValues);
+  const [disabled1, setDisabled1] = useState(false);
+  const [errors, setErrors] = useState(initialFilterValues);
+  const [filterFn, setFilterFn] = useState({
+    fn: (items) => {
+      let newRecords = items.filter((item) => item.vouNo !== "X X X X");
+      return newRecords;
+    },
+  });
+  const [popup, setPopup] = useState(false);
+  const [otherValues, setOtherValues] = useState(initialValues);
+
   let headcells =
     bankValues.docCode == "JV"
       ? [
@@ -59,21 +72,10 @@ export default function AcForm(props) {
           { id: "Debit", label: "Debit" },
           { id: "Edit", label: "Edit" },
         ];
+  const [headCells, setHeadCells] = useState(headcells);
 
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
-  const [errors, setErrors] = useState({});
-  const [headCells, setHeadCells] = useState(headcells);
-  const [disabled1, setDisabled1] = useState(false);
-
-  const [filterFn, setFilterFn] = useState({
-    fn: (items) => {
-      let newRecords = items.filter((item) => item.vouNo !== "X X X X");
-      return newRecords;
-    },
-  });
-  const [popup, setPopup] = useState(false);
-  const [otherValues, setOtherValues] = useState(initialValues);
   const {
     TblContainer,
     TblHead,
@@ -171,97 +173,99 @@ export default function AcForm(props) {
   }
   const handleSubmit = (e) => {
     e.preventDefault();
-    setButtonPopup(false);
-    let x = true;
-    records.map((ite) => {
-      if (ite.vouNo == bankValues.vouNo) {
-        console.log(ite, bankValues);
-        x = false;
+    if (Validate(bankValues, errors, setErrors, true)) {
+      setButtonPopup(false);
+      let x = true;
+      records.map((ite) => {
+        if (ite.vouNo == bankValues.vouNo) {
+          console.log(ite, bankValues);
+          x = false;
+        }
+      });
+      let Fil = itemList.filter((item) => item.vouNo !== "X X X X");
+      if (bankValues !== "JV") {
+        Fil = Fil.map((item, i) => {
+          return { ...item, srNo: i + 2, vouNo: bankValues.vouNo };
+        });
+        bankValues.srNo = 1;
+        let obj = finalCalc(bankValues);
+        Fil.push(obj);
+      } else {
+        Fil = Fil.map((item, i) => {
+          return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
+        });
       }
-    });
-    let Fil = itemList.filter((item) => item.vouNo !== "X X X X");
-    if (bankValues !== "JV") {
-      Fil = Fil.map((item, i) => {
-        return { ...item, srNo: i + 2, vouNo: bankValues.vouNo };
-      });
-      bankValues.srNo = 1;
-      let obj = finalCalc(bankValues);
-      Fil.push(obj);
-    } else {
-      Fil = Fil.map((item, i) => {
-        return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
-      });
-    }
-    const userCode = localStorage.getItem("userCode");
-    const userCompanyCode = localStorage.getItem("userCompanyCode");
-    const user = JSON.parse(localStorage.getItem("user"));
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearStart=${user.yearStartDate}`;
-    if (x) {
-      axios
-        .put(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
+      const userCode = localStorage.getItem("userCode");
+      const userCompanyCode = localStorage.getItem("userCompanyCode");
+      const user = JSON.parse(localStorage.getItem("user"));
+      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearStart=${user.yearStartDate}`;
+      if (x) {
+        axios
+          .put(
+            Config.accounting + query,
+            {
+              obj: {
+                values: bankValues,
+                itemList: Fil,
+              },
             },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          let max = response.data.max;
-          let Fil = response.data.itemList;
-          Fil = Fil.filter((item) => item.srNo !== 1);
-          console.log(Fil, { ...bankValues, vouNo: max });
+            {
+              headers: {
+                authorization: "Bearer" + token,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.itemList);
+            let max = response.data.max;
+            let Fil = response.data.itemList;
+            Fil = Fil.filter((item) => item.srNo !== 1);
+            console.log(Fil, { ...bankValues, vouNo: max });
 
-          setRecords([...records, ...Fil, { ...bankValues, vouNo: max }]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
+            setRecords([...records, ...Fil, { ...bankValues, vouNo: max }]);
+            setNotify({
+              isOpen: true,
+              message: "Voucher created  successfully",
+              type: "success",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      axios
-        .patch(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
+      } else {
+        axios
+          .patch(
+            Config.accounting + query,
+            {
+              obj: {
+                values: bankValues,
+                itemList: Fil,
+              },
             },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          let newArr = records.filter(
-            (item) => item.vouNo !== bankValues.vouNo
-          );
-          console.log(Fil);
-          Fil = Fil.filter((item) => item.srNo !== 1);
-          setRecords([...newArr, ...Fil, { ...bankValues }]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
+            {
+              headers: {
+                authorization: "Bearer" + token,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.itemList);
+            let newArr = records.filter(
+              (item) => item.vouNo !== bankValues.vouNo
+            );
+            console.log(Fil);
+            Fil = Fil.filter((item) => item.srNo !== 1);
+            setRecords([...newArr, ...Fil, { ...bankValues }]);
+            setNotify({
+              isOpen: true,
+              message: "Voucher created  successfully",
+              type: "success",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      }
     }
   };
   function calc(list) {
@@ -285,38 +289,41 @@ export default function AcForm(props) {
     }
   }, [itemList]);
   const handleAdd = () => {
-    let x = true;
-    itemList.map((ite) => {
-      if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
-        console.log(ite, otherValues);
-        x = false;
-      }
-      ite.narration = bankValues.narration;
-    });
-    if (x) {
-      const latest = [
-        ...itemList,
-        {
-          ...otherValues,
-          srNo: Number(itemList[itemList.length - 1].srNo) + 1,
-        },
-      ];
-      setItemList(latest);
-      setOtherValues(initialValues);
-    } else {
-      const newItemList = itemList.map((ite) => {
+    console.log(Validate(otherValues, otherErrors, setOtherErrors, false));
+    if (Validate(otherValues, otherErrors, setOtherErrors, false)) {
+      let x = true;
+      itemList.map((ite) => {
         if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
-          return otherValues;
-        } else {
-          return ite;
+          console.log(ite, otherValues);
+          x = false;
         }
+        ite.narration = bankValues.narration;
       });
-      console.log(newItemList);
+      if (x) {
+        const latest = [
+          ...itemList,
+          {
+            ...otherValues,
+            srNo: Number(itemList[itemList.length - 1].srNo) + 1,
+          },
+        ];
+        setItemList(latest);
+        setOtherValues(initialValues);
+      } else {
+        const newItemList = itemList.map((ite) => {
+          if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
+            return otherValues;
+          } else {
+            return ite;
+          }
+        });
+        console.log(newItemList);
 
-      setItemList(newItemList);
-      setOtherValues(initialValues);
+        setItemList(newItemList);
+        setOtherValues(initialValues);
+      }
+      console.log(bankValues, itemList, x);
     }
-    console.log(bankValues, itemList, x);
   };
   function getName(code) {
     let name = "";
@@ -375,6 +382,7 @@ export default function AcForm(props) {
                 setValue={setBankValues}
                 options1={bankOptions}
                 options2={banks}
+                error={errors.acCode}
               />
             </Grid>
           )}
@@ -400,6 +408,7 @@ export default function AcForm(props) {
               setValue={setOtherValues}
               options1={otherOptions}
               options2={others}
+              error={otherErrors.acCode}
             />
           </Grid>
           <Grid item xs={12} sm={2}>
@@ -409,7 +418,7 @@ export default function AcForm(props) {
               type="number"
               value={otherValues.credit}
               onChange={handleOtherChange}
-              error={errors.credit}
+              error={otherErrors.credit}
             />
           </Grid>
           <Grid item xs={12} sm={2}>
@@ -419,7 +428,7 @@ export default function AcForm(props) {
               label="Debit"
               value={otherValues.debit}
               onChange={handleOtherChange}
-              error={errors.debit}
+              error={otherErrors.debit}
             />
           </Grid>
           <Grid

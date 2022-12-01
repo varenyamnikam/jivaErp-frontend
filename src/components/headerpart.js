@@ -99,6 +99,9 @@ const Headerpart = (props) => {
                 <Link
                   to={Config.logoutPageUrl}
                   className="dropdown-item dropdown-footer"
+                  onClick={() => {
+                    localStorage.clear();
+                  }}
                 >
                   <center>
                     <span>Log off!</span>

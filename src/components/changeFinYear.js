@@ -7,6 +7,8 @@ import SmartAutoSuggest from "./smartAutoSuggest";
 import CircularProgress, {
   circularProgressClasses,
 } from "@mui/material/CircularProgress";
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router";
 import Notification from "./Notification";
 import Controls from "./controls/Controls";
 const initialValues = {
@@ -143,7 +145,15 @@ export default function ChangeFinyear({ setButtonPopup }) {
             alignItems: "center",
           }}
         >
-          <Controls.Button onClick={handleSubmit} text="Submit" />
+          <Link
+            to={Config.logoutPageUrl}
+            style={{ backgroundColor: "white" }}
+            onClick={() => {
+              localStorage.clear();
+            }}
+          >
+            <Controls.Button onClick={handleSubmit} text="Submit" />
+          </Link>
         </Grid>
       </Grid>
       <Notification notify={notify} setNotify={setNotify} />

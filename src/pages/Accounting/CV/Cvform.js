@@ -39,6 +39,8 @@ export default function AcForm(props) {
     bankValues,
     setBankValues,
     initialValues,
+    initialFilterValues,
+
     vouItems,
     notify,
     setNotify,
@@ -63,10 +65,9 @@ export default function AcForm(props) {
 
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(initialFilterValues);
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
-
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       let newRecords = items.filter((item) => item.vouNo !== "X X X X");
@@ -120,15 +121,26 @@ export default function AcForm(props) {
       [name]: value,
     });
   };
-  const handleOtherChange = (e) => {
-    const { name, value } = e.target;
-    console.log(name, value + "clicked haha");
-    setOtherValues({
-      ...otherValues,
-      [name]: value,
+  function Validate(fieldValues = bankValues) {
+    console.log(fieldValues);
+    let temp = { ...errors };
+    console.log(errors);
+    function check(key) {
+      if (key in fieldValues)
+        temp[key] = fieldValues[key] ? "" : "This field is required.";
+    }
+    check("vouDate");
+    check("fromName");
+    check("toName");
+    check("amount");
+    setErrors({
+      ...temp,
     });
-  };
-
+    delete temp.startDate;
+    delete temp.endDate;
+    console.log(temp);
+    return Object.values(temp).every((x) => x == "");
+  }
   const user = AuthHandler.getUser();
   if (
     !bankValues.vouNo.includes(
@@ -154,134 +166,102 @@ export default function AcForm(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let x = true;
-    records.map((ite) => {
-      if (ite.vouNo == bankValues.vouNo) {
-        console.log(ite, bankValues);
-        x = false;
-      }
-    });
-    let Fil = [
-      {
-        ...bankValues,
-        acCode: bankValues.fromCode,
-        acName: "",
-        fromName: "",
-        toName: "",
-        credit: Number(bankValues.amount),
-        debit: 0,
-        srNo: 1,
-      },
-      {
-        ...bankValues,
-        acCode: bankValues.toCode,
-        debit: Number(bankValues.amount),
-        credit: 0,
-        acName: "",
-        toName: "",
-        fromName: "",
-        srNo: 2,
-      },
-    ];
-
-    const userCode = localStorage.getItem("userCode");
-    const userCompanyCode = localStorage.getItem("userCompanyCode");
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-    if (x) {
-      axios
-        .put(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          setRecords([...records, ...response.data.itemList]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      axios
-        .patch(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          let newArr = records.filter(
-            (item) => item.vouNo !== bankValues.vouNo
-          );
-          console.log(Fil);
-          setRecords([...newArr, ...Fil]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-
-  const handleAdd = () => {
-    let x = true;
-    itemList.map((ite) => {
-      if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
-        console.log(ite, otherValues);
-        x = false;
-      }
-    });
-    if (x) {
-      const latest = [
-        ...itemList,
-        {
-          ...otherValues,
-          srNo: Number(itemList[itemList.length - 1].srNo) + 1,
-        },
-      ];
-      setItemList(latest);
-      setOtherValues(initialValues);
-    } else {
-      const newItemList = itemList.map((ite) => {
-        if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
-          return otherValues;
-        } else {
-          return ite;
+    if (Validate()) {
+      let x = true;
+      records.map((ite) => {
+        if (ite.vouNo == bankValues.vouNo) {
+          console.log(ite, bankValues);
+          x = false;
         }
       });
-      console.log(newItemList);
+      let Fil = [
+        {
+          ...bankValues,
+          acCode: bankValues.fromCode,
+          acName: "",
+          fromName: "",
+          toName: "",
+          credit: Number(bankValues.amount),
+          debit: 0,
+          srNo: 1,
+        },
+        {
+          ...bankValues,
+          acCode: bankValues.toCode,
+          debit: Number(bankValues.amount),
+          credit: 0,
+          acName: "",
+          toName: "",
+          fromName: "",
+          srNo: 2,
+        },
+      ];
 
-      setItemList(newItemList);
-      setOtherValues(initialValues);
+      const userCode = localStorage.getItem("userCode");
+      const userCompanyCode = localStorage.getItem("userCompanyCode");
+      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+      if (x) {
+        axios
+          .put(
+            Config.accounting + query,
+            {
+              obj: {
+                bankV: bankValues,
+                itemList: Fil,
+              },
+            },
+            {
+              headers: {
+                authorization: "Bearer" + token,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.itemList);
+            setRecords([...records, ...response.data.itemList]);
+            setNotify({
+              isOpen: true,
+              message: "Voucher created  successfully",
+              type: "success",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        axios
+          .patch(
+            Config.accounting + query,
+            {
+              obj: {
+                bankV: bankValues,
+                itemList: Fil,
+              },
+            },
+            {
+              headers: {
+                authorization: "Bearer" + token,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.itemList);
+            let newArr = records.filter(
+              (item) => item.vouNo !== bankValues.vouNo
+            );
+            console.log(Fil);
+            setRecords([...newArr, ...Fil]);
+            setNotify({
+              isOpen: true,
+              message: "Voucher created  successfully",
+              type: "success",
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     }
-    console.log(bankValues, itemList, x);
   };
 
   return (
@@ -320,6 +300,7 @@ export default function AcForm(props) {
               label="Voucher Date"
               value={bankValues}
               setValue={setBankValues}
+              error={errors.vouDate}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -333,6 +314,7 @@ export default function AcForm(props) {
               setValue={setBankValues}
               options1={bankOptions}
               options2={banks}
+              error={errors.fromName}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -346,6 +328,7 @@ export default function AcForm(props) {
               setValue={setBankValues}
               options1={bankOptions}
               options2={banks}
+              error={errors.toName}
             />
           </Grid>
 

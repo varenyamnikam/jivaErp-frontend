@@ -33,6 +33,7 @@ import MultipleSelectCheckmarks from "../../components/multiSelect";
 import Filter from "../../components/filterButton";
 import AcForm from "./AcForm";
 import PrintAcc from "../../components/prinAcc";
+import { getTime } from "date-fns";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -58,15 +59,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
 const initialAccounts = {
   acCode: "",
   acc: "",
@@ -97,6 +89,50 @@ const initialAccounts = {
 };
 export default function AcMaster(props) {
   const { title, initialValues } = props;
+  const user = JSON.parse(localStorage.getItem("user"));
+  function currentFinyear() {
+    const today = new Date();
+    console.log(user);
+    console.log(
+      new Date(user.defaultYearStart),
+      new Date(today.getFullYear(), 3, 1),
+      new Date(user.defaultYearStart).setHours(0, 0, 0, 0) <=
+        new Date(today.getFullYear(), 3, 1).setHours(0, 0, 0, 0)
+    );
+
+    if (
+      new Date(user.defaultYearStart).setHours(0, 0, 0, 0) <=
+      new Date(today.getFullYear(), 3, 1).setHours(0, 0, 0, 0)
+    )
+      return true;
+    else {
+      return false;
+    }
+  }
+
+  function getD() {
+    const today = new Date();
+    let oneMonthAgo = new Date();
+    if (currentFinyear()) {
+      oneMonthAgo = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate()
+      );
+      console.log("current");
+    } else {
+      const endDate = new Date(user.defaultYearEnd);
+      oneMonthAgo = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth() - 1,
+        endDate.getDate()
+      );
+      console.log("prev");
+    }
+    console.log(oneMonthAgo);
+    return oneMonthAgo;
+  }
+
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
     { id: "Account", label: "Account", feild: "getName" },
@@ -109,11 +145,10 @@ export default function AcMaster(props) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  const user = JSON.parse(localStorage.getItem("user"));
 
   let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&yearStart=${
     user.yearStartDate
-  }`;
+  }&yearCode=${user.defaultYearCode}`;
   const initialFilterValues = {
     ...initialValues,
     vouNo: "",
@@ -166,7 +201,7 @@ export default function AcMaster(props) {
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}`;
 
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };

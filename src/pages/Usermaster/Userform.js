@@ -265,6 +265,7 @@ export default function Userform(props) {
           ...values,
           defaultYearCode: item.yearCode,
           defaultYearStart: item.yearStartDate,
+          defaultYearEnd: item.yearEndDate,
         });
       }
     });

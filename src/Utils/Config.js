@@ -5,6 +5,7 @@ const PORT = process.env.PORT;
 
 // console.log(userCompanyCode, userCode);
 class Config {
+  static user = JSON.parse(localStorage.getItem("user"));
   static query = AuthHandler.getQuery();
   // //FOR TEST URL
   // static loginUrl = "http://localhost:3001/api/login";

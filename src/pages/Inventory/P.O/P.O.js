@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="P.O"
+      title="Puchase Order"
       docCode="PO"
       initialValues={initialValues}
       route="dc"

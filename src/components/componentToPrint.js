@@ -50,7 +50,6 @@ const useStyles = makeStyles((theme) => ({
     bottom: 0,
     left: 0,
     width: "100%",
-    color: "white",
   },
   center: { alignItems: "center", justifyContent: "flex-end" },
 }));
@@ -59,16 +58,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   const { values, voucherItems, adress, accounts, products, payTerms, item } =
     props;
   const classes = useStyles();
-  function getTheme() {
-    const color = JSON.parse(
-      localStorage.getItem("adm_softwareSettings")
-    ).color;
-    if (color == "blue") {
-      return "#79A9C5EB";
-    } else {
-      return "green";
-    }
-  }
 
   const recentImageDataUrl = localStorage.getItem("recent-image");
   const ad = adress.filter((item) => item.acCode == values.partyCode);
@@ -131,9 +120,10 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
     if (color == "blue") {
       return "#79A9C5EB";
     } else {
-      return "green";
+      return "#66FF99";
     }
   }
+
   function getPay(code) {
     let temp = "";
     payTerms.map((item) => {
@@ -259,7 +249,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: getTheme(), color: "white" }}
+                      style={{ backgroundColor: getTheme() }}
                     >
                       <h5> From</h5>
                     </Grid>
@@ -277,7 +267,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: getTheme(), color: "white" }}
+                      style={{ backgroundColor: getTheme() }}
                     >
                       <h5>Bill To</h5>
                     </Grid>
@@ -297,7 +287,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                       Item
                       sm={9}
                       xs={9}
-                      style={{ backgroundColor: getTheme(), color: "white" }}
+                      style={{ backgroundColor: getTheme() }}
                     >
                       <h5> Ship To</h5>
                     </Grid>
@@ -316,14 +306,13 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableHead style={{ backgroundColor: getTheme(), color: "white" }}>
-            <TableRow style={{ backgroundColor: getTheme(), color: "white" }}>
+          <TableHead style={{ backgroundColor: getTheme() }}>
+            <TableRow style={{ backgroundColor: getTheme() }}>
               <TableCell
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "20%",
-                  color: "white",
                 }}
               >
                 Product
@@ -333,7 +322,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
                   width: "5%",
-                  color: "white",
                 }}
               >
                 Quantity
@@ -342,7 +330,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
                 }}
               >
                 Rate
@@ -351,7 +338,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
                 }}
               >
                 Amount
@@ -360,7 +346,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
                 }}
               >
                 Discount
@@ -369,35 +354,15 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
                 }}
               >
-                cgst
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
-                }}
-              >
-                sgst
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
-                }}
-              >
-                igst
+                G.S.T
               </TableCell>
               {settings.useCessitem == "Yes" && (
                 <TableCell
                   align="right"
                   style={{
                     border: "1px solid rgba(0,0,0,0.2)",
-                    color: "white",
                   }}
                 >
                   cess
@@ -407,7 +372,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 align="right"
                 style={{
                   border: "1px solid rgba(0,0,0,0.2)",
-                  color: "white",
+
                   width: "10%",
                 }}
               >
@@ -468,23 +433,14 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                     border: "1px solid rgba(0,0,0,0.2)",
                   }}
                 >
-                  {rnd(item.cgst)} ({rnd(item.cgstP)}%)
-                </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
-                  }}
-                >
-                  {rnd(item.sgst)} ({rnd(item.sgstP)}%)
-                </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
-                  }}
-                >
-                  {rnd(item.igst)} ({rnd(item.igstP)}%)
+                  {rnd(
+                    Number(item.cgst) + Number(item.sgst) + Number(item.igst)
+                  )}
+                  (
+                  {rnd(
+                    Number(item.cgstP) + Number(item.sgstP) + Number(item.igstP)
+                  )}
+                  %)
                 </TableCell>
                 {settings.useCessitem == "Yes" && (
                   <TableCell

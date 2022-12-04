@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="P.V"
+      title="Purchase Voucher"
       docCode="PV"
       initialValues={initialValues}
       route="ledger"

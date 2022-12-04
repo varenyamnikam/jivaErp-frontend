@@ -44,7 +44,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="D.C"
+      title="Delivery Challan"
       docCode="DC"
       initialValues={initialValues}
       route={company.saleStockUpdateUsing == "SI" ? "ledger" : "dc"}

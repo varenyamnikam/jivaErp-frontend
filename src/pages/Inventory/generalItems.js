@@ -25,16 +25,14 @@ import {
   InputAdornment,
   TableContainer,
 } from "@material-ui/core";
-
+import Validate from "./validateItem";
 const headcells = [
   { id: "Product", label: "Product" },
   { id: "Quantity", label: "Quantity" },
   { id: "Rate", label: "Rate" },
   { id: "AMOUNT", label: "AMOUNT" },
   { id: "Discount", label: "Discount" },
-  { id: "C-GST", label: "C-GST" },
-  { id: "S-GST", label: "S-GST" },
-  { id: "I-GST", label: "I-GST" },
+  { id: "GST", label: "G.S.T" },
   { id: "CESS", label: "CESS" },
   { id: "Item Total", label: "Item Total" },
   { id: "Delete", label: "Delete" },
@@ -55,10 +53,11 @@ export default function GeneralItemForm(props) {
     setCommon,
     common,
   } = props;
+  const validateValues = { ...vouItems, vouNo: "", expDate: "" };
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
   const [item, setItem] = useState(vouItems);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
   const [notify, setNotify] = useState({
@@ -196,6 +195,7 @@ export default function GeneralItemForm(props) {
       vouSrNo: 1,
     });
   const handleSubmit = (e) => {
+    setPopup(false);
     e.preventDefault();
     let x = true;
     itemList.map((ite) => {
@@ -261,7 +261,7 @@ export default function GeneralItemForm(props) {
   return (
     <>
       <Popup
-        title="Filter"
+        title="Item"
         openPopup={popup}
         setOpenPopup={setPopup}
         size="md"
@@ -279,7 +279,7 @@ export default function GeneralItemForm(props) {
               setValue={setItem}
               options1={prodOptions}
               options2={products}
-              error={errors.prodName}
+              error={errors.prodCode}
             />
           </Grid>
           {settings.itemDescription == "Yes" && (
@@ -336,6 +336,7 @@ export default function GeneralItemForm(props) {
                 setValues={setItem}
                 batchList={batchList}
                 setBatchlist={setBatchlist}
+                error={errors.qty}
               />
             </Grid>
           ) : (
@@ -456,14 +457,15 @@ export default function GeneralItemForm(props) {
               type="submit"
               text="Submit"
               onClick={(e) => {
-                if (useBatch == "NO" && item.prodCode) {
-                  console.log("hi");
-                  getStock(e);
-                } else {
-                  console.log("hi else");
-                  handleSubmit(e);
+                if (Validate(item, errors, setErrors, settings, input)) {
+                  if (useBatch == "NO" && item.prodCode) {
+                    console.log("hi");
+                    getStock(e);
+                  } else {
+                    console.log("hi else");
+                    handleSubmit(e);
+                  }
                 }
-                setPopup(false);
               }}
             />
           </Grid>
@@ -493,13 +495,18 @@ export default function GeneralItemForm(props) {
                     </TableCell>
                     <TableCell>
                       {" "}
-                      {rnd(item.cgst)} ({rnd(item.cgstP)}%)
-                    </TableCell>
-                    <TableCell>
-                      {rnd(item.sgst)} ({rnd(item.sgstP)}%)
-                    </TableCell>
-                    <TableCell>
-                      {rnd(item.igst)} ({rnd(item.igstP)}%)
+                      {rnd(
+                        Number(item.cgst) +
+                          Number(item.sgst) +
+                          Number(item.igst)
+                      )}
+                      (
+                      {rnd(
+                        Number(item.cgstP) +
+                          Number(item.sgstP) +
+                          Number(item.igstP)
+                      )}
+                      %)
                     </TableCell>
                     <TableCell>
                       {rnd(item.cess)} ({rnd(item.cessP)}%)
@@ -556,6 +563,7 @@ export default function GeneralItemForm(props) {
             onClick={(e) => {
               setPopup(true);
               setBatchlist([{ batchNo: 0, qty: 0, sell: 0 }]);
+              setErrors(validateValues);
             }}
           />
         </Grid>

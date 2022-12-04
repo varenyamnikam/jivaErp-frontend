@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="Q.T"
+      title="Quotation"
       docCode="QT"
       initialValues={initialValues}
       route="both"

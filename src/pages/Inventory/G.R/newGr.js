@@ -43,7 +43,7 @@ export default function GR() {
 
   return (
     <ReuseMaster
-      title="GR"
+      title="Good Reciept Note"
       docCode="GR"
       initialValues={initialValues}
       route="dc"

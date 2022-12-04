@@ -45,7 +45,7 @@ export default function SI() {
 
   return (
     <ReuseMaster
-      title="S.I"
+      title="Sale Invoice"
       docCode="SI"
       initialValues={initialValues}
       route={company.saleStockUpdateUsing == "DC" ? "ledger" : "dc"}

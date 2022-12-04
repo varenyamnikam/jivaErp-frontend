@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="G.R"
+      title="Good Reciept Note"
       docCode="G.R"
       initialValues={initialValues}
       route="dc"

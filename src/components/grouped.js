@@ -64,11 +64,10 @@ const statusItems = [
 
 export default function Grouped(props) {
   // const { value, setValue, error = null, onChange, disabled, ...other } = props;
-  const { values, setValues, batchList, setBatchlist } = props;
+  const { values, setValues, batchList, setBatchlist, error = null } = props;
   const [popup, setPopup] = useState(false);
   const [priority, setPriority] = useState("batch no");
   const [focus, setFocus] = useState(false);
-  const [error, setError] = useState({});
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -281,6 +280,7 @@ export default function Grouped(props) {
             className={classes.root1}
             name="qty"
             value={values.qty}
+            {...(error && { error: true, helperText: error })}
             onChange={(e) => {
               setValues({ ...values, qty: e.target.value });
               if (values.prodCode) {

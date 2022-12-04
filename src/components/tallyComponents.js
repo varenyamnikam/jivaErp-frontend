@@ -286,6 +286,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
     ))
   );
   const center = { display: "flex", justifyContent: "center" };
+  const right = { display: "flex", justifyContent: "flex-end" };
+  function getDate(code) {
+    const date = new Date(code);
+    return (
+      String(date.getDate()) +
+      "/" +
+      String(date.getMonth() + 1) +
+      "/" +
+      String(date.getFullYear()).slice(-2)
+    );
+  }
+
   return (
     <>
       <div
@@ -293,7 +305,10 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
         style={{ height: geth(getItems(values)), padding: "20px" }}
       >
         <Grid container>
-          <Grid Item xs={12} sm={12} style={center}>
+          <Grid Item xs={3} sm={3}>
+            <h2>{getImage()}</h2>
+          </Grid>
+          <Grid Item xs={6} sm={6} style={{ paddingLeft: "150px" }}>
             <h1>{company.companyName}</h1>
           </Grid>
           <Grid Item xs={12} sm={12} style={center}>
@@ -308,7 +323,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <h3>{`${title} No. ${values.vouNo}`}</h3>
           </Grid>
           <Grid Item xs={6} sm={6} style={center}>
-            <h3>{String(values.vouDate)}</h3>
+            <h3>Date: {getDate(values.vouDate)}</h3>
           </Grid>
           <Grid Item xs={12} sm={12} style={{ ...center }}>
             <Grid
@@ -340,13 +355,15 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 xs={8}
                 sm={8}
                 style={{
+                  ...center,
+
                   paddingLeft: "20px",
                   borderRight: "3px solid black",
                 }}
               >
                 <h5>Account: </h5>
               </Grid>
-              <Grid Item xs={4} sm={4} style={center}></Grid>
+              <Grid Item xs={4} sm={4} style={right}></Grid>
               {getItems(values).map((item) => (
                 <>
                   <Grid
@@ -354,13 +371,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                     xs={8}
                     sm={8}
                     style={{
-                      ...center,
+                      paddingLeft: "20px",
                       borderRight: "3px solid black",
                     }}
                   >
                     <h4>{getParty(item)}</h4>
                   </Grid>
-                  <Grid Item xs={4} sm={4} style={center}>
+                  <Grid
+                    Item
+                    xs={4}
+                    sm={4}
+                    style={{ ...right, paddingRight: "20px" }}
+                  >
                     <h4>
                       {Number(item.credit) == 0 ? item.debit : item.credit}
 
@@ -374,7 +396,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 xs={8}
                 sm={8}
                 style={{
-                  ...center,
                   borderTop: "3px solid black",
                   borderRight: "3px solid black",
                 }}
@@ -394,7 +415,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                 xs={4}
                 sm={4}
                 style={{
-                  ...center,
+                  ...right,
                   borderTop: "3px solid black",
                 }}
               >
@@ -413,7 +434,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
           <Grid Item xs={4} sm={4} style={{ ...center, marginTop: "20px" }}>
             <h3>Narration : {values.narration}</h3>
           </Grid>
-          <Grid Item xs={12} sm={12} style={{ ...center, marginTop: "50px" }}>
+          <Grid Item xs={12} sm={12} style={{ ...center, marginTop: "250px" }}>
             <h2>Authorized Signatory</h2>
           </Grid>
         </Grid>

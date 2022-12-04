@@ -226,6 +226,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
     console.log(obj, values.docCode);
     return obj;
   }
+  const right = { display: "flex", justifyContent: "flex-end" };
 
   function getImage() {
     if (recentImageDataUrl) {
@@ -314,7 +315,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             xs={3}
             style={{ display: "flex", justifyContent: "center" }}
           >
-            <h3> Date: {getDate(new Date())}</h3>
+            <h3> Date: {getDate(values.vouDate)}</h3>
           </Grid>
           <Grid Item xs={12} sm={12}>
             <h3>Payment Through : {getParty(values)}</h3>
@@ -372,13 +373,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
                     xs={8}
                     sm={8}
                     style={{
-                      ...center,
+                      paddingLeft: "20px",
                       borderRight: "3px solid black",
                     }}
                   >
                     <h4>{getParty(item)}</h4>
                   </Grid>
-                  <Grid Item xs={4} sm={4} style={center}>
+                  <Grid
+                    Item
+                    xs={4}
+                    sm={4}
+                    style={{ ...right, paddingRight: "20px" }}
+                  >
                     <h4>
                       {Number(item.credit) == 0 ? item.debit : item.credit}
 
@@ -389,18 +395,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               ))}
             </Grid>
           </Grid>
-          <Grid Item xs={6} sm={6} style={{ ...center, marginTop: "50px" }}>
-            <h2>Authorized Signatory</h2>
-          </Grid>
 
           <Grid Item xs={6} sm={6} style={{ ...center, marginTop: "50px" }}>
             <h4>
               Amount (In Words): INR
               {price_in_words(
                 finalCalc().credit == 0 ? finalCalc().debit : finalCalc().credit
-              )}
+              ) + " "}
               only
             </h4>
+          </Grid>
+          <Grid Item xs={6} sm={6} style={{ ...center, marginTop: "250px" }}>
+            <h2>Authorized Signatory</h2>
           </Grid>
         </Grid>
       </div>

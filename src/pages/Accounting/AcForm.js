@@ -61,15 +61,17 @@ export default function AcForm(props) {
     bankValues.docCode == "JV"
       ? [
           { id: "A/c Name", label: "A/c Name" },
-          { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
+          { id: "Credit", label: "Credit" },
+
           { id: "Edit", label: "Edit" },
         ]
       : [
           { id: "Bank Name", label: "Bank Name" },
           { id: "A/c Name", label: "A/c Name" },
-          { id: "Credit", label: "Credit" },
           { id: "Debit", label: "Debit" },
+          { id: "Credit", label: "Credit" },
+
           { id: "Edit", label: "Edit" },
         ];
   const [headCells, setHeadCells] = useState(headcells);
@@ -468,8 +470,8 @@ export default function AcForm(props) {
                         <TableCell>{bankValues.acName}</TableCell>
                       )}
                       <TableCell>{getName(item.acCode)}</TableCell>
-                      <TableCell>{Number(item.credit)}</TableCell>
                       <TableCell>{Number(item.debit)}</TableCell>
+                      <TableCell>{Number(item.credit)}</TableCell>
 
                       <TableCell>
                         <Controls.ActionButton
@@ -506,22 +508,22 @@ export default function AcForm(props) {
           <Grid item xs={0} sm={3}></Grid>
           <Grid item xs={12} sm={3}>
             <Controls.Input
+              name="debit"
+              label="Debit"
+              value={bankValues.debit}
+              onChange={handleChange}
+              error={errors.debit}
+              disabled={true}
+            />
+          </Grid>{" "}
+          <Grid item xs={12} sm={3}>
+            <Controls.Input
               name="credit"
               label="Credit"
               type="number"
               value={bankValues.credit}
               onChange={handleChange}
               error={errors.credit}
-              disabled={true}
-            />
-          </Grid>{" "}
-          <Grid item xs={12} sm={3}>
-            <Controls.Input
-              name="debit"
-              label="Debit"
-              value={bankValues.debit}
-              onChange={handleChange}
-              error={errors.debit}
               disabled={true}
             />
           </Grid>{" "}

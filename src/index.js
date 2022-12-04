@@ -50,7 +50,7 @@ import CP from "./pages/Accounting/CP/CpMaster";
 import JV from "./pages/Accounting/JV/JvMaster";
 import CV from "./pages/Accounting/CV/CvMaster";
 import OB from "./pages/Accounting/OB/ObMaster";
-
+import StockReport from "./pages/Stock/report/stockReport";
 ReactDOM.render(
   <Router>
     <Switch>
@@ -162,6 +162,11 @@ ReactDOM.render(
         exact
         path="/Inventory/StockMaster"
         page={<StockMaster />}
+      />
+      <PrivateRouteNew
+        exact
+        path="/Inventory/StockReport"
+        page={<StockReport />}
       />
       <PrivateRouteNew exact path="/AcTransaction/BR" page={<BR />} />
       <PrivateRouteNew exact path="/AcTransaction/BP" page={<BP />} />

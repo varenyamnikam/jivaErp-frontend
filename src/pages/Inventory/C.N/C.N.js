@@ -44,7 +44,7 @@ export default function QT() {
   console.log(Config.ledger);
   return (
     <ReuseMaster
-      title="C.N"
+      title="Credit Note"
       docCode="CN"
       initialValues={initialValues}
       route="ledger"

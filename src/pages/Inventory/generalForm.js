@@ -55,9 +55,41 @@ export default function GeneralForm(props) {
     common,
     itemList,
     setItemList,
+    title,
   } = props;
+  const validateValues = {
+    ...initialValues,
+    vouNo: "",
+    docCode: "",
+    finYear: "",
+    branchCode: "",
+    vouDate: "",
+    partyBillDate: "",
+    partyChallanDate: "",
+  };
   const [input, setInput] = useState(values);
+  const [errors, setErrors] = useState(validateValues);
+  function Validate(fieldValues = input) {
+    console.log(fieldValues);
+    let temp = { ...errors };
+    function check(key) {
+      if (key in fieldValues)
+        temp[key] = fieldValues[key] ? "" : "This field is required.";
+    }
+    function check0(key) {
+      if (key in fieldValues)
+        temp[key] =
+          Number(fieldValues[key]) > 0 ? "" : "This should be more than 0";
+    }
 
+    check("partyCode");
+    check0("itemTotal");
+    setErrors({
+      ...temp,
+    });
+    console.log(temp);
+    return Object.values(temp).every((x) => x == "");
+  }
   adress.filter((item) => item.acCode == input.partyCode);
   console.log(adress);
   const refOptions = records
@@ -68,8 +100,7 @@ export default function GeneralForm(props) {
   const addressOptions = adress
     .filter((item) => item.acCode == input.partyCode)
     .map((item) => item.addressLine1);
-  const [errors, setErrors] = useState(initialFilterValues);
-  // console.log(errors);
+  console.log(errors);
   const partyOptions = accounts
     .filter((item) => item.preFix == "C")
     .map((item) => {
@@ -244,7 +275,7 @@ export default function GeneralForm(props) {
             setValue={setInput}
             options1={partyOptions}
             options2={accounts}
-            error={errors.partyName}
+            error={errors.partyCode}
           />{" "}
         </Grid>{" "}
         <Grid item xs={12} sm={6} className={classes.input}>
@@ -496,7 +527,7 @@ export default function GeneralForm(props) {
               type="submit"
               text="Submit"
               onClick={(e) => {
-                handleSubmit(input, itemList);
+                if (Validate()) handleSubmit(input, itemList);
               }}
             />
           </div>

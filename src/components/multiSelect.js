@@ -69,7 +69,10 @@ export default function MultipleSelectPlaceholder({
 
   return (
     <div style={{ marginTop: "4px" }}>
-      <FormControl sx={{ m: 10, width: 100, mt: 3 }} style={{ height: "40px" }}>
+      <FormControl
+        sx={{ m: 10, width: 100, mt: 3 }}
+        style={{ height: "40px", margin: "0px" }}
+      >
         <Select
           multiple
           displayEmpty
@@ -97,6 +100,7 @@ export default function MultipleSelectPlaceholder({
             borderRadius: "5px",
             borderTopLeftRadius: "0px",
             borderBottomLeftRadius: "0px",
+            margin: "0px",
           }}
           disableUnderline={true}
           MenuProps={{

@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="D.N"
+      title="Debit Note"
       docCode="DN"
       initialValues={initialValues}
       route="ledger"

@@ -43,7 +43,7 @@ export default function QT() {
 
   return (
     <ReuseMaster
-      title="P.I"
+      title="Performa Invoice"
       docCode="PI"
       initialValues={initialValues}
       route="both"

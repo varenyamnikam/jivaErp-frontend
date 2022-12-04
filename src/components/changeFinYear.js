@@ -11,6 +11,28 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
 import Notification from "./Notification";
 import Controls from "./controls/Controls";
+const initialBranchValues = {
+  contactNo: "",
+  Mobileno: "",
+  // pesticideLicenceNo: "",
+  // seedLicenceNo: "",
+  acBranchName: "",
+  acBranchCode: "",
+  Emailid: "",
+  GSTno: "",
+  pinCode: "",
+  adressLine2: "",
+  adressLine1: "",
+  branchName: "",
+  branchCode: "X X X X",
+  branchType: "",
+  stateCode: 0,
+  stateName: "",
+  countryName: "",
+  districtName: "",
+  talukaName: "",
+};
+
 const initialValues = {
   defaultYearCode: "X X X X",
   finYear: "",
@@ -27,6 +49,8 @@ export default function ChangeFinyear({ setButtonPopup }) {
   const [loading, setLoading] = useState(true);
   const [values, setValues] = useState(user);
   const [records, setRecords] = useState([initialValues]);
+  const [branch, setBranch] = useState([initialBranchValues]);
+
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -37,7 +61,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
     const token = AuthHandler.getLoginToken();
     const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
     axios
-      .get(Config.finYear + query, {
+      .get(Config.usermasterUrl + query, {
         headers: {
           authorization: "Bearer" + token,
         },
@@ -47,6 +71,11 @@ export default function ChangeFinyear({ setButtonPopup }) {
           setRecords(response.data.adm_finYear);
         else {
           setRecords([initialValues]);
+        }
+        if (response.data.adm_branch.length !== 0)
+          setBranch(response.data.adm_branch);
+        else {
+          setBranch([initialBranchValues]);
         }
       })
       .catch((error) => {
@@ -69,6 +98,8 @@ export default function ChangeFinyear({ setButtonPopup }) {
     return date;
   }
   let options = records.map((item) => item.finYear);
+  let options1 = branch.map((item) => item.branchName);
+
   function handleSubmit() {
     const token = AuthHandler.getLoginToken();
     const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
@@ -110,7 +141,9 @@ export default function ChangeFinyear({ setButtonPopup }) {
           alignItems: "center",
           height: "100px",
           width: "250px",
+          margin: "25px",
         }}
+        spacing={2}
       >
         <Grid
           item
@@ -133,6 +166,29 @@ export default function ChangeFinyear({ setButtonPopup }) {
             setValue={setValues}
             options1={options}
             options2={records}
+          />{" "}
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <SmartAutoSuggest
+            style={{ width: "100%" }}
+            name1="defaultBranchName"
+            code1="defaultBranchCode"
+            label="Financial Year"
+            name2="branchName"
+            code2="branchCode"
+            value={values}
+            setValue={setValues}
+            options1={options1}
+            options2={branch}
           />{" "}
         </Grid>
         <Grid

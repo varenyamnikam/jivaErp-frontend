@@ -51,6 +51,7 @@ import JV from "./pages/Accounting/JV/JvMaster";
 import CV from "./pages/Accounting/CV/CvMaster";
 import OB from "./pages/Accounting/OB/ObMaster";
 import StockReport from "./pages/Stock/report/stockReport";
+import POReport from "./pages/Report/POReport";
 ReactDOM.render(
   <Router>
     <Switch>
@@ -125,17 +126,17 @@ ReactDOM.render(
         exact
         path="/Master/Accounts/Customers"
         page={<Customers />}
-      ></PrivateRouteNew>
+      />
       <PrivateRouteNew
         exact
         path="/Master/Accounts/Suppliers"
         page={<Suppliers />}
-      ></PrivateRouteNew>
+      />
       <PrivateRouteNew
         exact
         path="/Master/Accounts/Employees"
         page={<Employees />}
-      ></PrivateRouteNew>
+      />
       <PrivateRouteNew
         exact
         path="/Inventory/ProductMaster"
@@ -153,6 +154,14 @@ ReactDOM.render(
       <PrivateRouteNew exact path="/Inventory/P.R" page={<PRMaster />} />
       <PrivateRouteNew exact path="/Inventory/C.N" page={<CNMaster />} />
       <PrivateRouteNew exact path="/Inventory/D.N" page={<DNMaster />} />
+      <PrivateRouteNew exact path="/AcTransaction/BR" page={<BR />} />
+      <PrivateRouteNew exact path="/AcTransaction/BP" page={<BP />} />
+      <PrivateRouteNew exact path="/AcTransaction/CR" page={<CR />} />
+      <PrivateRouteNew exact path="/AcTransaction/CP" page={<CP />} />
+      <PrivateRouteNew exact path="/AcTransaction/JV" page={<JV />} />
+      <PrivateRouteNew exact path="/AcTransaction/CV" page={<CV />} />
+      <PrivateRouteNew exact path="/AcTransaction/OB" page={<OB />} />
+
       <PrivateRouteNew
         exact
         path="/Inventory/PaymentTerm"
@@ -168,13 +177,18 @@ ReactDOM.render(
         path="/Inventory/StockReport"
         page={<StockReport />}
       />
-      <PrivateRouteNew exact path="/AcTransaction/BR" page={<BR />} />
-      <PrivateRouteNew exact path="/AcTransaction/BP" page={<BP />} />
-      <PrivateRouteNew exact path="/AcTransaction/CR" page={<CR />} />
-      <PrivateRouteNew exact path="/AcTransaction/CP" page={<CP />} />
-      <PrivateRouteNew exact path="/AcTransaction/JV" page={<JV />} />
-      <PrivateRouteNew exact path="/AcTransaction/CV" page={<CV />} />
-      <PrivateRouteNew exact path="/AcTransaction/OB" page={<OB />} />
+      <PrivateRouteNew
+      exact
+      path="/Inventory/StockReport"
+      page={<StockReport />}
+    />
+
+    <PrivateRouteNew
+    exact
+    path="/Report/POReport"
+    page={<POReport />}
+  />
+
     </Switch>
   </Router>,
 

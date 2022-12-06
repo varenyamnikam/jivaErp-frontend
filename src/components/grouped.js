@@ -133,9 +133,6 @@ export default function Grouped(props) {
     });
     return x;
   }
-  var promise = new Promise((resolve, reject) => {
-    if (records[0].batchNo !== 0) resolve = true;
-  });
   function getStock(y = false) {
     const useBatch = JSON.parse(
       localStorage.getItem("adm_softwareSettings")

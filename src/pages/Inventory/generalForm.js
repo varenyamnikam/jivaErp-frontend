@@ -56,6 +56,7 @@ export default function GeneralForm(props) {
     itemList,
     setItemList,
     title,
+    reference,
   } = props;
   const validateValues = {
     ...initialValues,
@@ -92,8 +93,8 @@ export default function GeneralForm(props) {
   }
   adress.filter((item) => item.acCode == input.partyCode);
   console.log(adress);
-  const refOptions = records
-    .filter((item) => input.refType == item.docCode)
+  const refOptions = reference
+    .filter((item) => input.docCode !== item.docCode)
     .map((item) => item.vouNo);
   const payOptions = payTerms.map((item) => item.paymentTerms);
   const prodOptions = products.map((item) => item.prodName);
@@ -528,6 +529,7 @@ export default function GeneralForm(props) {
               text="Submit"
               onClick={(e) => {
                 if (Validate()) handleSubmit(input, itemList);
+                console.log(Validate());
               }}
             />
           </div>

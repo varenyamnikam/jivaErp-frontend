@@ -145,6 +145,8 @@ export default function ReuseMaster(props) {
   const [refresh, setRefresh] = useState(false);
   const [common, setCommon] = useState(initialCommonValues);
   const [records, setRecords] = useState([initialValues]);
+  const [reference, setReference] = useState([initialValues]);
+
   const [filter, setFilter] = useState(initialFilterValues);
   const [itemList, setItemList] = useState([vouItems]);
   const [notify, setNotify] = useState({
@@ -188,7 +190,15 @@ export default function ReuseMaster(props) {
   }
   console.log(Config[route]);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${docCode}&yearStart=${user.yearStartDate}`;
+    let qry = initialValues.docCode;
+    if (initialValues.docCode == "GR") {
+      qry = JSON.stringify({ $in: ["GR", "PO"] });
+    }
+    if (initialValues.docCode == "SI") {
+      qry = JSON.stringify({ $in: ["SI", "DC", "QT"] });
+    }
+
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
@@ -202,13 +212,15 @@ export default function ReuseMaster(props) {
         console.log(response.data);
         if (refresh) setRefresh(false);
 
-        const gr = response.data.inv_voucher.map((item) => {
-          return {
-            ...item,
-            getDate: getDate(item.vouDate),
-            getName: getName(item.partyCode),
-          };
-        });
+        const gr = response.data.inv_voucher
+          .filter((item) => item.docCode == docCode)
+          .map((item) => {
+            return {
+              ...item,
+              getDate: getDate(item.vouDate),
+              getName: getName(item.partyCode),
+            };
+          });
 
         function getAccounts(arr) {
           if (arr.length !== 0) {
@@ -252,7 +264,12 @@ export default function ReuseMaster(props) {
           payTerms: getPayterms(response.data.mst_paymentTerm),
           products: getProd(response.data.mst_prodMaster),
         });
-
+        const po = response.data.inv_voucher.filter(
+          (item) => item.docCode !== docCode
+        );
+        if (po.length !== 0) {
+          setReference(po);
+        }
         if (gr.length !== 0) {
           setRecords(gr);
         } else {
@@ -722,6 +739,7 @@ export default function ReuseMaster(props) {
                       itemList={itemList}
                       setItemList={setItemList}
                       title={title}
+                      reference={reference}
                     />
                   </Popup>
 

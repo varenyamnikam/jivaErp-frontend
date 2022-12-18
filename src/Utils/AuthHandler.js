@@ -115,8 +115,8 @@ class AuthHandler {
     return localStorage.getItem("userCompanyCode");
   }
   static getUser() {
-    if (reactLocalStorage.get("user"))
-      return JSON.parse(reactLocalStorage.get("user"));
+    if (localStorage.getItem("user"))
+      return JSON.parse(localStorage.getItem("user"));
     else {
       return null;
     }

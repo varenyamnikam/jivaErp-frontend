@@ -4,9 +4,9 @@ export default function DcValues() {
   const user = AuthHandler.getUser();
   const initialValues = {
     vouNo: "X X X X",
-    branchCode: user.defaultBranchCode,
+    branchCode: user ? user.defaultBranchCode : "0000",
     docCode: "DC",
-    finYear: user.defaultYearCode,
+    finYear: user ? user.defaultYearCode : "0000",
     vno: "",
     manualNo: "",
     vouDate: new Date(),

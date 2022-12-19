@@ -34,7 +34,6 @@ import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import CmnToolBar from "../../components/CommonToolBar";
 import Outer from "../../components/outer";
-
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -256,146 +255,81 @@ export default function StockMaster() {
   const accountOptions = accounts.map((item) => item.acName);
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="StockMaster"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
-            <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <CmnToolBar
-                      filterIcon={filterIcon}
-                      filter={filter}
-                      handleFilter={handleFilter}
-                      setFilterPopup={setFilterPopup}
-                      setFilter={setFilter}
-                      setFilterFn={setFilterFn}
-                      setFilterIcon={setFilterIcon}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
-                      initialFilterFn={initialFilterFn}
-                      buttonText="Export Data to Excel"
-                      TblContainer={TblContainer}
-                      TblHead={TblHead}
-                      TblPagination={TblPagination}
-                      headCells={headcells}
-                      recordsAfterSorting={recordsAfterAndSorting}
-                      headcells={headcells}
-                      setheadcells={setheadcells}
-                      initialHeadCells={headCells}
-                      selected={selected}
-                      setSelected={setSelected}
-                    />
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0] == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {typeof item[headcell.feild] == "number"
-                                      ? Math.abs(item[headcell.feild])
-                                      : item[headcell.feild]}
-                                    {headcell.feild == "currentBalance"
-                                      ? item.currentBalance == 0
-                                        ? ""
-                                        : item.currentBalance < 0
-                                        ? "Cr"
-                                        : "Dr"
-                                      : ""}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
+      <Outer>
+        {" "}
+        <PageHeader
+          title="StockMaster"
+          icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+        />
+        <section className="content">
+          <div className="card">
+            <div className="card-body">
+              <section className="content">
+                <CmnToolBar
+                  filterIcon={filterIcon}
+                  setFilterPopup={setFilterPopup}
+                  setFilter={setFilter}
+                  setFilterFn={setFilterFn}
+                  setFilterIcon={setFilterIcon}
+                  initialFilterValues={initialFilterValues}
+                  setRefresh={setRefresh}
+                  initialFilterFn={initialFilterFn}
+                  buttonText="Export Data to Excel"
+                  TblContainer={TblContainer}
+                  TblHead={TblHead}
+                  TblPagination={TblPagination}
+                  headCells={headcells}
+                  recordsAfterSorting={recordsAfterAndSorting}
+                  headcells={headcells}
+                  setheadcells={setheadcells}
+                  initialHeadCells={headCells}
+                  selected={selected}
+                  setSelected={setSelected}
+                />{" "}
+                <TableContainer>
+                  <TblContainer>
+                    <TblHead />
+                    {records[0] == "X X X X" ? (
+                      <MuiSkeleton />
+                    ) : (
+                      <TableBody>
+                        {recordsAfterPagingAndSorting().map((item) => (
+                          <TableRow>
+                            {headcells.map((headcell, i) => (
+                              <TableCell
+                                key={headcell.id}
+                                // sortDirection={orderBy === headcell.id ? order : false}
+                                style={{
+                                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                {Display(item, headcell)}
+                              </TableCell>
                             ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    )}
+                  </TblContainer>
+                </TableContainer>
+                <TblPagination />
+              </section>
 
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} className={classes.input}>
-                        <SmartAutoSuggest
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                          name1="acName"
-                          code1="acCode"
-                          name2="acName"
-                          code2="acCode"
-                          label="Account"
-                          value={filter}
-                          setValue={setFilter}
-                          options1={accountOptions}
-                          options2={accounts}
-                        />
-                      </Grid>
+              <Popup
+                title="Filter"
+                openPopup={filterPopup}
+                setOpenPopup={setFilterPopup}
+              ></Popup>
 
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setRefresh(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
-            </section>
+              <Notification notify={notify} setNotify={setNotify} />
+              <ConfirmDialog
+                confirmDialog={confirmDialog}
+                setConfirmDialog={setConfirmDialog}
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </Outer>
     </>
   );
 }

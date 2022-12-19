@@ -48,7 +48,7 @@ export default function SI() {
       title="Sale Invoice"
       docCode="SI"
       initialValues={initialValues}
-      route={company.saleStockUpdateUsing == "DC" ? "ledger" : "dc"}
+      route={company.saleStockUpdateUsing == "DC" ? "ledger" : "both"}
     />
   );
 }

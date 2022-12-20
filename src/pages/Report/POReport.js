@@ -538,7 +538,7 @@ export default function POReport() {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title="StockMaster"
+              title="P.O Report"
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">

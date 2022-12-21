@@ -60,9 +60,10 @@ const tfStyle = {
   // },
   "& .MuiAutocomplete-inputRoot": {
     // color: "purple",
+    //here
     // p: 0,
     // right: 10,
-    // bottom: 5,
+    // top: 5,
     // paddingTop: "10px",
 
     //   // This matches the specificity of the default styles at https://github.com/mui-org/material-ui/blob/v4.11.3/packages/material-ui-lab/src/Autocomplete/Autocomplete.js#L90

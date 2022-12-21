@@ -110,9 +110,9 @@ const initialReport = {
   deliveredQty: "",
 };
 
-export default function POReport() {
+export default function DCReport() {
   const headCells = [
-    { id: "PO no", label: "PO no", feild: "vouNo" },
+    { id: "DC no", label: "DC no", feild: "vouNo" },
     { id: "Date", label: "Date", feild: "vouDate" },
     { id: "Party", label: "Party", feild: "partyName" },
     { id: "Product Code", label: "Product Code", feild: "prodCode" },
@@ -123,7 +123,6 @@ export default function POReport() {
     { id: "GST", label: "GST", feild: "gst" },
     { id: "%", label: "%", feild: "gstP" },
     { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount" },
-    { id: "Delivered", label: "Delivered", feild: "deliveredQty" },
   ];
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = localStorage.getItem("userCode");
@@ -241,7 +240,8 @@ export default function POReport() {
     return ref;
   }
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=DC&yearStart=${user.yearStartDate}`;
+    const qrObj = JSON.stringify({ $in: ["SI", "DC"] });
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
     axios
@@ -252,11 +252,11 @@ export default function POReport() {
       })
       .then((response) => {
         console.log(response.data);
-        let gr = response.data.inv_voucherItems.filter(
-          (item) => item.docCode == "GR"
+        let si = response.data.inv_voucherItems.filter(
+          (item) => item.docCode == "SI"
         );
-        let po = response.data.inv_voucherItems.filter(
-          (item) => item.docCode == "PO"
+        let dc = response.data.inv_voucherItems.filter(
+          (item) => item.docCode == "DC"
         );
 
         function getAccounts(arr) {
@@ -303,18 +303,18 @@ export default function POReport() {
         };
         setCommon(cmnData);
         let report = [];
-        console.log("PO=>", po);
-        let grVou = response.data.inv_voucher.filter(
-          (item) => item.docCode == "GR"
+        console.log("DC=>", dc);
+        let siVou = response.data.inv_voucher.filter(
+          (item) => item.docCode == "SI"
         );
 
         response.data.inv_voucher
-          .filter((item) => item.docCode == "PO")
+          .filter((item) => item.docCode == "DC")
           .map((voucher, i) => {
             let arr = [];
-            arr = po.filter((vouItem) => voucher.vouNo == vouItem.vouNo);
+            arr = dc.filter((vouItem) => voucher.vouNo == vouItem.vouNo);
             let deliveredGr = "";
-            grVou.map((it) => {
+            siVou.map((it) => {
               if (it.refNo == voucher.vouNo) deliveredGr = it.vouNo;
             });
             if (arr.length != 0) {
@@ -328,7 +328,7 @@ export default function POReport() {
                   partyName: getPartyName(voucher.partyCode, cmnData.accounts),
                   gst: calc(item).tot,
                   gstP: calc(item).totP,
-                  deliveredQty: getGr(gr, deliveredGr),
+                  deliveredQty: getGr(si, deliveredGr),
                   vouDate: getDate(item.vouDate),
                 });
               });
@@ -492,45 +492,6 @@ export default function POReport() {
         });
     }
   };
-  function getEntry(code, signal, type) {
-    const token = AuthHandler.getLoginToken();
-    let newValue = values;
-    // axios
-    //   .post(
-    //     // Config.addUser,
-    //     Config.batch + query,
-    //     { code: code, type: "entry" },
-    //     {
-    //       headers: {
-    //         authorization: "Bearer" + token,
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     setValues(response.data.values);
-
-    //     newValue = response.data.values;
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     setNotify({
-    //       isOpen: true,
-    //       message: "unable to fetch entry",
-    //       type: "warn",
-    //     });
-    //   })
-    //   .finally(() => {
-    //     getProd(code);
-    //     if (signal == "v") {
-    //       setButtonPopup(true);
-    //       // setLoading("X X X X");
-    //     } else {
-    //       setPrint(true);
-    //     }
-    //   });
-    return newValue;
-  }
   return (
     <>
       <div className="hold-transition sidebar-mini">

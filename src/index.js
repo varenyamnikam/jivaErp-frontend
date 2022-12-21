@@ -52,6 +52,8 @@ import CV from "./pages/Accounting/CV/CvMaster";
 import OB from "./pages/Accounting/OB/ObMaster";
 import StockReport from "./pages/Stock/report/stockReport";
 import POReport from "./pages/Report/POReport";
+import DCReport from "./pages/Report/DCReport";
+
 import AcReport from "./pages/Report/acReport";
 
 ReactDOM.render(
@@ -184,6 +186,7 @@ ReactDOM.render(
         page={<StockReport />}
       />
       <PrivateRouteNew exact path="/Report/POReport" page={<POReport />} />
+      <PrivateRouteNew exact path="/Report/DCReport" page={<DCReport />} />
       <PrivateRouteNew exact path="/Report/AcReport" page={<AcReport />} />
     </Switch>
   </Router>,

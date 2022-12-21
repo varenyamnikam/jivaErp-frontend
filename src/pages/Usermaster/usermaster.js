@@ -50,7 +50,6 @@ const initialValues = {
   Mobileno: "",
   Password: "",
   RePassword: "",
-  Role: "",
   Status: "",
   userName: "",
   userCode: "X X X X",

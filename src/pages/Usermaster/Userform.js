@@ -97,12 +97,11 @@ export default function Userform(props) {
           ? ""
           : "mobile no. should be  10 digit";
     }
-    console.log(fieldValues.Mobileno.length);
-    setErrors({
-      ...temp,
-    });
+    console.log(temp);
+    setErrors(temp);
 
-    if (fieldValues == values) return Object.values(temp).every((x) => x == "");
+    if (fieldValues == values)
+      return Object.values(temp).every((x) => x == "" || x == null);
   };
   useEffect(() => {
     if (!Object.values(errors).every((x) => x == "")) validate();
@@ -189,6 +188,7 @@ export default function Userform(props) {
               message: "Unable to connect to servers",
               type: "warning",
             });
+            console.log(error);
           });
         const newrecord = records.filter((item) => {
           return item.userCode !== values.userCode;

@@ -21,7 +21,7 @@ import checklist from "../img/Checklist.jpg";
 import coolBackground from "../img/cool-background.png";
 import Config from "../Utils/Config";
 import "../components/css/style.css";
-
+import Settings from "../components/registerSoftwareSettings";
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   textAlign: "center",
@@ -55,16 +55,29 @@ const initialFValues = {
   gstInNo: "",
   regType: "FREE",
 };
+const initialValues = {
+  userCompanyCode: "X X X X",
+  userBatchNo: "",
+  useSerialNo: "",
+  itemDescription: "",
+  gstReg: "",
+  useintraStateSale: "",
+  usePesticideSale: "",
+  useCessitem: "",
+  saleStockUpdateUsing: "",
+  purcStockUpdateUsing: "",
+  color: "blue",
+  useAcc: "",
+};
 
 export default function RegisterForm() {
   const [values, setValues] = useState(initialFValues);
-  const [stateDisable, setStateDisable] = useState(true);
-  const [districtDisable, setDistrictDisable] = useState(true);
+  const [input, setInput] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [location, setLocation] = useState({
     country: [{}],
     districts: [{}],
-    states: [{}],
+    states: [{ stateName: "X" }],
     talukas: [{}],
   });
   const validate = (fieldValues = values) => {
@@ -90,7 +103,7 @@ export default function RegisterForm() {
     return Object.values(temp).every((x) => x == "");
   };
   useEffect(() => {
-    if (location.states.length == 1) {
+    if (location.states[0].stateName == "X") {
       console.log("location set");
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };
@@ -128,7 +141,7 @@ export default function RegisterForm() {
       axios
         .post(
           Config.register,
-          { values },
+          { values, input },
           {
             headers: {
               authorization: "Bearer" + token,
@@ -139,6 +152,7 @@ export default function RegisterForm() {
           console.log(response);
           alert(`UserCompanyCode : ${response.data.companyCode}   
           userCode: ${response.data.userCode}   password:${response.data.password}`);
+          localStorage.setItem("adm_softwareSettings", JSON.stringify(input));
           window.location = "/";
         });
     }
@@ -335,6 +349,9 @@ export default function RegisterForm() {
                           onChange={handleInputChange}
                           fullWidth
                         />
+                      </Grid>{" "}
+                      <Grid item xs={12} sm={12}>
+                        <Settings input={input} setInput={setInput} />
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <ImageUpload recentImage="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" />

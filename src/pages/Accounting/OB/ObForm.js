@@ -84,7 +84,7 @@ export default function AcForm(props) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  const banks = accounts.filter((item) => item.preFix == "G");
+  const banks = accounts.filter((item) => item.preFix !== "G");
   const others = accounts.filter((item) => item.preFix !== "G");
 
   const bankOptions = accounts.map((item) => item.acName);

@@ -329,7 +329,7 @@ export default function POReport() {
                   partyName: getPartyName(voucher.partyCode, cmnData.accounts),
                   gst: calc(item).tot,
                   gstP: calc(item).totP,
-                  deliveredQty: getGr(gr, deliveredGr),
+                  deliveredQty: Number(getGr(gr, deliveredGr)),
                   vouDate: getDate(item.vouDate),
                 });
               });

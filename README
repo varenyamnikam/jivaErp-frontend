@@ -1,2 +1,9 @@
 remaining:-
   SI dynamic routing
+stock(dc)|  ledger  both  none
+ dc      |                  dc
+ gr      |  si      si      gr
+         |  pv      pv      pi
+         |          pr      po
+         |          sr      qt
+         |                  so

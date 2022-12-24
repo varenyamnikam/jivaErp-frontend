@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AuthHandler from "../../../Utils/AuthHandler";
 import ReuseMaster from "../reusableMaster";
 export default function QT() {
+  const company = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+
   const user = AuthHandler.getUser();
   const initialValues = {
     vouNo: "X X X X",
@@ -46,7 +48,7 @@ export default function QT() {
       title="Purchase Voucher"
       docCode="PV"
       initialValues={initialValues}
-      route="ledger"
+      route={company.purcStockUpdateUsing == "GRN" ? "ledger" : "both"}
     />
   );
 }

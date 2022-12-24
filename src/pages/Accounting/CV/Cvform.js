@@ -206,7 +206,7 @@ export default function AcForm(props) {
             Config.accounting + query,
             {
               obj: {
-                bankV: bankValues,
+                values: bankValues,
                 itemList: Fil,
               },
             },

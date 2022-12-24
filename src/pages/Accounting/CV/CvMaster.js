@@ -32,6 +32,7 @@ import Print from "../../../components/print";
 import MultipleSelectCheckmarks from "../../../components/multiSelect";
 import Filter from "../../../components/filterButton";
 import CvForm from "./Cvform";
+import DateCalc from "../../../components/dateCalc";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -57,15 +58,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
 const initialValues = {
   userCompanyCode: "",
   vouNo: "X X X X",
@@ -129,6 +121,8 @@ export default function AcMaster({ title = "Contra Voucher" }) {
     { id: "Date", label: "Date", feild: "getDate" },
     { id: "Edit", label: "Edit", feild: "" },
   ];
+  const user = JSON.parse(localStorage.getItem("user"));
+  const { getD } = DateCalc(user);
 
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
@@ -190,7 +184,8 @@ export default function AcMaster({ title = "Contra Voucher" }) {
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}`;
+    console.log(query);
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios

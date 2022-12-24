@@ -23,7 +23,7 @@ const Profile = () => {
   const [location, setLocation] = useState({
     country: [{}],
     districts: [{}],
-    states: [{}],
+    states: [{ stateName: "X X X X" }],
     talukas: [{}],
   });
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ const Profile = () => {
     // !save && setSave(true);
   }
   useEffect(() => {
-    if (location.states.length == 1) {
+    if (location.states[0].stateName == "X X X X") {
       console.log("location set");
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };

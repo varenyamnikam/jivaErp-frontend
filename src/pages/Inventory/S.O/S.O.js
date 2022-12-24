@@ -46,7 +46,7 @@ export default function QT() {
       title="Sale Order"
       docCode="SO"
       initialValues={initialValues}
-      route="both"
+      route="none"
     />
   );
 }

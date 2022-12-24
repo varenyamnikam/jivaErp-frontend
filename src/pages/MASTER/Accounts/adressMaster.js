@@ -155,7 +155,7 @@ export default function AdressMaster(props) {
   return (
     <>
       <Box sx={{ width: "100%", typography: "body1" }}>
-        <TabContext value={value.toString()}>
+        <TabContext value={value.toString()} disabled={true}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               {adresses.map((item, index) => {
@@ -190,7 +190,7 @@ export default function AdressMaster(props) {
           </Box>
           {adresses.map((item, index) => {
             return (
-              <TabPanel value={(index + 1).toString()}>
+              <TabPanel value={(index + 1).toString()} disabled={true}>
                 {" "}
                 <Adressform
                   currentAdress={item}

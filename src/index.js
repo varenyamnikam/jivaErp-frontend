@@ -56,6 +56,8 @@ import DCReport from "./pages/Report/DCReport";
 import SIReport from "./pages/Report/SIReport";
 import AcReport from "./pages/Report/acReport";
 import BankBook from "./pages/Report/bankBook";
+import CashBook from "./pages/Report/cashBook";
+
 ReactDOM.render(
   <Router>
     <Switch>
@@ -190,6 +192,7 @@ ReactDOM.render(
       <PrivateRouteNew exact path="/Report/AcReport" page={<AcReport />} />
       <PrivateRouteNew exact path="/Report/SIReport" page={<SIReport />} />
       <PrivateRouteNew exact path="/Report/BankBook" page={<BankBook />} />
+      <PrivateRouteNew exact path="/Report/CashBook" page={<CashBook />} />
     </Switch>
   </Router>,
 

@@ -164,6 +164,7 @@ export default function AcMaster(props) {
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}`;
+    console.log(query);
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios

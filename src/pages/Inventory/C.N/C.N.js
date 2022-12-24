@@ -47,7 +47,7 @@ export default function QT() {
       title="Credit Note"
       docCode="CN"
       initialValues={initialValues}
-      route="ledger"
+      route="none"
     />
   );
 }

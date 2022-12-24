@@ -32,6 +32,7 @@ import Print from "../../../components/print";
 import MultipleSelectCheckmarks from "../../../components/multiSelect";
 import Filter from "../../../components/filterButton";
 import CvForm from "./ObForm";
+import DateCalc from "../../../components/dateCalc";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -57,38 +58,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
-const initialValues = {
-  userCompanyCode: "",
-  vouNo: "X X X X",
-  branchCode: "",
-  docCode: "OB",
-  finYear: "",
-  vno: "",
-  manualNo: "",
-  vouDate: new Date(),
-  srNo: "",
-  acCode: "",
-  acName: "",
-  debit: "",
-  credit: "",
-  narration: "",
-  refType: "",
-  vouStatus: "",
-  checkNo: "",
-  favouringName: "",
-  entryBy: "",
-  entryOn: "",
-};
-
 const initialAccounts = {
   acCode: "",
   acc: "",
@@ -118,7 +87,41 @@ const initialAccounts = {
   userCompanyCode: "",
 };
 export default function AcMaster({ title = "Opening Balance" }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const { getD } = DateCalc(user);
+  const userDate = new Date(
+    JSON.parse(localStorage.getItem("user")).defaultYearStart
+  );
+  const newDate = new Date(
+    new Date().setFullYear(userDate.getFullYear(), 2, 31)
+  );
+
+  const initialValues = {
+    userCompanyCode: "",
+    vouNo: "X X X X",
+    branchCode: "",
+    docCode: "OB",
+    finYear: "",
+    vno: "",
+    manualNo: "",
+    vouDate: newDate,
+    srNo: "",
+    acCode: "",
+    acName: "",
+    debit: "",
+    credit: "",
+    narration: "",
+    refType: "",
+    vouStatus: "",
+    checkNo: "",
+    favouringName: "",
+    entryBy: "",
+    entryOn: "",
+  };
+
   const headCells = [
+    { id: "Vou No", label: "Vou No", feild: "vouNo" },
+
     { id: "Account", label: "Account", feild: "getName" },
     { id: "Credit", label: "Credit", feild: "credit" },
     { id: "Debit", label: "Debit", feild: "debit" },
@@ -132,13 +135,6 @@ export default function AcMaster({ title = "Opening Balance" }) {
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
   let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}`;
-  const initialFilterValues = {
-    ...initialValues,
-    vouNo: "",
-    allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
-  };
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
@@ -148,7 +144,13 @@ export default function AcMaster({ title = "Opening Balance" }) {
       return newRecords;
     },
   };
-
+  const initialFilterValues = {
+    ...initialValues,
+    vouNo: "",
+    allFields: "",
+    startDate: getD(),
+    endDate: new Date(),
+  };
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [filterPopup, setFilterPopup] = useState(false);
@@ -184,7 +186,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
   console.log("filter=>", filter);
   console.log(Config.batch);
   if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}`;
+    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}`;
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
@@ -455,6 +457,13 @@ export default function AcMaster({ title = "Opening Balance" }) {
                           <TableBody>
                             {recordsAfterPagingAndSorting().map((item) => (
                               <TableRow>
+                                <TableCell
+                                  style={{
+                                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  {item.vouNo}
+                                </TableCell>
                                 <TableCell
                                   style={{
                                     borderRight: "1px solid rgba(0,0,0,0.2)",

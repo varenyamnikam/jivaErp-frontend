@@ -46,7 +46,7 @@ export default function QT() {
       title="Quotation"
       docCode="QT"
       initialValues={initialValues}
-      route="both"
+      route="none"
     />
   );
 }

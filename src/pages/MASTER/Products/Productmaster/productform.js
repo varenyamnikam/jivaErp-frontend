@@ -83,7 +83,7 @@ export default function Productform(props) {
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
     check("itemType");
-    check("prodCompany");
+    // check("prodCompany");
     check("prodName");
     check("UOM");
     check("maintainStock");

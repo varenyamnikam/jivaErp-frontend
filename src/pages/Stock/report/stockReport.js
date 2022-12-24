@@ -266,7 +266,7 @@ export default function StockMaster() {
     });
   }
 
-  function getEntry(opening, prod) {
+  function getEntry(initialOpening, prod) {
     let itemStock = stock.filter((item) => item.prodCode == prod.prodCode);
     itemStock.sort((a, b) => {
       return new Date(b.vouDate).getTime() - new Date(a.vouDate).getTime();
@@ -276,14 +276,27 @@ export default function StockMaster() {
       let arr = [];
       let totIn = 0;
       let totOut = 0;
-
+      let opening = 0;
       itemStock.map((item, i) => {
         opening =
-          Number(opening) + Number(item.inwardQty) - Number(item.outwardQty);
+          Number(initialOpening) +
+          Number(item.inwardQty) -
+          Number(item.outwardQty);
         totIn += Number(item.inwardQty);
         totOut += Number(item.outwardQty);
+        arr[0] = {
+          vouNo: "OPENING",
+          rec: "",
+          issue: "",
+          cumRec: "",
+          cumIssue: "",
+          cumStock: initialOpening,
+          prodCode: prod.prodCode,
+          prodName: prod.prodName,
+          vouDate: "",
+        };
 
-        arr[i] = {
+        arr[i + 1] = {
           vouNo: item.refNo,
           rec: Number(item.inwardQty),
           issue: Number(item.outwardQty),
@@ -436,8 +449,19 @@ export default function StockMaster() {
                                           color="primary"
                                           onClick={(e) => {
                                             e.preventDefault();
-                                            getEntry(item.openingStock, item);
-                                            setButtonPopup(true);
+                                            if (
+                                              Number(item.inward) == 0 &&
+                                              Number(item.outward) == 0
+                                            ) {
+                                              setNotify({
+                                                isOpen: true,
+                                                message: "No change in stock",
+                                                type: "warning",
+                                              });
+                                            } else {
+                                              getEntry(item.openingStock, item);
+                                              setButtonPopup(true);
+                                            }
                                           }}
                                         >
                                           <VisibilityIcon fontSize="small" />

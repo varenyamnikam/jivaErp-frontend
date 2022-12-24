@@ -47,7 +47,7 @@ export default function QT() {
       title="Delivery Challan"
       docCode="DC"
       initialValues={initialValues}
-      route={company.saleStockUpdateUsing == "SI" ? "ledger" : "dc"}
+      route={company.saleStockUpdateUsing == "Invoice" ? "none" : "dc"}
     />
   );
 }

@@ -170,7 +170,7 @@ export default function ProductMaster(props) {
         })
         .then((response) => {
           const unitNameArr = [];
-
+          console.log(response);
           if (response.data.mst_unit[0]) {
             response.data.mst_unit.map((item) => {
               unitNameArr.push(item.UOM);

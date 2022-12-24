@@ -46,7 +46,7 @@ export default function QT() {
       title="Performa Invoice"
       docCode="PI"
       initialValues={initialValues}
-      route="both"
+      route="none"
     />
   );
 }

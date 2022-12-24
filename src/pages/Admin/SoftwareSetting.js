@@ -100,6 +100,7 @@ export default function Settings() {
   if (values.userCompanyCode == "X X X X") {
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
+    console.log("hi", values);
     axios
       .get(Config.soft + query, {
         headers: {
@@ -107,11 +108,15 @@ export default function Settings() {
         },
       })
       .then((response) => {
+        console.log(response.data);
         if (response.data.result) {
           setValues(response.data.result);
         } else {
           setValues({ ...values, userCompanyCode: "" });
         }
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
   console.log(values);

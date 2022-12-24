@@ -46,7 +46,7 @@ export default function QT() {
       title="Puchase Order"
       docCode="PO"
       initialValues={initialValues}
-      route="dc"
+      route="none"
     />
   );
 }

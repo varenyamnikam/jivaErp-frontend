@@ -36,6 +36,7 @@ export default function Customersform(props) {
     notify,
     setAcCodeHook,
     acCodeHook,
+    acTypeFor,
     acTypeOptions,
     firmTypeOptions,
     acGroupData,
@@ -61,8 +62,8 @@ export default function Customersform(props) {
     check("acName");
     check("acGroupName");
     check("acType");
-    if (values.preFix == "C") check("mktArea");
-    check("firmType");
+    if (values.preFix == "E") check("mktArea");
+    if (values.preFix != "E") check("firmType");
     check("acStatus");
     setErrors({
       ...temp,
@@ -166,6 +167,7 @@ export default function Customersform(props) {
               message: "Unable to connect to servers",
               type: "warning",
             });
+            console.log(error);
           });
       }
     }
@@ -239,40 +241,6 @@ export default function Customersform(props) {
       );
     }
   }
-  function getMktArea() {
-    if (values.preFix == "C") {
-      return (
-        <>
-          <Grid item container xs={4} justifyContent={"flex-end"}>
-            <Controls.Input
-              name=""
-              label="Marketing Area"
-              value={input.mktArea}
-              onChange={() => {}}
-              error={errors.mktArea}
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <div style={{ marginTop: 20 }}>
-              <Stack spacing={2} direction="row">
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setButtonPopup(true);
-                  }}
-                >
-                  choose
-                </Button>
-              </Stack>
-            </div>
-          </Grid>
-        </>
-      );
-    } else {
-      return <></>;
-    }
-  }
-
   return (
     <>
       <Form onSubmit={handleSubmit}>
@@ -424,17 +392,47 @@ export default function Customersform(props) {
               // error={errors.stateCode}
             />
           </Grid>
-          <Grid item sm={6} xs={12}>
-            <UnusedAutosuggest
-              name="firmType"
-              label="Firm type"
-              value={input}
-              setValue={setInput}
-              options={firmTypeOptions}
-              error={errors.firmType}
-            />
-          </Grid>
-          {getMktArea()}
+          {values.preFix != "E" && (
+            <>
+              <Grid item sm={6} xs={12}>
+                <UnusedAutosuggest
+                  name="firmType"
+                  label="Firm type"
+                  value={input}
+                  setValue={setInput}
+                  options={firmTypeOptions}
+                  error={errors.firmType}
+                />
+              </Grid>
+            </>
+          )}
+          {values.preFix == "E" && (
+            <>
+              <Grid item container xs={4} justifyContent={"flex-end"}>
+                <Controls.Input
+                  name=""
+                  label="Marketing Area"
+                  value={input.mktArea}
+                  onChange={() => {}}
+                  error={errors.mktArea}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <div style={{ marginTop: 20 }}>
+                  <Stack spacing={2} direction="row">
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        setButtonPopup(true);
+                      }}
+                    >
+                      choose
+                    </Button>
+                  </Stack>
+                </div>
+              </Grid>
+            </>
+          )}{" "}
           <Grid item xs={5}>
             <Controls.RadioGroup
               name="acStatus"

@@ -396,6 +396,7 @@ export default function AccountMaster() {
     });
   }
   if (!values.acGroupName && values.acGroupCode) {
+    console.log("hi", acGroupData, values.acGroupCode);
     acGroupData.map((item) => {
       if (values.acGroupCode == item.acGroupCode) {
         setValues({ ...values, acGroupName: item.acGroupName });

@@ -95,6 +95,7 @@ export default function UnusedAutosuggest(props) {
     error = null,
   } = props;
   const [inputValue, setInputValue] = React.useState("");
+  console.log(options1, options2);
   const classes = useStyles();
   console.log(value[name1]);
   if (value[name1]) {

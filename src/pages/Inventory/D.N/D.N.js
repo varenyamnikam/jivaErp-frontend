@@ -46,7 +46,7 @@ export default function QT() {
       title="Debit Note"
       docCode="DN"
       initialValues={initialValues}
-      route="ledger"
+      route="none"
     />
   );
 }

@@ -364,7 +364,7 @@ export default function ReuseMaster(props) {
         x = false;
       }
     });
-
+    setButtonPopup(false);
     console.log(input, itemList, new Date(input.vouDate), x);
     const token = AuthHandler.getLoginToken();
     // setButtonPopup(false);
@@ -408,7 +408,7 @@ export default function ReuseMaster(props) {
           });
         })
         .catch((err) => {
-          console.log(err.err);
+          console.log(err);
         });
     } else {
       axios

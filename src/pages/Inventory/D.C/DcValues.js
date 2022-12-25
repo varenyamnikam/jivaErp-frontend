@@ -40,7 +40,7 @@ export default function DcValues() {
     returnCash: "",
   };
 
-  const vouItems = {
+  const initialVouItem = {
     vouNo: "X",
     vouSrNo: "",
     prodCode: "",
@@ -135,7 +135,7 @@ export default function DcValues() {
   };
   const initialCommonValues = {
     accounts: [initialAc],
-    voucherItems: [vouItems],
+    voucherItems: [initialVouItem],
     adress: [initialAdress],
     payTerms: [initialPayValues],
     products: [initialProdValues],
@@ -144,7 +144,7 @@ export default function DcValues() {
   const docOptions = ["DC", "QT", "GR", "SI"];
   return {
     initialValues,
-    vouItems,
+    initialVouItem,
     initialAc,
     initialAdress,
     initialPayValues,

@@ -51,7 +51,7 @@ export default function GeneralForm(props) {
     openPopup,
     setOpenPopup,
     handleSubmit,
-    vouItems,
+    initialVouItem,
     common,
     itemList,
     setItemList,
@@ -102,8 +102,22 @@ export default function GeneralForm(props) {
     .filter((item) => item.acCode == input.partyCode)
     .map((item) => item.addressLine1);
   console.log(errors);
+  function getAccType() {
+    let x = "";
+    if (
+      values.docCode == "PO" ||
+      values.docCode == "GR" ||
+      values.docCode == "PV" ||
+      values.docCode == "PR"
+    )
+      x = "S";
+    else {
+      x = "C";
+    }
+    return x
+  }
   const partyOptions = accounts
-    .filter((item) => item.preFix == "C")
+    .filter((item) => item.preFix == getAccType())
     .map((item) => {
       return item.acName;
     });
@@ -398,7 +412,7 @@ export default function GeneralForm(props) {
         records={records}
         products={products}
         prodOptions={prodOptions}
-        vouItems={vouItems}
+        initialVouItem={initialVouItem}
         input={input}
         setCommon={setCommon}
         common={common}

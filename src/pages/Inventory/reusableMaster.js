@@ -109,7 +109,7 @@ export default function ReuseMaster(props) {
   }`;
   const {
     initialAc,
-    vouItems,
+    initialVouItem,
     initialAdress,
     initialPayValues,
     initialProdValues,
@@ -148,7 +148,7 @@ export default function ReuseMaster(props) {
   const [reference, setReference] = useState([initialValues]);
 
   const [filter, setFilter] = useState(initialFilterValues);
-  const [itemList, setItemList] = useState([vouItems]);
+  const [itemList, setItemList] = useState([initialVouItem]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -233,7 +233,7 @@ export default function ReuseMaster(props) {
           if (arr.length !== 0) {
             return arr;
           } else {
-            return [vouItems];
+            return [initialVouItem];
           }
         }
         function getAdress(arr) {
@@ -250,19 +250,13 @@ export default function ReuseMaster(props) {
             return [initialPayValues];
           }
         }
-        function getProd(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialProdValues];
-          }
-        }
+        const prodData = response.data.mst_prodMaster;
         setCommon({
           accounts: getAccounts(response.data.mst_accounts),
           voucherItems: getVouItems(response.data.inv_voucherItems),
           adress: getAdress(response.data.mst_acadress),
           payTerms: getPayterms(response.data.mst_paymentTerm),
-          products: getProd(response.data.mst_prodMaster),
+          products: prodData.length == 0 ? initialProdValues : prodData,
         });
         const po = response.data.inv_voucher.filter(
           (item) => item.docCode !== docCode
@@ -465,8 +459,15 @@ export default function ReuseMaster(props) {
       .then((response) => {
         console.log(response.data);
         setValues(response.data.values);
-
+        let restOfVouItems = common.voucherItems.filter(
+          (item) => item.vouNo != code
+        );
+        setCommon({
+          ...common,
+          voucherItems: [...restOfVouItems, ...response.data.itemList],
+        });
         newValue = response.data.values;
+        setLatestVouItems(code, response.data.itemList);
       })
       .catch((err) => {
         console.log(err);
@@ -477,7 +478,6 @@ export default function ReuseMaster(props) {
         });
       })
       .finally(() => {
-        getProd(code);
         if (signal == "v") {
           setButtonPopup(true);
           // setLoading("X X X X");
@@ -488,14 +488,14 @@ export default function ReuseMaster(props) {
     return newValue;
   }
   let componentRef = React.useRef();
-  function getProd(voucherNumber) {
+  function setLatestVouItems(voucherNumber, latestData) {
     let arr = [];
-    arr = common.voucherItems.filter((item) => item.vouNo == voucherNumber);
-    console.log(arr, common.voucherItems, itemList, voucherNumber);
+    arr = latestData.filter((item) => item.vouNo == voucherNumber);
+    console.log(arr, latestData, itemList, voucherNumber);
     if (arr.length !== 0) {
       setItemList(arr);
     } else {
-      setItemList([vouItems]);
+      setItemList([initialVouItem]);
     }
   }
   return (
@@ -623,7 +623,7 @@ export default function ReuseMaster(props) {
                             onClick={(e) => {
                               setButtonPopup(true);
                               setValues({ ...initialValues, vouNo: "" });
-                              setItemList([vouItems]);
+                              setItemList([initialVouItem]);
                             }}
                           />
                         </Grid>
@@ -733,7 +733,7 @@ export default function ReuseMaster(props) {
                       openPopup={buttonPopup}
                       setOpenPopup={setButtonPopup}
                       handleSubmit={handleSubmit}
-                      vouItems={vouItems}
+                      initialVouItem={initialVouItem}
                       setCommon={setCommon}
                       common={common}
                       itemList={itemList}

@@ -48,15 +48,15 @@ export default function GeneralItemForm(props) {
     records,
     products,
     prodOptions,
-    vouItems,
+    initialVouItem,
     input,
     setCommon,
     common,
   } = props;
-  const validateValues = { ...vouItems, vouNo: "", expDate: "" };
+  const validateValues = { ...initialVouItem, vouNo: "", expDate: "" };
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
-  const [item, setItem] = useState(vouItems);
+  const [item, setItem] = useState(initialVouItem);
   const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
@@ -214,7 +214,7 @@ export default function GeneralItemForm(props) {
       ]);
       console.log({ ...item, vouSrNo: newNo, vouNo: input.vouNo }, itemList);
       setItem({
-        ...vouItems,
+        ...initialVouItem,
         vouNo: "",
       });
     } else {
@@ -223,7 +223,7 @@ export default function GeneralItemForm(props) {
       );
       setItemList(updatedRecords);
       setItem({
-        ...vouItems,
+        ...initialVouItem,
         vouNo: "",
       });
     }
@@ -450,7 +450,7 @@ export default function GeneralItemForm(props) {
               text="Reset"
               color="default"
               onClick={() => {
-                setItem(vouItems);
+                setItem(initialVouItem);
               }}
             />
             <Controls.Button
@@ -533,7 +533,7 @@ export default function GeneralItemForm(props) {
                           );
                           if (arr.length !== 0) setItemList(arr);
                           else {
-                            setItemList([vouItems]);
+                            setItemList([initialVouItem]);
                           }
                         }}
                       >

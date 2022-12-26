@@ -322,7 +322,7 @@ export default function StockMaster() {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title="StockMaster"
+              title="Stock Report"
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">

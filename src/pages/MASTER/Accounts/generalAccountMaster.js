@@ -362,7 +362,7 @@ export default function Customers({ acTypeFor, initialValues }) {
   }
   function getTitle() {
     if (value == "1") {
-      return "CustomerForm";
+      return `${acTypeFor}Form`;
     } else {
       return "Address Master";
     }

@@ -135,7 +135,9 @@ export default function RegisterForm() {
     e.preventDefault();
     console.log(errors);
     const a = 1;
+
     if (validate()) {
+      alert(`${values.regMobileNo} is this no. correct?`);
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };
       axios
@@ -151,7 +153,8 @@ export default function RegisterForm() {
         .then((response) => {
           console.log(response);
           alert(`UserCompanyCode : ${response.data.companyCode}   
-          userCode: ${response.data.userCode}   password:${response.data.password}`);
+          userCode: ${response.data.userCode}   password:${response.data.password} .
+          plz check mobile number (${values.regMobileNo}) for details`);
           localStorage.setItem("adm_softwareSettings", JSON.stringify(input));
           window.location = "/";
         });

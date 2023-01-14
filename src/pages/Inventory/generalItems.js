@@ -15,6 +15,10 @@ import Popup from "../../components/Popup";
 import Percent from "../../components/percentageNew";
 import Grouped from "../../components/grouped";
 import Notification from "../../components/Notification";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import Lottie from "react-lottie";
+import rupee from "../../components/lotties/105335-rupee-coin.json";
+
 import {
   Paper,
   makeStyles,
@@ -37,8 +41,11 @@ const headcells = [
   { id: "Item Total", label: "Item Total" },
   { id: "Delete", label: "Delete" },
 ];
+const initialPause = { rate: true, itemAmount: true };
 const useStyles = makeStyles((theme) => ({
-  // item: { minWidth: "200px", flexGrow: 1 },
+  inputRoot: {
+    paddingLeft: "5px",
+  },
 }));
 
 export default function GeneralItemForm(props) {
@@ -53,6 +60,7 @@ export default function GeneralItemForm(props) {
     setCommon,
     common,
   } = props;
+  const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
   const validateValues = { ...initialVouItem, vouNo: "", expDate: "" };
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(settings);
@@ -60,6 +68,8 @@ export default function GeneralItemForm(props) {
   const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
+  const [isPaused, setIsPaused] = useState(initialPause);
+
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -79,6 +89,23 @@ export default function GeneralItemForm(props) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
+  const pause = {
+    loop: false,
+    autoplay: true,
+    animationData: rupee,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  const play = {
+    loop: false,
+    autoplay: false,
+    animationData: rupee,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   const classes = useStyles();
   const { totalBeforeDs, totalAfterDs, Final } = Calculate(
@@ -166,7 +193,11 @@ export default function GeneralItemForm(props) {
   //     if (x) setBatchlist(item.batchList);
   //   }
   // });
-  console.log(batchList);
+  console.log(
+    batchList,
+    isPaused,
+    Object.values(isPaused).every((x) => x !== true)
+  );
 
   function rnd(no) {
     return Number(no)
@@ -352,11 +383,33 @@ export default function GeneralItemForm(props) {
           )}
           <Grid item xs={12} sm={3} className={classes.input}>
             <Controls.Input
+              style={{ paddingLeft: "0px" }}
               name="rate"
               label="Rate"
               value={item.rate}
               onChange={handleChange}
               error={errors.rate}
+              onFocus={() => {
+                setIsPaused((prev) => ({ ...prev, rate: false }));
+              }}
+              onBlur={() => {
+                setIsPaused((prev) => ({ ...prev, rate: true }));
+              }}
+              classes={{ input: classes.noPadding }}
+              className={classes.root}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lottie
+                      options={play}
+                      height={60}
+                      width={30}
+                      isStopped={isPaused.rate}
+                    />
+                  </InputAdornment>
+                ),
+                classes: { root: classes.inputRoot },
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={3} className={classes.input}>
@@ -433,6 +486,26 @@ export default function GeneralItemForm(props) {
               value={item.itemAmount}
               onChange={handleChange}
               error={errors.itemAmount}
+              onFocus={() => {
+                setIsPaused((prev) => ({ ...prev, itemAmount: false }));
+              }}
+              onBlur={() => {
+                setIsPaused((prev) => ({ ...prev, itemAmount: true }));
+              }}
+              classname={classes.root}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lottie
+                      options={play}
+                      height={60}
+                      width={30}
+                      isStopped={isPaused.itemAmount}
+                    />
+                  </InputAdornment>
+                ),
+                classes: { root: classes.inputRoot },
+              }}
             />
           </Grid>
           <Grid
@@ -481,68 +554,65 @@ export default function GeneralItemForm(props) {
       >
         <Grid item sm={12} xs={12}>
           <TableContainer>
-            <TblContainer>
+            <TblContainer ref={parent}>
               <TblHead />
-              <TableBody>
-                {recordsAfterPagingAndSorting().map((item) => (
-                  <TableRow key={item._id}>
-                    <TableCell>{getProdName(item.prodCode)}</TableCell>
-                    <TableCell>{item.qty}</TableCell>
-                    <TableCell>{item.rate}</TableCell>
-                    <TableCell> {Number(item.qr)}</TableCell>
-                    <TableCell>
-                      {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
-                    </TableCell>
-                    <TableCell>
-                      {" "}
-                      {rnd(
-                        Number(item.cgst) +
-                          Number(item.sgst) +
-                          Number(item.igst)
-                      )}
-                      (
-                      {rnd(
-                        Number(item.cgstP) +
-                          Number(item.sgstP) +
-                          Number(item.igstP)
-                      )}
-                      %)
-                    </TableCell>
-                    <TableCell>
-                      {rnd(item.cess)} ({rnd(item.cessP)}%)
-                    </TableCell>{" "}
-                    <TableCell>{item.itemAmount}</TableCell>
-                    <TableCell>
-                      <Controls.ActionButton
-                        color="primary"
-                        onClick={() => {
-                          setItem(item);
-                          setPopup(true);
-                          if (useBatch == "Yes") {
-                            setBatchlist(item.batchList);
-                          }
-                        }}
-                      >
-                        <EditOutlinedIcon fontSize="small" />
-                      </Controls.ActionButton>
-                      <Controls.ActionButton
-                        color="secondary"
-                        onClick={() => {
-                          const arr = itemList.filter(
-                            (ite) => ite.vouSrNo !== item.vouSrNo
-                          );
-                          if (arr.length !== 0) setItemList(arr);
-                          else {
-                            setItemList([initialVouItem]);
-                          }
-                        }}
-                      >
-                        <DeleteIconOutline fontSize="small" />
-                      </Controls.ActionButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+
+              {recordsAfterPagingAndSorting().map((item) => (
+                <TableRow key={item._id}>
+                  <TableCell>{getProdName(item.prodCode)}</TableCell>
+                  <TableCell>{item.qty}</TableCell>
+                  <TableCell>{item.rate}</TableCell>
+                  <TableCell> {Number(item.qr)}</TableCell>
+                  <TableCell>
+                    {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
+                  </TableCell>
+                  <TableCell>
+                    {" "}
+                    {rnd(
+                      Number(item.cgst) + Number(item.sgst) + Number(item.igst)
+                    )}
+                    (
+                    {rnd(
+                      Number(item.cgstP) +
+                        Number(item.sgstP) +
+                        Number(item.igstP)
+                    )}
+                    %)
+                  </TableCell>
+                  <TableCell>
+                    {rnd(item.cess)} ({rnd(item.cessP)}%)
+                  </TableCell>{" "}
+                  <TableCell>{item.itemAmount}</TableCell>
+                  <TableCell>
+                    <Controls.ActionButton
+                      color="primary"
+                      onClick={() => {
+                        setItem(item);
+                        setPopup(true);
+                        if (useBatch == "Yes") {
+                          setBatchlist(item.batchList);
+                        }
+                      }}
+                    >
+                      <EditOutlinedIcon fontSize="small" />
+                    </Controls.ActionButton>
+                    <Controls.ActionButton
+                      color="secondary"
+                      onClick={() => {
+                        const arr = itemList.filter(
+                          (ite) => ite.vouSrNo !== item.vouSrNo
+                        );
+                        if (arr.length !== 0) setItemList(arr);
+                        else {
+                          setItemList([initialVouItem]);
+                        }
+                      }}
+                    >
+                      <DeleteIconOutline fontSize="small" />
+                    </Controls.ActionButton>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TblContainer>
           </TableContainer>
         </Grid>

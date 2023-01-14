@@ -40,7 +40,7 @@ import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import DcFilterForm from "./D.C/dcFilterForm";
-import DcForm from "./generalForm";
+import DcForm from "./design";
 import DcValues from "./D.C/DcValues";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
@@ -711,10 +711,10 @@ export default function ReuseMaster(props) {
                     <TblPagination />
                   </section>
                   <Popup
+                    size="lg"
                     title={`${title} form`}
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
-                    size="md"
                   >
                     <DcForm
                       records={records}

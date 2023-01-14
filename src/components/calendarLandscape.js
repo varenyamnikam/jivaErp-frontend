@@ -5,7 +5,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import { makeStyles, IconButton } from "@material-ui/core";
-
+import "./arrows.css";
 const useStyles = makeStyles((theme) => ({
   root: {
     top: 5,
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiOutlinedInput-root": {
       // probably the width of your search IconButton or more if needed
       // color: "red",
-      // paddingTop: "0px",
+      paddingRight: "50px",
       height: "40px",
     },
   },
@@ -62,23 +62,26 @@ export default function StaticDatePickerLandscape(props) {
   const classes = useStyles();
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DatePicker
-        inputFormat="dd/MM/yyyy"
-        label={label}
-        value={value[name]}
-        onChange={(newValue) => {
-          setValue({ ...value, [name]: newValue });
-        }}
-        // style={{ borderRadius: "10px" }}
-        // style={{ width: "90%" }}
-        renderInput={(params) => (
-          <TextField className={classes.root} size="small" {...params} />
-        )}
-        disabled={disabled}
-        {...(error && { error: true, helperText: error })}
-      />
-    </LocalizationProvider>
+    <div className="customDatePickerWidth">
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <DatePicker
+          inputFormat="dd/MM/yyyy"
+          label={label}
+          value={value[name]}
+          onChange={(newValue) => {
+            setValue({ ...value, [name]: newValue });
+          }}
+          wrapperClassName="datepicker"
+          // style={{ borderRadius: "10px" }}
+          containerStyle={{ width: "100%" }}
+          renderInput={(params) => (
+            <TextField className={classes.root} size="small" {...params} />
+          )}
+          disabled={disabled}
+          {...(error && { error: true, helperText: error })}
+        />
+      </LocalizationProvider>
+    </div>
   );
 }
 // import * as React from "react";

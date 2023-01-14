@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme) => ({
     top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      color: "#D3D3D3",
+      // color: "#D3D3D3",
     },
     "& .MuiFormLabel-root.Mui-focused": {
       color: "blue", // or black

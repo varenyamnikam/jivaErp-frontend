@@ -4,17 +4,24 @@ import axios from "axios";
 import Config from "../../Utils/Config";
 import { makeStyles } from "@material-ui/core";
 import Controls from "../../components/controls/Controls";
-import { Grid } from "@material-ui/core";
+import { Grid, InputAdornment } from "@material-ui/core";
 import { useForm, Form } from "../../components/useForm";
 import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
+import AnimatedSmartAutoSuggest from "../../components/animatedSmartAutoSuggest";
 import Calendar from "../../components/calendar";
 import NotSmartAutoSuggest from "../../components/haha";
 import Divider from "@mui/material/Divider";
 import ItemForm from "./generalItems";
 import Popup from "../../components/Popup";
 import Percent from "../../components/percentageNew";
+import Lottie from "react-lottie";
+import rupee from "../../components/lotties/105335-rupee-coin.json";
+import delivery from "../../components/lotties/31531-truck-shipping.json";
+import bill from "../../components/lotties/66365-my-bills.json";
+import cashIcon from "../../components/lotties/g5mYcVtWJ1.json";
+
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -70,6 +77,23 @@ export default function GeneralForm(props) {
   };
   const [input, setInput] = useState(values);
   const [errors, setErrors] = useState(validateValues);
+  const [isPaused, setIsPaused] = useState({
+    rate: true,
+    itemAmount: true,
+    netAmount: true,
+    bill: true,
+    ship: true,
+    cash: true,
+  });
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: cashIcon,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   function Validate(fieldValues = input) {
     console.log(fieldValues);
     let temp = { ...errors };
@@ -114,7 +138,7 @@ export default function GeneralForm(props) {
     else {
       x = "C";
     }
-    return x
+    return x;
   }
   const partyOptions = accounts
     .filter((item) => item.preFix == getAccType())
@@ -204,6 +228,30 @@ export default function GeneralForm(props) {
       return input.vouNo;
     }
   }
+  const play = {
+    loop: false,
+    autoplay: false,
+    animationData: rupee,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+  const playBill = {
+    loop: false,
+    autoplay: false,
+    animationData: bill,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+  const playShip = {
+    loop: false,
+    autoplay: false,
+    animationData: delivery,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   return (
     <>
@@ -279,7 +327,7 @@ export default function GeneralForm(props) {
           />
         </Grid>
         <Grid item xs={12} sm={12} className={classes.input}>
-          <SmartAutoSuggest
+          <AnimatedSmartAutoSuggest
             style={{ width: "100%" }}
             name1="partyName"
             code1="partyCode"
@@ -291,10 +339,12 @@ export default function GeneralForm(props) {
             options1={partyOptions}
             options2={accounts}
             error={errors.partyCode}
+            height={30}
+            icon="user"
           />{" "}
         </Grid>{" "}
         <Grid item xs={12} sm={6} className={classes.input}>
-          <SmartAutoSuggest
+          <AnimatedSmartAutoSuggest
             style={{
               width: "100%",
               display: "flex",
@@ -310,10 +360,12 @@ export default function GeneralForm(props) {
             options1={addressOptions}
             options2={adress}
             error={errors.billingAdress}
+            height={50}
+            icon="bill"
           />
         </Grid>
         <Grid item xs={12} sm={6} className={classes.input}>
-          <SmartAutoSuggest
+          <AnimatedSmartAutoSuggest
             style={{
               width: "100%",
               display: "flex",
@@ -329,6 +381,8 @@ export default function GeneralForm(props) {
             options1={addressOptions}
             options2={adress}
             error={errors.shippingAdress}
+            height={60}
+            icon="delivery"
           />
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
@@ -368,7 +422,7 @@ export default function GeneralForm(props) {
           />
         </Grid>{" "}
         <Grid item xs={12} sm={6} className={classes.input}>
-          <SmartAutoSuggest
+          <AnimatedSmartAutoSuggest
             style={{
               width: "100%",
               display: "flex",
@@ -384,6 +438,8 @@ export default function GeneralForm(props) {
             options1={payOptions}
             options2={payTerms}
             error={errors.payTerm}
+            height={50}
+            icon="pay"
           />
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
@@ -426,6 +482,26 @@ export default function GeneralForm(props) {
             value={input.itemTotal}
             onChange={handleChange}
             error={errors.itemTotal}
+            onFocus={() => {
+              setIsPaused((prev) => ({ ...prev, itemAmount: false }));
+            }}
+            onBlur={() => {
+              setIsPaused((prev) => ({ ...prev, itemAmount: true }));
+            }}
+            classname={classes.root}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lottie
+                    options={play}
+                    height={60}
+                    width={30}
+                    isStopped={isPaused.itemAmount}
+                  />
+                </InputAdornment>
+              ),
+              classes: { root: classes.inputRoot },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={2} className={classes.input}>
@@ -465,6 +541,26 @@ export default function GeneralForm(props) {
             value={input.netAmount}
             onChange={() => {}}
             error={errors.netAmount}
+            onFocus={() => {
+              setIsPaused((prev) => ({ ...prev, netAmount: false }));
+            }}
+            onBlur={() => {
+              setIsPaused((prev) => ({ ...prev, netAmount: true }));
+            }}
+            classname={classes.root}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lottie
+                    options={play}
+                    height={60}
+                    width={30}
+                    isStopped={isPaused.netAmount}
+                  />
+                </InputAdornment>
+              ),
+              classes: { root: classes.inputRoot },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
@@ -474,6 +570,24 @@ export default function GeneralForm(props) {
             value={input.recievedCash}
             onChange={handleChange}
             error={errors.recievedCash}
+            onFocus={() => {
+              setIsPaused((prev) => ({ ...prev, cash: false }));
+            }}
+            onBlur={() => {
+              setIsPaused((prev) => ({ ...prev, cash: true }));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lottie
+                    options={defaultOptions}
+                    isStopped={isPaused.cash}
+                    height={50}
+                    width={30}
+                  />
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={2} className={classes.input}>

@@ -3,16 +3,23 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { AirlineSeatIndividualSuiteSharp } from "@material-ui/icons";
 import { SliderValueLabelUnstyled } from "@mui/base";
-import { makeStyles, IconButton } from "@material-ui/core";
+import { makeStyles, IconButton, InputAdornment } from "@material-ui/core";
+import Lottie from "react-lottie";
+import delivery from "./lotties/nK5x78XOnU.json";
+import bill from "./lotties/66365-my-bills.json";
+import rupee from "./lotties/7933-rupee.json";
+import user from "./lotties/53184-user.json";
+import pay from "./lotties/BZtpDpwBXT.json";
+import cash from "./lotties/g5mYcVtWJ1.json";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
       fontSize: 15,
       color: "#D3D3D3",
       position: "absolute",
-      // p: 5,
-      // right: 40,
-      // bottom: 5,
+      p: 5,
+      right: 40,
+      bottom: 5,
     },
     "& .MuiFormLabel-root.Mui-focused": {
       color: "blue", // or black
@@ -50,19 +57,19 @@ const tfStyle = {
   "& .MuiOutlinedInput-root": {
     // probably the width of your search IconButton or more if needed
     // color: "red",
-    // paddingTop: "0px",
+    paddingTop: "0px",
   },
   ".MuiInputBase-input": {
     height: "1.5rem",
     p: 0,
     right: 10,
-    // bottom: 5,
+    bottom: 5,
   },
   "& .MuiAutocomplete-inputRoot": {
     // color: "purple",
-    // p: 0,
+    p: 0,
     // right: 10,
-    // top: 5,
+    top: 5,
 
     // This matches the specificity of the default styles at https://github.com/mui-org/material-ui/blob/v4.11.3/packages/material-ui-lab/src/Autocomplete/Autocomplete.js#L90
     '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child': {
@@ -82,26 +89,82 @@ const tfStyle = {
 };
 
 export default function UnusedAutosuggest(props) {
-  const { value, setValue, options, error, name, label } = props;
+  const {
+    value,
+    setValue,
+    options1,
+    options2,
+    name1,
+    label,
+    code1,
+    name2,
+    code2,
+    error = null,
+    icon,
+    height,
+    ...other
+  } = props;
   const [inputValue, setInputValue] = React.useState("");
+  const [isPaused, setIsPaused] = React.useState(true);
+  function getIcon() {
+    if (icon == "bill") {
+      return bill;
+    } else if (icon == "delivery") {
+      return delivery;
+    } else if (icon == "user") {
+      return user;
+    } else if (icon == "pay") {
+      return pay;
+    } else {
+      return user;
+    }
+  }
+  const play = {
+    loop: false,
+    autoplay: false,
+    animationData: getIcon(),
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  console.log(options1, options2);
   const classes = useStyles();
-  console.log(inputValue);
+  console.log(value[name1]);
+  if (value[name1]) {
+    options2.map((item) => {
+      if (value[name1] == item[name2] && value[code1] !== item[code2]) {
+        setValue({
+          ...value,
+          [code1]: item[code2],
+        });
+      }
+    });
+  }
+  if (!value[name1] && value[code1]) {
+    console.log("hi", value);
+    options2.map((item) => {
+      if (value[code1] == item[code2]) {
+        setValue({ ...value, [name1]: item[name2] });
+      }
+    });
+  }
   let inputRef;
   return (
     <>
       <Autocomplete
         disablePortal
         id="combo-box-demo"
+        size="small"
         classes={{
           clearIndicatorDirty: classes.clearIndicator,
           popupIndicator: classes.popupIndicator,
         }}
-        size="small"
         onClose={() => {
           inputRef.focus();
         }}
         style={{ width: "100%" }}
-        value={value[name]}
+        value={value[name1]}
         onChange={(event, newValue, reason) => {
           inputRef.focus();
           if (newValue) {
@@ -111,7 +174,7 @@ export default function UnusedAutosuggest(props) {
             } else {
               setValue({
                 ...value,
-                [name]: newValue,
+                [name1]: newValue,
               });
               console.log("onchange" + newValue);
             }
@@ -128,17 +191,30 @@ export default function UnusedAutosuggest(props) {
             setInputValue("");
             setValue({
               ...value,
-              [name]: "",
+              [name1]: "",
             });
           }
         }}
-        options={options}
+        onFocus={() => {
+          setIsPaused(false);
+        }}
+        onBlur={() => {
+          setIsPaused(true);
+        }}
+        options={options1}
         renderInput={(params) => (
           <TextField
             className={classes.root}
             {...params}
             {...(error && { error: true, helperText: error })}
             label={label}
+            sx={tfStyle}
+            onFocus={() => {
+              setIsPaused(false);
+            }}
+            onBlur={() => {
+              setIsPaused(true);
+            }}
             InputProps={{
               ...params.InputProps,
               sx: {
@@ -146,11 +222,21 @@ export default function UnusedAutosuggest(props) {
                 // placed under the icon at the end
                 // "&&&": { pr: "70px" },
               },
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lottie
+                    options={play}
+                    height={height}
+                    width={30}
+                    isStopped={isPaused}
+                  />
+                </InputAdornment>
+              ),
             }}
-            sx={tfStyle}
             inputRef={(input) => {
               inputRef = input;
             }}
+            {...other}
           />
         )}
       />

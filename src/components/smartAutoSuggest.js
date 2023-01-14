@@ -4,11 +4,12 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { AirlineSeatIndividualSuiteSharp } from "@material-ui/icons";
 import { SliderValueLabelUnstyled } from "@mui/base";
 import { makeStyles, IconButton } from "@material-ui/core";
+import Lottie from "react-lottie";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      color: "#D3D3D3",
+      // color: "#D3D3D3",
       position: "absolute",
       p: 5,
       right: 40,
@@ -93,10 +94,14 @@ export default function UnusedAutosuggest(props) {
     name2,
     code2,
     error = null,
+
+    ...other
   } = props;
   const [inputValue, setInputValue] = React.useState("");
+
   console.log(options1, options2);
   const classes = useStyles();
+
   console.log(value[name1]);
   if (value[name1]) {
     options2.map((item) => {
@@ -181,6 +186,7 @@ export default function UnusedAutosuggest(props) {
             inputRef={(input) => {
               inputRef = input;
             }}
+            {...other}
           />
         )}
       />

@@ -33,7 +33,7 @@ import { Form } from "../../../components/useForm";
 import Customersform from "./CustomersForm";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
-import TabList from "@mui/lab/TabList";
+import Tabs from "@mui/material/Tabs";
 import TabPanel from "@mui/lab/TabPanel";
 import Box from "@mui/material/Box";
 import Adressform from "./adressForm";
@@ -601,9 +601,13 @@ export default function Customers({ acTypeFor, initialValues }) {
                     <Box sx={{ width: "100%", typography: "body1" }}>
                       <TabContext value={value}>
                         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                          <TabList
+                          <Tabs
+                            value={value}
                             onChange={handleChange}
-                            aria-label="lab API tabs example"
+                            indicatorColor="secondary"
+                            textColor="inherit"
+                            variant="fullWidth"
+                            aria-label="full width tabs example"
                           >
                             <Tab label={acTypeFor} value="1" />
                             <Tab
@@ -611,7 +615,7 @@ export default function Customers({ acTypeFor, initialValues }) {
                               value="2"
                               disabled={values.acCode == "X X X X"}
                             />
-                          </TabList>
+                          </Tabs>
                         </Box>
                         <TabPanel value="1">
                           <Customersform

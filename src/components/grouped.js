@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      color: "#D3D3D3",
+      // color: "#D3D3D3",
     },
     "& .MuiFormLabel-root.Mui-focused": {
       color: "blue", // or black
@@ -267,7 +267,7 @@ export default function Grouped(props) {
   return (
     <>
       <Grid container>
-        <Grid Item sm={6} xs={6}>
+        <Grid Item sm={8} xs={12}>
           <TextField
             fullWidth
             size="small"
@@ -286,7 +286,7 @@ export default function Grouped(props) {
             }}
           />
         </Grid>
-        <Grid Item sm={6} xs={6}>
+        <Grid Item sm={4} xs={12}>
           <Button
             disableElevation
             variant="contained"

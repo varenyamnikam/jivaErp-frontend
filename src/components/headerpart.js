@@ -6,6 +6,8 @@ import Config from "../Utils/Config";
 import { reactLocalStorage } from "reactjs-localstorage";
 import Popup from "./Popup";
 import ChangeFinyear from "./changeFinYear";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import PersonIcon from "@mui/icons-material/Person";
 const Headerpart = (props) => {
   const recentImageDataUrl = localStorage.getItem("recent-image");
   const [buttonPopup, setButtonPopup] = React.useState(false);
@@ -42,12 +44,22 @@ const Headerpart = (props) => {
   console.log(userCompanyName);
   return (
     <>
-      <nav className="main-header navbar navbar-expand navbar-white navbar-light">
+      <nav
+        className="main-header navbar navbar-expand navbar-white navbar-light"
+        style={{
+          backgroundImage:
+            "linear-gradient( to right, #6ae6ff, #36ccf8, #00b0f0, #0094e4, #1976d2)",
+          color: "white",
+        }}
+      >
         <ul className="navbar-nav">
           <li className="nav-item">
             <a className="nav-link" data-widget="pushmenu" href="#">
-              <i className="fas fa-bars"></i>
+              <i className="fas fa-bars" style={{ color: "white" }}></i>
             </a>
+          </li>
+          <li className="nav-item">
+            <StorefrontIcon style={{ marginTop: "8px", marginLeft: "25px" }} />
           </li>
           <li
             className="nav-item d-none d-sm-inline-block"
@@ -69,7 +81,7 @@ const Headerpart = (props) => {
         <ul className="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
           <li className="nav-item dropdown">
             <a className="nav-link" data-toggle="dropdown" href="#">
-              <i className="fa fa-user"></i>
+              <i className="fa fa-user" style={{ color: "white" }}></i>
             </a>
             <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <span className="dropdown-header">

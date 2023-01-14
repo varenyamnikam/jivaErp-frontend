@@ -6,6 +6,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
     margin: "0px",
     marginLeft: "10px",
+    // borderRadius: "50%",
   },
   secondary: {
     backgroundColor: theme.palette.secondary.light,

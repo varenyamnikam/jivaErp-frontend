@@ -1,0 +1,49 @@
+.button {
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: white;
+  text-align: center;
+  font-size: 20px;
+  padding: 20px;
+  width: 200px;
+  height: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 5px #999;
+}
+
+.button span {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transition: 0.5s;
+}
+.button:active {
+  background-color: #3e8e41;
+  transform: translateY(4px);
+  box-shadow: 0 0px #666;
+}
+.button span:after {
+  content: "\00ab";
+  position: absolute;
+  opacity: 1;
+  top: 0;
+  left: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-left: 50px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  left: 20px;
+}

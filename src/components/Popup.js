@@ -5,10 +5,13 @@ import {
   DialogContent,
   makeStyles,
   Typography,
+  IconButton,
 } from "@material-ui/core";
 import Controls from "./controls/Controls";
 import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
+import VerticalTabs from "./verticalTabs";
+
 const useStyles = makeStyles((theme) => ({
   dialogWrapper: {
     // padding: theme.spacing(2),
@@ -24,9 +27,8 @@ const useStyles = makeStyles((theme) => ({
     //paddingRight: "0px",
   },
 }));
-
 export default function Popup(props) {
-  const { title, children, openPopup, setOpenPopup, size } = props;
+  const { title, children, openPopup, setOpenPopup, size, ...other } = props;
   const classes = useStyles();
   console.log(size, title);
   function getSize(ok) {
@@ -42,21 +44,24 @@ export default function Popup(props) {
       open={openPopup}
       maxWidth={getSize()}
       classes={{ paper: classes.dialogWrapper }}
+      {...other}
     >
       <DialogTitle className={classes.dialogTitle}>
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography
             variant="h6"
             component="div"
-            style={{ flexGrow: 1, paddingTop: "10px" }}
+            style={{ paddingTop: "10px" }}
           >
             {title}
           </Typography>
+
           <Controls.ActionButton
             color="secondary"
             onClick={() => {
               setOpenPopup(false);
             }}
+            // style={{ borderRadius: "50%", margin: "0px" }}
           >
             <CloseIcon />
           </Controls.ActionButton>

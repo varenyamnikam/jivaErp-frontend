@@ -5,8 +5,8 @@ const PORT = process.env.PORT;
 
 // console.log(userCompanyCode, userCode);
 class Config {
-  // static user = JSON.parse(localStorage.getItem("user"));
-  // static query = AuthHandler.getQuery();
+  static user = JSON.parse(localStorage.getItem("user"));
+  static query = AuthHandler.getQuery();
   // static loginUrl = "http://localhost:3001/api/login";
   // static register = "http://localhost:3001/api/register";
   // static homeUrl = "http://localhost:3001/api/home";

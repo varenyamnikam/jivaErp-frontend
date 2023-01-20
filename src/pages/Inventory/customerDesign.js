@@ -28,6 +28,7 @@ import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import DoneIcon from "@mui/icons-material/Done";
 import MenuPopupState from "../../components/checkBoxMenu";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
+import Accordion from "../../components/accordions";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -350,107 +351,6 @@ export default function CustomerForm(props) {
                 icon="user"
               />{" "}
             </Grid>{" "}
-            {"manualNo" in settings && (
-              <>
-                <Grid item xs={12} sm={6} className={classes.input}>
-                  <AnimatedSmartAutoSuggest
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                    }}
-                    name1="shippingAdress"
-                    code1="shippingAdressCode"
-                    name2="addressLine1"
-                    code2="addressNo"
-                    label="Shipping Adress"
-                    value={input}
-                    setValue={setInput}
-                    options1={addressOptions}
-                    options2={adress}
-                    error={errors.shippingAdress}
-                    height={60}
-                    icon="delivery"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} className={classes.input}>
-                  <Controls.Input
-                    name="partyBillNo"
-                    label="Party Bill No"
-                    value={input.partyBillNo}
-                    onChange={handleChange}
-                    error={errors.partyBillNo}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} className={classes.input}>
-                  <StaticDatePickerLandscape
-                    style={{ width: "100%" }}
-                    name="partyBillDate"
-                    label="Party Bill Date"
-                    value={input}
-                    setValue={setInput}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} className={classes.input}>
-                  <Controls.Input
-                    name="partyChallanNo"
-                    label="Party Challan No"
-                    value={input.partyChallanNo}
-                    onChange={handleChange}
-                    error={errors.partyChallanNo}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} className={classes.input}>
-                  <StaticDatePickerLandscape
-                    style={{ width: "100%" }}
-                    name="partyChallanDate"
-                    label="Party Challan Date"
-                    value={input}
-                    setValue={setInput}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} className={classes.input}>
-                  <AnimatedSmartAutoSuggest
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                    }}
-                    name1="paymentTerms"
-                    code1="paymentTermsCode"
-                    name2="paymentTerms"
-                    code2="paymentTermsCode"
-                    label="Payment Terms"
-                    value={input}
-                    setValue={setInput}
-                    options1={payOptions}
-                    options2={payTerms}
-                    error={errors.payTerm}
-                    height={50}
-                    icon="pay"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={3} className={classes.input}>
-                  <Controls.Input
-                    name="transportation"
-                    label="Transportation"
-                    value={input.transportation}
-                    onChange={handleChange}
-                    error={errors.transportation}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} className={classes.input}>
-                  <Controls.Input
-                    name="fright"
-                    label="Fright"
-                    value={input.fright}
-                    onChange={handleChange}
-                    error={errors.fright}
-                  />
-                </Grid>
-              </>
-            )}
           </Grid>
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
@@ -491,8 +391,160 @@ export default function CustomerForm(props) {
         <Grid item xs={12} sm={2} className={classes.input}>
           <Controls.Input disabled={true} label="state" />
         </Grid>
-        <Grid item xs={12} sm={2} className={classes.input}>
-          <MenuPopupState value={itemList} setValue={setItemList} />
+        <Grid item xs={12} sm={12} className={classes.input}>
+          <Accordion primary="Additional Information" secondary="optional">
+            <>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4} className={classes.input}>
+                  <AnimatedSmartAutoSuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name1="shippingAdress"
+                    code1="shippingAdressCode"
+                    name2="addressLine1"
+                    code2="addressNo"
+                    label="Shipping Adress"
+                    value={input}
+                    setValue={setInput}
+                    options1={addressOptions}
+                    options2={adress}
+                    error={errors.shippingAdress}
+                    height={60}
+                    icon="delivery"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="partyBillNo"
+                    label="Party Bill No"
+                    value={input.partyBillNo}
+                    onChange={handleChange}
+                    error={errors.partyBillNo}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <StaticDatePickerLandscape
+                    style={{ width: "100%" }}
+                    name="partyBillDate"
+                    label="Party Bill Date"
+                    value={input}
+                    setValue={setInput}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="partyChallanNo"
+                    label="Party Challan No"
+                    value={input.partyChallanNo}
+                    onChange={handleChange}
+                    error={errors.partyChallanNo}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <StaticDatePickerLandscape
+                    style={{ width: "100%" }}
+                    name="partyChallanDate"
+                    label="Party Challan Date"
+                    value={input}
+                    setValue={setInput}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <AnimatedSmartAutoSuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name1="paymentTerms"
+                    code1="paymentTermsCode"
+                    name2="paymentTerms"
+                    code2="paymentTermsCode"
+                    label="Payment Terms"
+                    value={input}
+                    setValue={setInput}
+                    options1={payOptions}
+                    options2={payTerms}
+                    error={errors.payTerm}
+                    height={50}
+                    icon="pay"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="transportation"
+                    label="Transportation"
+                    value={input.transportation}
+                    onChange={handleChange}
+                    error={errors.transportation}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="fright"
+                    label="Fright"
+                    value={input.fright}
+                    onChange={handleChange}
+                    error={errors.fright}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="recievedCash"
+                    label="Recieved Cash"
+                    value={input.recievedCash}
+                    onChange={handleChange}
+                    error={errors.recievedCash}
+                    onFocus={() => {
+                      setIsPaused((prev) => ({ ...prev, cash: false }));
+                    }}
+                    onBlur={() => {
+                      setIsPaused((prev) => ({ ...prev, cash: true }));
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lottie
+                            options={defaultOptions}
+                            isStopped={isPaused.cash}
+                            height={50}
+                            width={30}
+                          />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <Controls.Input
+                    name="returnCash"
+                    label="Return Cash"
+                    value={input.returnCash}
+                    onChange={handleChange}
+                    error={errors.returnCash}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <SmartAutoSuggest
+                    name1="agentName"
+                    code1="agentCode"
+                    name2="acName"
+                    code2="acCode"
+                    label="Agent"
+                    value={input}
+                    setValue={setInput}
+                    options1={agentOptions}
+                    options2={accounts}
+                    error={errors.agentName}
+                  />
+                </Grid>
+              </Grid>
+            </>
+          </Accordion>
         </Grid>
         <Grid
           container
@@ -598,89 +650,7 @@ export default function CustomerForm(props) {
               style={{ height: "40px" }}
             />
           </Grid>
-          {"manualNo" in settings && (
-            <>
-              <Grid item xs={12} sm={3} className={classes.input}>
-                <Controls.Input
-                  name="recievedCash"
-                  label="Recieved Cash"
-                  value={input.recievedCash}
-                  onChange={handleChange}
-                  error={errors.recievedCash}
-                  onFocus={() => {
-                    setIsPaused((prev) => ({ ...prev, cash: false }));
-                  }}
-                  onBlur={() => {
-                    setIsPaused((prev) => ({ ...prev, cash: true }));
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lottie
-                          options={defaultOptions}
-                          isStopped={isPaused.cash}
-                          height={50}
-                          width={30}
-                        />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={2} className={classes.input}>
-                <Controls.Input
-                  name="returnCash"
-                  label="Return Cash"
-                  value={input.returnCash}
-                  onChange={handleChange}
-                  error={errors.returnCash}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4} className={classes.input}>
-                <UnusedAutosuggest
-                  style={{ width: "100%" }}
-                  name="recievedBy"
-                  label="Recieved By"
-                  value={input}
-                  setValue={setInput}
-                  options={[
-                    "CASH",
-                    "Phone Pay",
-                    "Google Pay",
-                    "Paytm",
-                    "Amazon Pay",
-                    "Whatsapp",
-                  ]}
-                  error={errors.recievedBy}
-                />
-              </Grid>
-              <Grid item xs={12} sm={3} className={classes.input}>
-                <UnusedAutosuggest
-                  style={{ width: "100%" }}
-                  name="cashCredit"
-                  label="Cash/Credit"
-                  value={input}
-                  setValue={setInput}
-                  options={["Cash", "Credit"]}
-                  error={errors.cashCredit}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} className={classes.input}>
-                <SmartAutoSuggest
-                  name1="agentName"
-                  code1="agentCode"
-                  name2="acName"
-                  code2="acCode"
-                  label="Agent"
-                  value={input}
-                  setValue={setInput}
-                  options1={agentOptions}
-                  options2={accounts}
-                  error={errors.agentName}
-                />
-              </Grid>
-            </>
-          )}{" "}
+
           <Grid item xs={12} sm="auto" className={classes.input}>
             <button
               class="button"

@@ -1,110 +1,142 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Box from "@mui/material/Box";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import "./index.css";
+import { home } from "react-icons-kit/icomoon/home";
+import { Icon } from "react-icons-kit";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import { getIconButtonUtilityClass } from "@mui/material";
+import { user } from "react-icons-kit/fa/user";
+import admin from "../img/admin.svg";
+import { cube } from "react-icons-kit/ionicons/cube";
+import man from "../img/man.png";
+import "./glow.css";
+import Accordion from "@mui/material/Accordion";
+import Fade from "react-reveal/Fade";
+import AuthHandler from "../Utils/AuthHandler";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+const SidebarLabel = styled.span`
+  margin-left: 16px;
+`;
 
-const AntTabs = styled(Tabs)({
-  borderBottom: "1px solid #e8e8e8",
-  "& .MuiTabs-indicator": {
-    backgroundColor: "#1890ff",
-  },
-});
+const DropdownLink = styled(Link)`
+  &:hover {
+    background: #632ce4;
+    cursor: pointer;
+  }
+`;
 
-const AntTab = styled((props) => <Tab disableRipple {...props} />)(
-  ({ theme }) => ({
-    textTransform: "none",
-    minWidth: 0,
-    [theme.breakpoints.up("sm")]: {
-      minWidth: 0,
-    },
-    fontWeight: theme.typography.fontWeightRegular,
-    marginRight: theme.spacing(1),
-    color: "rgba(0, 0, 0, 0.85)",
-    fontFamily: [
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(","),
-    "&:hover": {
-      color: "#40a9ff",
-      opacity: 1,
-    },
-    "&.Mui-selected": {
-      color: "#1890ff",
-      fontWeight: theme.typography.fontWeightMedium,
-    },
-    "&.Mui-focusVisible": {
-      backgroundColor: "#d1eaff",
-    },
-  })
-);
+function getRights(node) {
+  let adm_userrights = JSON.parse(localStorage.getItem("adm_userrights"));
+  // let adm_userrights = [];
+  let x = true;
+  if (adm_userrights) {
+    adm_userrights.map((right) => {
+      if (
+        right.screenCode == node.screenCode &&
+        right.userCode == AuthHandler.getUserCode() &&
+        right.menuRight == "N"
+      ) {
+        console.log("hi", node);
+        x = false;
+      }
+    });
+  }
+  return x;
+}
+const SubMenu = ({ data = [] }) => {
+  function getIcon(data) {
+    if (data.screenName == "ADMIN") {
+      return home;
+    } else return "";
+  }
+  console.log(data);
+  return (
+    <>
+      {data.map((tree) => (
+        <> {getRights(tree) && <TreeNode node={tree} />} </>
+      ))}
+    </>
+  );
+};
 
-const StyledTabs = styled((props) => (
-  <Tabs
-    {...props}
-    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-  />
-))({
-  "& .MuiTabs-indicator": {
-    display: "flex",
-    justifyContent: "center",
-    backgroundColor: "transparent",
-  },
-  "& .MuiTabs-indicatorSpan": {
-    maxWidth: 40,
-    width: "100%",
-    backgroundColor: "#635ee7",
-  },
-});
-
-const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
-  ({ theme }) => ({
-    textTransform: "none",
-    fontWeight: theme.typography.fontWeightRegular,
-    fontSize: theme.typography.pxToRem(15),
-    marginRight: theme.spacing(1),
-    color: "rgba(255, 255, 255, 0.7)",
-    "&.Mui-selected": {
-      color: "#fff",
-    },
-    "&.Mui-focusVisible": {
-      backgroundColor: "rgba(100, 95, 228, 0.32)",
-    },
-  })
-);
-
-export default function CustomizedTabs() {
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+const TreeNode = ({ node }) => {
+  const [childVisible, setChildVisiblity] = useState(false);
+  function getIcon(data) {
+    if (data.screenName == "ADMIN") {
+      return <Icon size={12} icon={getIcon(node)} />;
+    } else {
+      return <i className="fa-solid fa-user-tie"></i>;
+    }
+  }
+  console.log(childVisible);
+  const hasChild = node.subNav ? true : false;
+  const className = `right fas fa-angle-left ${
+    childVisible ? "fa-rotate-270" : ""
+  }`;
+  console.log(className);
+  console.log(childVisible);
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        variant="scrollable"
-        scrollButtons={false}
-        aria-label="scrollable prevent tabs example"
-      >
-        <Tab label="Item One" />
-        <Tab label="Item Two" />
-        <Tab label="Item Three" />
-        <Tab label="Item Four" />
-        <Tab label="Item Five" />
-        <Tab label="Item Six" />
-        <Tab label="Item Seven" />
-      </Tabs>
-    </Box>
+    <>
+      <li className="nav-item" onClick={(e) => setChildVisiblity((v) => !v)}>
+        <Link to={node.pageLink}>
+          <a
+            href="#"
+            className="nav-link"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <div>
+              <i className="far fa-dot-circle nav-icon"></i>
+              <p>{node.screenName}</p>
+            </div>
+            {hasChild ? (
+              childVisible ? (
+                <>
+                  <ExpandMoreIcon />
+                </>
+              ) : (
+                <>
+                  <ChevronLeftIcon />
+                </>
+              )
+            ) : (
+              <></>
+            )}
+          </a>
+        </Link>
+        {hasChild ? (
+          <ul className="nav nav-treeview">
+            <SubMenu data={node.subNav} />
+          </ul>
+        ) : (
+          <></>
+        )}
+      </li>
+    </>
   );
-}
+};
+
+export default SubMenu;
+// <div className="col d-tree-head">
+// <Link to={node.pageLink}>
+//   <Icon size={12} icon={home} />
+
+//   <span className="brand-text font-weight-light">
+//     {node.screenName}
+//   </span>
+// </Link>
+// </div>
+// <div className="col d-tree-head">
+// <DropdownLink to={node.pageLink}>
+//   <SidebarLabel>{node.screenName}</SidebarLabel>
+// </DropdownLink>
+// </div>
+// </div>
+// <i
+//               className={`right fas fa-angle-left ${
+//                 node.screenName == childVisible ? "fa-rotate-270" : ""
+//               }`}
+//             ></i>

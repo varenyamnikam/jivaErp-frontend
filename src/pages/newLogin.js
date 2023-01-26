@@ -184,6 +184,7 @@ export default function SignIn() {
       setState({ ...state, loginStatus: 3 });
       // window.location = Config.homeUrl;
       history.push("/home");
+      document.location.reload(true);
       // setnotify({
       //   isOpen: true,
       //   message: "login success",

@@ -15,14 +15,21 @@ import "./glow.css";
 import Accordion from "@mui/material/Accordion";
 import Fade from "react-reveal/Fade";
 import AuthHandler from "../Utils/AuthHandler";
-
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 const SidebarLabel = styled.span`
   margin-left: 16px;
 `;
 
 const DropdownLink = styled(Link)`
   &:hover {
-    background: #632ce4;
+    background: #757575;
+    color: "white";
+    fontcolor: "white";
     cursor: pointer;
   }
 `;
@@ -52,13 +59,11 @@ const SubMenu = ({ data = [] }) => {
   }
   console.log(data);
   return (
-    <div className="d-tree">
-      <ul className="d-flex d-tree-container flex-column">
-        {data.map((tree) => (
-          <> {getRights(tree) && <TreeNode node={tree} />} </>
-        ))}
-      </ul>
-    </div>
+    <>
+      {data.map((tree) => (
+        <> {getRights(tree) && <TreeNode node={tree} />} </>
+      ))}
+    </>
   );
 };
 
@@ -74,36 +79,56 @@ const TreeNode = ({ node }) => {
 
   const hasChild = node.subNav ? true : false;
   return (
-    <li className="d-tree-node border-0">
+    <li className="nav-item">
       <div className="d-flex" onClick={(e) => setChildVisiblity((v) => !v)}>
-        {hasChild && (
-          <div
-            className={`d-inline d-tree-toggler ${
-              childVisible ? "active" : ""
-            }`}
-          >
-            <FontAwesomeIcon className="w3-text-white" icon="caret-right" />
-          </div>
-        )}
-        <div className="col d-tree-head">
-          <Link to={node.pageLink}>
+        <DropdownLink
+          to={node.pageLink}
+          className="nav-link glow"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            color: "white",
+          }}
+        >
+          <div className="glow">
             {node.screenName == "ADMIN" ? (
               <img src={man} height={22} color="red" />
             ) : node.screenName == "MASTER" ? (
               <Icon size={17} icon={cube} />
             ) : node.screenName == "INVENTORY" ? (
               <InventoryIcon fontSize="small" />
+            ) : node.screenName == "Purchase" ? (
+              <ShoppingCartIcon fontSize="small" />
+            ) : node.screenName == "Stock" ? (
+              <FontAwesomeIcon icon="fas fa-cubes" />
+            ) : node.screenName == "Sale" ? (
+              <CurrencyRupeeIcon fontSize="small" />
+            ) : node.screenName == "A/C Transaction" ? (
+              <AccountBalanceIcon fontSize="small" />
+            ) : node.screenName == "Report" ? (
+              <ListAltIcon fontSize="small" />
             ) : (
               ""
             )}
-            <span
-              className="brand-text font-weight-light"
-              style={{ marginLeft: "10px" }}
-            >
-              <span className="glow">{node.screenName}</span>
+            <span className="glow" style={{ marginLeft: "10px" }}>
+              {node.screenName}
             </span>
-          </Link>
-        </div>
+          </div>
+
+          {hasChild ? (
+            childVisible ? (
+              <>
+                <ExpandMoreIcon />
+              </>
+            ) : (
+              <>
+                <ChevronLeftIcon />
+              </>
+            )
+          ) : (
+            <></>
+          )}
+        </DropdownLink>
       </div>
 
       {hasChild && childVisible && (

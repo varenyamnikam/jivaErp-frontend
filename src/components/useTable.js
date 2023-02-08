@@ -21,6 +21,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import Pagination from "@mui/material/Pagination";
+import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
 const useStyles = makeStyles((theme) => ({
   table: {
     marginTop: theme.spacing(1),
@@ -37,11 +38,7 @@ const useStyles = makeStyles((theme) => ({
       //   backgroundColor: "red",
       // },
     },
-    "& tbody tr": {
-      "&:nth-of-type(even)": {
-        backgroundColor: "#e3e0e0",
-      },
-    },
+    "& tbody tr": {},
     "& tbody tr:hover": {
       backgroundColor: "#fffbf2",
       // backgroundColor: "red",
@@ -59,7 +56,7 @@ export default function useTable(records, headCells, filterFn) {
 
   const pages = [10, 25, 50, 100, 500];
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
   const [order, setOrder] = useState();
   const [orderBy, setOrderBy] = useState();
   ////////////////////////////////////////////////////
@@ -166,9 +163,11 @@ export default function useTable(records, headCells, filterFn) {
   };
   /////////////////////////////////////////////////////////
   const TblContainer = (props) => (
-    <Table className={classes.table} size="small">
-      {props.children}
-    </Table>
+    <TableContainer sx={{ maxHeight: 440 }}>
+      <Table className={classes.table} size="small" stickyHeader>
+        {props.children}
+      </Table>
+    </TableContainer>
   );
   const handleSortRequest = (cellId) => {
     const isAsc = orderBy === cellId && order === "asc";

@@ -715,6 +715,7 @@ export default function ReuseMaster(props) {
                     title={`${title} form`}
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
+                    style={{ padding: "0px" }}
                   >
                     <DcForm
                       records={records}

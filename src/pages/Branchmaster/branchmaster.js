@@ -355,57 +355,69 @@ const Branchmaster = (props) => {
                     </Toolbar>
 
                     <Grid container>
-                      <TableContainer>
-                        <TblContainer>
-                          <TblHead />
-                          {records[0].branchCode == "X X X X" ? (
-                            <MuiSkeleton />
-                          ) : (
-                            <TableBody>
-                              {recordsAfterPagingAndSorting().map((item) => (
-                                <TableRow key={item._id}>
-                                  <TableCell>{item.branchCode}</TableCell>
-                                  <TableCell>{item.branchName}</TableCell>
-                                  <TableCell>{item.branchType}</TableCell>
-                                  <TableCell>{item.talukaName}</TableCell>
-                                  <TableCell>
-                                    <Controls.ActionButton
-                                      color="primary"
-                                      onClick={() => {
-                                        setValues(item);
-                                        setButtonPopup(true);
+                      <TblContainer>
+                        <TblHead />
+                        {records[0].branchCode == "X X X X" ? (
+                          <MuiSkeleton />
+                        ) : (
+                          <TableBody>
+                            {recordsAfterPagingAndSorting().map((item) => (
+                              <TableRow key={item._id}>
+                                <TableCell>{item.branchCode}</TableCell>
+                                <TableCell>{item.branchName}</TableCell>
+                                <TableCell>{item.branchType}</TableCell>
+                                <TableCell>{item.talukaName}</TableCell>
+                                <TableCell>
+                                  <Controls.ActionButton
+                                    color="primary"
+                                    onClick={() => {
+                                      setValues(item);
+                                      setButtonPopup(true);
+                                    }}
+                                  >
+                                    <EditOutlinedIcon
+                                      fontSize="small"
+                                      style={{
+                                        height: "18px",
+                                        width: "18px",
+                                        margin: "2px",
                                       }}
-                                    >
-                                      <EditOutlinedIcon fontSize="small" />
-                                    </Controls.ActionButton>
-                                    <Controls.ActionButton
-                                      color="secondary"
-                                      onClick={(e) => {
-                                        console.log(item);
-                                        setConfirmDialog({
-                                          isOpen: true,
-                                          title:
-                                            "Are you sure to delete this record?",
-                                          subTitle:
-                                            "You can't undo this operation",
-                                          onConfirm: (e) => {
-                                            onDelete(item);
-                                            e.preventDefault();
-                                            console.log("records:" + records);
-                                          },
-                                        });
-                                        e.preventDefault();
+                                    />
+                                  </Controls.ActionButton>
+                                  <Controls.ActionButton
+                                    color="secondary"
+                                    onClick={(e) => {
+                                      console.log(item);
+                                      setConfirmDialog({
+                                        isOpen: true,
+                                        title:
+                                          "Are you sure to delete this record?",
+                                        subTitle:
+                                          "You can't undo this operation",
+                                        onConfirm: (e) => {
+                                          onDelete(item);
+                                          e.preventDefault();
+                                          console.log("records:" + records);
+                                        },
+                                      });
+                                      e.preventDefault();
+                                    }}
+                                  >
+                                    <DeleteIconOutline
+                                      fontSize="small"
+                                      style={{
+                                        height: "18px",
+                                        width: "18px",
+                                        margin: "2px",
                                       }}
-                                    >
-                                      <DeleteIconOutline fontSize="small" />
-                                    </Controls.ActionButton>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          )}
-                        </TblContainer>
-                      </TableContainer>
+                                    />
+                                  </Controls.ActionButton>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        )}
+                      </TblContainer>
                     </Grid>
                     <TblPagination />
                   </section>

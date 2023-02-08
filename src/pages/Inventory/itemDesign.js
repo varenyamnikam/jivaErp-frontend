@@ -50,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
   inputRoot: {
     paddingLeft: "5px",
   },
+  next: { backgroundColor: theme.palette.primary.light },
 }));
 const useStylesContainer = makeStyles((theme) => ({
   root: {
@@ -304,7 +305,11 @@ export default function GeneralItemForm(props) {
   const classesContainer = useStylesContainer();
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={2}
+        // style={{ display: "flex", justifyContent: "flex-end" }}
+      >
         <Grid item xs={12} sm={6} className={classes.input}>
           <ProductAutoSuggest
             style={{ borderRadius: "0px" }}
@@ -335,7 +340,7 @@ export default function GeneralItemForm(props) {
           input.docCode !== "SI" &&
           settings.userBatchNo == "Yes" && (
             <>
-              <Grid item xs={12} sm={3} className={classes.input}>
+              <Grid item xs={12} sm={2} className={classes.input}>
                 <Controls.Input
                   name="batchNo"
                   label="Batch No"
@@ -344,7 +349,7 @@ export default function GeneralItemForm(props) {
                   error={errors.batchNo}
                 />
               </Grid>
-              <Grid item xs={12} sm={3} className={classes.input}>
+              <Grid item xs={12} sm={2} className={classes.input}>
                 <StaticDatePickerLandscape
                   name="expDate"
                   label="Expiry Date"
@@ -387,7 +392,7 @@ export default function GeneralItemForm(props) {
             />{" "}
           </Grid>
         )}
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Controls.Input
             name="rate"
             label="Rate"
@@ -416,7 +421,7 @@ export default function GeneralItemForm(props) {
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Percent
             name1="discount"
             name2="disPer"
@@ -428,7 +433,7 @@ export default function GeneralItemForm(props) {
             error={errors.discount}
           />
         </Grid>
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Percent
             name1="cgst"
             name2="cgstP"
@@ -441,7 +446,7 @@ export default function GeneralItemForm(props) {
             error={errors.cgst}
           />
         </Grid>
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Percent
             name1="sgst"
             name2="sgstP"
@@ -454,7 +459,7 @@ export default function GeneralItemForm(props) {
             error={errors.sgst}
           />
         </Grid>
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Percent
             name1="igst"
             name2="igstP"
@@ -468,7 +473,7 @@ export default function GeneralItemForm(props) {
           />
         </Grid>
         {settings.useCessitem == "Yes" && (
-          <Grid item xs={12} sm={3} className={classes.input}>
+          <Grid item xs={12} sm={2} className={classes.input}>
             <Percent
               name1="cess"
               name2="cessP"
@@ -482,7 +487,7 @@ export default function GeneralItemForm(props) {
             />
           </Grid>
         )}
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid item xs={12} sm={2} className={classes.input}>
           <Controls.Input
             name="itemAmount"
             label="Item Amount"
@@ -511,10 +516,13 @@ export default function GeneralItemForm(props) {
             }}
           />
         </Grid>
-        <Grid item xs={12} sm="auto" className={classes.input}>
-          <MenuPopupState setValues={setSettings} />
-        </Grid>
-        <Grid item xs={12} sm="auto" className={classes.input}>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          className={classes.input}
+          style={{ display: "flex", justifyContent: "flex-end", flexGrow: "1" }}
+        >
           {" "}
           <Controls.Button
             text="Add"
@@ -643,3 +651,6 @@ export default function GeneralItemForm(props) {
 // <StaticDatePickerLandscape
 // value={values.}
 // />
+// <Grid item xs={12} sm="auto" className={classes.input}>
+// <MenuPopupState setValues={setSettings} />
+// </Grid>

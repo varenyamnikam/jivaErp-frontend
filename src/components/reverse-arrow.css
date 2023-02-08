@@ -1,6 +1,6 @@
 .button {
   border-radius: 4px;
-  background-color: #f4511e;
+  background-color: #3f51b5;
   border: none;
   color: white;
   text-align: center;
@@ -8,7 +8,7 @@
   padding: 20px;
   width: 200px;
   height: 50px;
-  transition: all 0.5s;
+  transition: all 0.15s;
   cursor: pointer;
   margin: 5px;
   display: flex;
@@ -26,14 +26,14 @@
   transition: 0.5s;
 }
 .button:active {
-  background-color: #3e8e41;
+  background-color: blue;
   transform: translateY(4px);
   box-shadow: 0 0px #666;
 }
 .button span:after {
   content: "\00ab";
   position: absolute;
-  opacity: 1;
+  opacity: 0;
   top: 0;
   left: -20px;
   transition: 0.5s;

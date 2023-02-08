@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiOutlinedInput-root": {
       // probably the width of your search IconButton or more if needed
       // color: "red",
-      paddingRight: "50px",
+      // paddingRight: "25px",
       height: "40px",
     },
   },
@@ -62,26 +62,27 @@ export default function StaticDatePickerLandscape(props) {
   const classes = useStyles();
 
   return (
-    <div className="customDatePickerWidth">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <DatePicker
-          inputFormat="dd/MM/yyyy"
-          label={label}
-          value={value[name]}
-          onChange={(newValue) => {
-            setValue({ ...value, [name]: newValue });
-          }}
-          wrapperClassName="datepicker"
-          // style={{ borderRadius: "10px" }}
-          containerStyle={{ width: "100%" }}
-          renderInput={(params) => (
-            <TextField className={classes.root} size="small" {...params} />
-          )}
-          disabled={disabled}
-          {...(error && { error: true, helperText: error })}
-        />
-      </LocalizationProvider>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DatePicker
+        inputFormat="dd/MM/yyyy"
+        label={label}
+        value={value[name]}
+        onChange={(newValue) => {
+          setValue({ ...value, [name]: newValue });
+        }}
+        wrapperClassName="datepicker"
+        renderInput={(params) => (
+          <TextField
+            className={classes.root}
+            size="small"
+            {...params}
+            fullWidth
+          />
+        )}
+        disabled={disabled}
+        {...(error && { error: true, helperText: error })}
+      />
+    </LocalizationProvider>
   );
 }
 // import * as React from "react";

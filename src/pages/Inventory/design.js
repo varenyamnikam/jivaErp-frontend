@@ -31,6 +31,8 @@ import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import PersonIcon from "@mui/icons-material/Person";
 import CustomerForm from "./customerDesign";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -96,7 +98,13 @@ export default function GeneralForm(props) {
             <Tab
               label="Item Details"
               value="1"
-              icon={<ListAltIcon color="primary" />}
+              icon={
+                tabValue == 1 ? (
+                  <ListAltIcon color="primary" />
+                ) : (
+                  <CheckCircleIcon color="success" />
+                )
+              }
               iconPosition="start"
             />
             <Tab

@@ -41,6 +41,7 @@ const clear = [
 const docOptions = ["DC", "QT", "GR", "SI"];
 const useStyles = makeStyles((theme) => ({
   // input: { minWidth: "200px", flexGrow: 1 },
+  input: {},
 }));
 
 export default function CustomerForm(props) {
@@ -347,7 +348,7 @@ export default function CustomerForm(props) {
                 options1={partyOptions}
                 options2={accounts}
                 error={errors.partyCode}
-                height={30}
+                height={28}
                 icon="user"
               />{" "}
             </Grid>{" "}
@@ -364,7 +365,7 @@ export default function CustomerForm(props) {
             rows={4}
           />
         </Grid>
-        <Grid item xs={12} sm={6} className={classes.input}>
+        <Grid item xs={12} sm={8} className={classes.input}>
           <AnimatedSmartAutoSuggest
             style={{
               width: "100%",
@@ -606,6 +607,22 @@ export default function CustomerForm(props) {
               error={errors.roundOff}
             />
           </Grid>
+          <Grid item xs={12} sm={3} className={classes.input}>
+            <SmartAutoSuggest
+              name1="agentName"
+              code1="agentCode"
+              name2="acName"
+              code2="acCode"
+              label="Payment To"
+              value={input}
+              setValue={setInput}
+              options1={agentOptions}
+              options2={accounts}
+              error={errors.agentName}
+              style={{ height: "40px" }}
+            />
+          </Grid>
+
           <Grid item xs={12} sm={2} className={classes.input}>
             <Controls.Input
               name="netAmount"
@@ -635,23 +652,8 @@ export default function CustomerForm(props) {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <SmartAutoSuggest
-              name1="agentName"
-              code1="agentCode"
-              name2="acName"
-              code2="acCode"
-              label="Payment To"
-              value={input}
-              setValue={setInput}
-              options1={agentOptions}
-              options2={accounts}
-              error={errors.agentName}
-              style={{ height: "40px" }}
-            />
-          </Grid>
 
-          <Grid item xs={12} sm="auto" className={classes.input}>
+          <Grid item xs={12} sm={4} className={classes.input}>
             <button
               class="button"
               onClick={() => {
@@ -664,35 +666,7 @@ export default function CustomerForm(props) {
           <Grid
             item
             xs={12}
-            sm={3}
-            className={classes.input}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <button
-              class="buttonSave"
-              onClick={() => {
-                setTabValue("1");
-              }}
-              style={{
-                width: "250px",
-                backgroundColor: "green",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <SaveIcon htmlColor="white" />
-              <span> Save & New Form</span>
-            </button>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm="auto"
+            sm={4}
             className={classes.input}
             style={{
               display: "flex",
@@ -717,7 +691,17 @@ export default function CustomerForm(props) {
               <span>Submit & Print</span>
             </button>
           </Grid>
-          <Grid item xs={12} sm="auto" className={classes.input}>
+          <Grid
+            item
+            xs={12}
+            sm={4}
+            className={classes.input}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
             <button
               class="buttonSave"
               onClick={() => {
@@ -730,7 +714,7 @@ export default function CustomerForm(props) {
                 alignItems: "center",
               }}
             >
-              <DoneIcon htmlColor="white" style={{ marginRight: "30px" }} />
+              <DoneIcon htmlColor="white" style={{ marginRight: "20px" }} />
               <span>Submit</span>
             </button>
           </Grid>
@@ -742,3 +726,31 @@ export default function CustomerForm(props) {
 // <StaticDatePickerLandscape
 // value={values.}
 // />
+// <Grid
+// item
+// xs={12}
+// sm={3}
+// className={classes.input}
+// style={{
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+// }}
+// >
+// <button
+//   class="buttonSave"
+//   onClick={() => {
+//     setTabValue("1");
+//   }}
+//   style={{
+//     width: "250px",
+//     backgroundColor: "green",
+//     display: "flex",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//   }}
+// >
+//   <SaveIcon htmlColor="white" />
+//   <span> Save & New Form</span>
+// </button>
+// </Grid>

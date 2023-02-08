@@ -6,19 +6,42 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
     margin: "0px",
     marginLeft: "10px",
+    height: "21px",
+    width: "21px",
     // borderRadius: "50%",
+    "&:hover": {
+      cursor: "pointer",
+      color: theme.palette.secondary.main,
+    },
   },
   secondary: {
     backgroundColor: theme.palette.secondary.light,
     "& .MuiButton-label": {
-      color: theme.palette.secondary.main,
+      color: "white",
+    },
+    color: "whitesmoke",
+
+    "&:hover": {
+      "& $addIcon": {
+        color: theme.palette.secondary.main,
+      },
     },
   },
   primary: {
     backgroundColor: theme.palette.primary.light,
     "& .MuiButton-label": {
-      color: theme.palette.primary.main,
+      color: "white",
     },
+    "&:hover": {
+      "& $addIcon": {
+        color: theme.palette.primary.main,
+      },
+    },
+
+    color: "whitesmoke",
+  },
+  addIcon: {
+    color: "white",
   },
 }));
 
@@ -34,7 +57,7 @@ export default function ActionButton(props) {
       disabled={disabled || false}
       {...other}
     >
-      {children}
+      <div className={classes.addIcon}>{children}</div>
     </Button>
   );
 }

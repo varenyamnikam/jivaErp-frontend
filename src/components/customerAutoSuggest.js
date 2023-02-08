@@ -264,7 +264,7 @@ export default function UnusedAutosuggest(props) {
               borderRadius: 0,
               backgroundColor: "green",
               color: "#E9E4DC",
-              height: "39px",
+              height: "41px",
               top: 5,
               width: "100%",
             }}
@@ -284,7 +284,7 @@ export default function UnusedAutosuggest(props) {
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
               top: 5,
-              height: "39px",
+              height: "41px",
             }}
             onClick={() => {}}
           >

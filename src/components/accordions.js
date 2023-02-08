@@ -5,15 +5,17 @@ import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
 import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
+import Switch from "./controls/Switch";
 const Accordion = withStyles({
-  root: {},
+  root: { color: "gray" },
   expanded: {},
 })(MuiAccordion);
 
 const AccordionSummary = withStyles({
   root: {
     backgroundColor: "rgba(0, 0, 0, .03)",
+    color: "gray",
     // borderBottom: '1px solid rgba(0, 0, 0, .125)',
     marginBottom: -1,
     minHeight: 56,
@@ -57,7 +59,8 @@ export default function QuestionSection({ primary, seconadry, children }) {
           expandIcon={<ExpandMoreIcon />}
           id="panel1d-header"
         >
-          <Typography>+ {primary}</Typography>
+          <AddCircleOutlineRoundedIcon style={{ marginRight: "15px" }} />
+          <Typography> {primary}</Typography>
         </AccordionSummary>
         <AccordionDetails>{children}</AccordionDetails>
       </Accordion>

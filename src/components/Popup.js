@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#e2e9f3",
   },
   dialogContent: {
-    //paddingRight: "0px",
+    // padding: "0px",
   },
 }));
 export default function Popup(props) {
@@ -47,7 +47,13 @@ export default function Popup(props) {
       {...other}
     >
       <DialogTitle className={classes.dialogTitle}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
           <Typography
             variant="h6"
             component="div"
@@ -61,13 +67,18 @@ export default function Popup(props) {
             onClick={() => {
               setOpenPopup(false);
             }}
-            // style={{ borderRadius: "50%", margin: "0px" }}
+            style={{
+              height: "30px",
+              width: "30px",
+              borderRadius: "50%",
+              margin: "5px",
+            }}
           >
             <CloseIcon />
           </Controls.ActionButton>
         </div>
       </DialogTitle>{" "}
-      <DialogContent className={classes.dialogContent} dividers>
+      <DialogContent className={classes.dialogContent} dividers {...other}>
         {children}
       </DialogContent>
     </Dialog>

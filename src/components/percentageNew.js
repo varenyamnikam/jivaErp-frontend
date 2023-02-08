@@ -120,7 +120,7 @@ export default function Percent(props) {
 
   return (
     <Grid container>
-      <Grid Item sm={6} xs={6}>
+      <Grid Item sm={7} xs={6}>
         <TextField
           fullWidth
           size="small"
@@ -142,14 +142,13 @@ export default function Percent(props) {
           disabled={disabled}
         />
       </Grid>
-      <Grid Item sm={6} xs={6}>
+      <Grid Item sm={5} xs={6}>
         <TextField
           fullWidth
           size="small"
           variant="outlined"
           type={"number"}
           style={{ borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px" }}
-          label={`percent`}
           name={name2}
           value={value[name2]}
           onChange={(e) => {

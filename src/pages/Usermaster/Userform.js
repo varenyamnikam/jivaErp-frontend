@@ -100,12 +100,11 @@ export default function Userform(props) {
     console.log(temp);
     setErrors(temp);
 
-    if (fieldValues == values)
-      return Object.values(temp).every((x) => x == "" || x == null);
+    return Object.values(temp).every((x) => x == "" || x == null);
   };
-  useEffect(() => {
-    if (!Object.values(errors).every((x) => x == "")) validate();
-  }, [values]);
+  // useEffect(() => {
+  //   if (!Object.values(errors).every((x) => x == "")) validate();
+  // }, [values]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -324,7 +323,6 @@ export default function Userform(props) {
             onChange={handleChange}
           />
         </Grid>
-
         <Grid item sm={6} xs={12}>
           <Controls.Input
             name="Mobileno"
@@ -363,36 +361,36 @@ export default function Userform(props) {
             error={errors.defaultFinYear}
           />
         </Grid>
-
         <Grid item sm={6} xs={12}>
-          <div className={classes.Weddings}>
-            <Controls.RadioGroup
-              name="AllowYearChange"
-              label="Allow Year Change"
-              value={values.AllowYearChange}
-              onChange={handleChange}
-              items={menuRightsItems}
-              error={errors.AllowYearChange}
-            />
-            <Controls.RadioGroup
-              name="AllowBranchChange"
-              label="Allow Branch Change"
-              value={values.AllowBranchChange}
-              onChange={handleChange}
-              items={menuRightsItems}
-              error={errors.AllowBranchChange}
-            />
-            <Controls.RadioGroup
-              name="Status"
-              label="Status"
-              value={values.Status}
-              onChange={handleChange}
-              items={statusItems}
-              error={errors.Status}
-            />
-          </div>
+          <Controls.RadioGroup
+            name="AllowYearChange"
+            label="Allow Year Change"
+            value={values.AllowYearChange}
+            onChange={handleChange}
+            items={menuRightsItems}
+            error={errors.AllowYearChange}
+          />{" "}
+        </Grid>{" "}
+        <Grid item sm={6} xs={12}>
+          <Controls.RadioGroup
+            name="AllowBranchChange"
+            label="Allow Branch Change"
+            value={values.AllowBranchChange}
+            onChange={handleChange}
+            items={menuRightsItems}
+            error={errors.AllowBranchChange}
+          />{" "}
+        </Grid>{" "}
+        <Grid item sm={6} xs={12}>
+          <Controls.RadioGroup
+            name="Status"
+            label="Status"
+            value={values.Status}
+            onChange={handleChange}
+            items={statusItems}
+            error={errors.Status}
+          />{" "}
         </Grid>
-        <Grid item sm={6} xs={12}></Grid>
         <Grid
           item
           sm={6}

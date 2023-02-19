@@ -273,24 +273,6 @@ export default function Customersform(props) {
               // error={errors.stateCode}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="propritorName"
-              label="Propritor Name"
-              value={input.propritorName}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="tradeName"
-              label="Trade Name"
-              value={input.tradeName}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
           <Grid item sm={6} xs={12}>
             <UnusedAutosuggest
               name="acType"
@@ -337,16 +319,7 @@ export default function Customersform(props) {
               onChange={handleChange}
               // error={errors.stateCode}
             />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="seedLicenNo"
-              label="Seed Licen No"
-              value={getValue(input.seedLicenNo)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
+          </Grid>{" "}
           <Grid item xs={12} sm={6}>
             <Controls.Input
               name="bankName"
@@ -374,24 +347,6 @@ export default function Customersform(props) {
               // error={errors.stateCode}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="creditDays"
-              label="Credit Days"
-              value={input.creditDays}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="creditAmount"
-              label="Credit Limit (Amount)"
-              value={input.creditAmount}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
           {values.preFix != "E" && (
             <>
               <Grid item sm={6} xs={12}>
@@ -402,6 +357,51 @@ export default function Customersform(props) {
                   setValue={setInput}
                   options={firmTypeOptions}
                   error={errors.firmType}
+                />
+              </Grid>{" "}
+              <Grid item xs={12} sm={6}>
+                <Controls.Input
+                  name="propritorName"
+                  label="Propritor Name"
+                  value={input.propritorName}
+                  onChange={handleChange}
+                  // error={errors.stateCode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controls.Input
+                  name="tradeName"
+                  label="Trade Name"
+                  value={input.tradeName}
+                  onChange={handleChange}
+                  // error={errors.stateCode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controls.Input
+                  name="seedLicenNo"
+                  label="Seed Licen No"
+                  value={getValue(input.seedLicenNo)}
+                  onChange={handleChange}
+                  // error={errors.stateCode}
+                />
+              </Grid>{" "}
+              <Grid item xs={12} sm={6}>
+                <Controls.Input
+                  name="creditDays"
+                  label="Credit Days"
+                  value={input.creditDays}
+                  onChange={handleChange}
+                  // error={errors.stateCode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controls.Input
+                  name="creditAmount"
+                  label="Credit Limit (Amount)"
+                  value={input.creditAmount}
+                  onChange={handleChange}
+                  // error={errors.stateCode}
                 />
               </Grid>
             </>
@@ -442,6 +442,14 @@ export default function Customersform(props) {
               items={statusItems}
               error={errors.acStatus}
             />
+          </Grid>{" "}
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            style={{ display: "flex", justifyContent: "flex-end" }}
+          >
+            <div>{getButton()}</div>
           </Grid>
         </Grid>
         <Popup
@@ -457,7 +465,6 @@ export default function Customersform(props) {
           />
         </Popup>
       </Form>
-      <div>{getButton()}</div>
     </>
   );
 }

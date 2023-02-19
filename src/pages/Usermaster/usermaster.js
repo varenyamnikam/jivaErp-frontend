@@ -355,27 +355,29 @@ const Usermaster = (props) => {
                                   >
                                     <EditOutlinedIcon fontSize="small" />
                                   </Controls.ActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      console.log(item);
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
-                                          e.preventDefault();
-                                          console.log("records:" + records);
-                                        },
-                                      });
-                                      e.preventDefault();
-                                    }}
-                                  >
-                                    <DeleteIconOutline fontSize="small" />
-                                  </Controls.ActionButton>
+                                  {Number(item.userCode) !== 1001 && (
+                                    <Controls.ActionButton
+                                      color="secondary"
+                                      onClick={(e) => {
+                                        console.log(item);
+                                        setConfirmDialog({
+                                          isOpen: true,
+                                          title:
+                                            "Are you sure to delete this record?",
+                                          subTitle:
+                                            "You can't undo this operation",
+                                          onConfirm: (e) => {
+                                            onDelete(item);
+                                            e.preventDefault();
+                                            console.log("records:" + records);
+                                          },
+                                        });
+                                        e.preventDefault();
+                                      }}
+                                    >
+                                      <DeleteIconOutline fontSize="small" />
+                                    </Controls.ActionButton>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -385,7 +387,7 @@ const Usermaster = (props) => {
                     </TableContainer>
                     <TblPagination />
                   </section>
-                  <Usermasterpopup
+                  <Popup
                     title="User form"
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
@@ -408,12 +410,12 @@ const Usermaster = (props) => {
                       finYear={finYear}
                       setNotify={setNotify}
                     />
-                  </Usermasterpopup>
+                  </Popup>
                   <Popup
-                    title="User Rights"
+                    size="md"
+                    title="Usermaster Form"
                     openPopup={popup}
                     setOpenPopup={setPopup}
-                    size="md"
                   >
                     <RightsForm
                       userCode={values.userCode}

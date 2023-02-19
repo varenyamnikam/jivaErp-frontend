@@ -68,7 +68,7 @@ export default function MarketingArea() {
   const classes = useStyles;
   const [errors, setErrors] = useState({});
   const [values, setValues] = useState({
-    mktArea: "",
+    mktArea: "", //parent area is the label
     acName: "",
     newArea: "",
     ///acCode
@@ -89,13 +89,15 @@ export default function MarketingArea() {
   const [dataBases, setDataBases] = useState(dataBase);
   const [editText, setEditText] = useState("EDIT");
   const [disable, setDisable] = useState(false);
+  const userCode = localStorage.getItem("userCode");
+  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
 
   useEffect(() => {
     if (dataBases[0] && dataBases[0].mktAreaCode == "X X X X") {
-      // console.log(dataBases);
       const token = AuthHandler.getLoginToken();
       axios
-        .get(Config.mktArea, {
+        .get(Config.mktArea + query, {
           headers: {
             authorization: "Bearer" + token,
           },
@@ -118,7 +120,7 @@ export default function MarketingArea() {
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };
       axios
-        .get(Config.accounts, {
+        .get(Config.accounts + query, {
           headers: {
             authorization: "Bearer" + token,
           },
@@ -204,7 +206,7 @@ export default function MarketingArea() {
             };
             axios
               .put(
-                Config.mktArea,
+                Config.mktArea + query,
                 { input },
                 {
                   headers: {
@@ -214,7 +216,7 @@ export default function MarketingArea() {
               )
               .then((response) => {
                 setDataBases(response.data.mst_mktArea);
-                // console.log(response);
+                // console.log(response.data.mst_mktArea);
               });
 
             console.log("hi");
@@ -234,7 +236,7 @@ export default function MarketingArea() {
             );
             axios
               .patch(
-                Config.mktArea,
+                Config.mktArea + query,
                 { input },
                 {
                   headers: {
@@ -257,7 +259,7 @@ export default function MarketingArea() {
       }
     }
   };
-
+  // acCode -> acName or acName to acCode
   if (values.acName) {
     employeeData.map((item) => {
       if ((values.acName == item.acName) & (values.acCode !== item.acCode)) {
@@ -265,13 +267,6 @@ export default function MarketingArea() {
       }
     });
   }
-  // if (!values.acName && values.acCode) {
-  //   employeeData.map((item) => {
-  //     if (values.acCode == item.acCode) {
-  //       setValues({ ...values, acName: item.acName });
-  //     }
-  //   });
-  // }
   if (!values.acName && values.assignTo) {
     employeeData.map((item) => {
       if (values.assignTo == item.acCode) {
@@ -279,7 +274,7 @@ export default function MarketingArea() {
       }
     });
   }
-
+  /////////////////////////////////
   function getLabel() {
     if (editText == "EDIT") {
       return "Assigned To";

@@ -20,6 +20,10 @@ import { Grid } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/InfoOutlined";
 import Tooltip from "@mui/material/Tooltip";
+import AuthHandler from "../Utils/AuthHandler";
+import axios from "axios";
+import Config from "../Utils/Config";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -116,10 +120,18 @@ export default function UnusedAutosuggest(props) {
     error = null,
     icon,
     height,
+    getAccType,
+    itemList,
     ...other
   } = props;
+  let history = useNavigate();
   const [inputValue, setInputValue] = React.useState("");
   const [isPaused, setIsPaused] = React.useState(true);
+  const [toolTip, setToolTip] = React.useState({
+    partyCode: "",
+    balance: "Check A/c balance",
+  });
+
   function getIcon() {
     if (icon == "bill") {
       return bill;
@@ -162,6 +174,47 @@ export default function UnusedAutosuggest(props) {
         setValue({ ...value, [name1]: item[name2] });
       }
     });
+  }
+  function updateBalance() {
+    console.log(value.partyCode, toolTip.partyCode);
+    if (value.partyCode !== toolTip.partyCode) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userCode = user.userCode;
+      const userCompanyCode = user.userCompanyCode;
+      const useBatch = JSON.parse(
+        localStorage.getItem("adm_softwareSettings")
+      ).userBatchNo;
+      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${value.partyCode}`;
+      const token = AuthHandler.getLoginToken();
+      console.log(query);
+      axios
+        .post(
+          Config.acReport,
+          {
+            userCompanyCode: userCompanyCode,
+            userCode: userCode,
+            yearCode: user.defaultYearCode,
+            branchCode: user.defaultBranchCode,
+            acCode: value.partyCode,
+          },
+          {
+            headers: {
+              authorization: "Bearer" + token,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data.balance);
+          if (res.data)
+            setToolTip({
+              partyCode: value.partyCode,
+              balance: `Rs ${String(res.data.balance)}`,
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
   let inputRef;
   return (
@@ -258,21 +311,29 @@ export default function UnusedAutosuggest(props) {
           />
         </Grid>
         <Grid Item sm={1} xs={6} style={{ justifyContent: "flex-end" }}>
-          <IconButton
-            aria-label="Example"
-            style={{
-              borderRadius: 0,
-              backgroundColor: "green",
-              color: "#E9E4DC",
-              height: "41px",
-              top: 5,
-              width: "100%",
-            }}
+          <Tooltip
+            title={
+              value.partyCode == toolTip.partyCode
+                ? toolTip.balance
+                : "Check A/c balance"
+            }
+            arrow
           >
-            <Tooltip title="Check Acc Balance" arrow>
+            <IconButton
+              aria-label="Example"
+              style={{
+                borderRadius: 0,
+                backgroundColor: "green",
+                color: "#E9E4DC",
+                height: "41px",
+                top: 5,
+                width: "100%",
+              }}
+              onClick={updateBalance}
+            >
               <InfoIcon width={30} color="white" />
-            </Tooltip>
-          </IconButton>
+            </IconButton>
+          </Tooltip>
         </Grid>{" "}
         <Grid Item sm={2} xs={6} style={{ justifyContent: "flex-end" }}>
           <Button
@@ -286,7 +347,29 @@ export default function UnusedAutosuggest(props) {
               top: 5,
               height: "41px",
             }}
-            onClick={() => {}}
+            onClick={() => {
+              let str = value.docCode;
+              let path =
+                "/Inventory/" + str.substring(0, 1) + "." + str.substring(1, 2);
+
+              const newParty = {
+                transactnValue: value,
+                transactnList: itemList,
+                path: path,
+                transactnOpen: true,
+                partyOpen: true,
+              };
+              localStorage.setItem("newParty", JSON.stringify(newParty));
+              if (getAccType() == "C") {
+                history.push("/Master/Accounts/Customers");
+              }
+              if (getAccType() == "S") {
+                history.push("/Master/Accounts/Suppliers");
+              }
+              if (getAccType() == "E") {
+                history.push("/Master/Accounts/Employees");
+              }
+            }}
           >
             New Party
           </Button>

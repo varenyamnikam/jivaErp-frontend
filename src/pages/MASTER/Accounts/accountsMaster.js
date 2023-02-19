@@ -475,35 +475,39 @@ export default function AccountMaster() {
                                   </span>
                                 </TableCell>
                                 <TableCell>
-                                  <Controls.ActionButton
-                                    color="primary"
-                                    onClick={() => {
-                                      setValues(item);
-                                      setButtonPopup(true);
-                                    }}
-                                  >
-                                    <EditOutlinedIcon fontSize="small" />
-                                  </Controls.ActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      console.log(item);
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
+                                  {item.userCompanyCode !== "all" && (
+                                    <>
+                                      <Controls.ActionButton
+                                        color="primary"
+                                        onClick={() => {
+                                          setValues(item);
+                                          setButtonPopup(true);
+                                        }}
+                                      >
+                                        <EditOutlinedIcon fontSize="small" />
+                                      </Controls.ActionButton>
+                                      <Controls.ActionButton
+                                        color="secondary"
+                                        onClick={(e) => {
+                                          console.log(item);
+                                          setConfirmDialog({
+                                            isOpen: true,
+                                            title:
+                                              "Are you sure to delete this record?",
+                                            subTitle:
+                                              "You can't undo this operation",
+                                            onConfirm: (e) => {
+                                              onDelete(item);
+                                              e.preventDefault();
+                                            },
+                                          });
                                           e.preventDefault();
-                                        },
-                                      });
-                                      e.preventDefault();
-                                    }}
-                                  >
-                                    <DeleteIconOutline fontSize="small" />
-                                  </Controls.ActionButton>
+                                        }}
+                                      >
+                                        <DeleteIconOutline fontSize="small" />
+                                      </Controls.ActionButton>
+                                    </>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}

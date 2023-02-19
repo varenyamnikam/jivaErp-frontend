@@ -24,6 +24,7 @@ export default function RightsForm(props) {
   const initialUserRights = {
     id: 0,
     userCode: userCode,
+    screenCode: "",
     screenName: "",
     menuRight: "Y",
     editRight: "Y",
@@ -65,18 +66,21 @@ export default function RightsForm(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
+      let x = true;
       const updatedRights = userRights.map((item) => {
+        console.log(item);
         if (
           values.screenCode == item.screenCode &&
           values.userCode == item.userCode
         ) {
+          x = false;
           return values;
         } else {
           return item;
         }
       });
       console.log(updatedRights);
-      setUserRights(updatedRights);
+      if (!x) setUserRights(updatedRights);
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };
       axios
@@ -91,7 +95,7 @@ export default function RightsForm(props) {
         )
         .then((response) => {
           console.log("hi....", values);
-          setUserRights([...userRights, values]);
+          if (x) setUserRights([...userRights, values]);
           setNotify({
             isOpen: true,
             message: "User rights updated  successfully",
@@ -116,22 +120,36 @@ export default function RightsForm(props) {
       [name]: value,
     });
   };
-  const findScreenName = (nodes) => {
-    if (
-      nodes.screenCode == values.screenCode &&
-      nodes.screenName !== values.screenName
-    ) {
-      setValues({ ...values, screenName: nodes.screenName });
-    } else {
-      if (Array.isArray(nodes.subNav)) {
-        nodes.subNav.map((node) => findScreenName(node));
-      }
-    }
-  };
-  if (values.screenCode)
+  function findScreenCode(name) {
+    let y = "";
+    let x;
     data.map((item) => {
-      findScreenName(item);
+      if (!"subnav" in item) {
+        x = recursiveSearch(item.subNav, name);
+        if (x) y = x;
+      }
     });
+    console.log(y);
+    return y;
+  }
+  const recursiveSearch = (nodes, name) => {
+    // if (nodes.screenName == name) {
+    //   console.log("hi");
+    //   return nodes.screenCode;
+    // } else {
+    // if (Array.isArray(nodes.subNav)) {
+    //   nodes.subNav.map((node) => recursiveSearch(node, name));
+    // }
+    // }
+    let x = "";
+    nodes.map((item) => {
+      if (item.screenName == name) {
+        x = item.screenCode;
+        console.log("hi");
+      }
+    });
+    return x;
+  };
   const resetForm = (e) => {
     setValues(initialUserRights);
   };

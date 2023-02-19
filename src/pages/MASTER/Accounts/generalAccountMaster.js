@@ -119,6 +119,8 @@ const initialAdress = {
 export default function Customers({ acTypeFor, initialValues }) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const openOnRender = newParty.partyOpen;
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const initialFilterValues = {
     ...initialValues,
@@ -127,7 +129,9 @@ export default function Customers({ acTypeFor, initialValues }) {
   };
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
-  const [buttonPopup, setButtonPopup] = useState(false);
+  const [buttonPopup, setButtonPopup] = useState(
+    openOnRender ? openOnRender : false
+  );
   const [values, setValues] = useState(initialValues);
   const [acCodeHook, setAcCodeHook] = useState(values.acCode);
   const [value, setValue] = useState("1");
@@ -181,8 +185,7 @@ export default function Customers({ acTypeFor, initialValues }) {
   //       setAdressData(response.data.acadress);
   //     });
   // }
-
-  console.log(recordsAfterPagingAndSorting(), records);
+  console.log(recordsAfterPagingAndSorting(), records, newParty);
   if (records[0] && records[0].acCode == "X X X X") {
     // console.log(records);
     const token = AuthHandler.getLoginToken();

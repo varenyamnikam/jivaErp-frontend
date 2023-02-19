@@ -121,6 +121,8 @@ export default function ControlledTreeView(props) {
         : null}
     </TreeItem>
   );
+  const firstEntry = dataBase.find((item) => Number(item.mktAreaCode) == 5001);
+  console.log(firstEntry);
   return (
     <TreeView
       aria-label="controlled"
@@ -132,7 +134,7 @@ export default function ControlledTreeView(props) {
       onNodeSelect={handleSelect}
       // sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
     >
-      {renderTree(dataBase[0])}
+      {renderTree(firstEntry ? firstEntry : dataBase[0])}
     </TreeView>
   );
 }

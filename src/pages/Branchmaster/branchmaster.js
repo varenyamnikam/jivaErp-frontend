@@ -384,34 +384,36 @@ const Branchmaster = (props) => {
                                       }}
                                     />
                                   </Controls.ActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      console.log(item);
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
-                                          e.preventDefault();
-                                          console.log("records:" + records);
-                                        },
-                                      });
-                                      e.preventDefault();
-                                    }}
-                                  >
-                                    <DeleteIconOutline
-                                      fontSize="small"
-                                      style={{
-                                        height: "18px",
-                                        width: "18px",
-                                        margin: "2px",
+                                  {Number(item.branchCode) !== 1001 && (
+                                    <Controls.ActionButton
+                                      color="secondary"
+                                      onClick={(e) => {
+                                        console.log(item);
+                                        setConfirmDialog({
+                                          isOpen: true,
+                                          title:
+                                            "Are you sure to delete this record?",
+                                          subTitle:
+                                            "You can't undo this operation",
+                                          onConfirm: (e) => {
+                                            onDelete(item);
+                                            e.preventDefault();
+                                            console.log("records:" + records);
+                                          },
+                                        });
+                                        e.preventDefault();
                                       }}
-                                    />
-                                  </Controls.ActionButton>
+                                    >
+                                      <DeleteIconOutline
+                                        fontSize="small"
+                                        style={{
+                                          height: "18px",
+                                          width: "18px",
+                                          margin: "2px",
+                                        }}
+                                      />
+                                    </Controls.ActionButton>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}

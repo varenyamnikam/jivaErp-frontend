@@ -20,6 +20,9 @@ import Lottie from "react-lottie";
 import rupee from "../../components/lotties/105335-rupee-coin.json";
 import ProductAutoSuggest from "../../components/productAutoSuggest.js";
 import MenuPopupState from "../../components/checkBoxMenu";
+import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
+import DoneIcon from "@mui/icons-material/Done";
+import Divider from "@mui/material/Divider";
 import "../../components/arrows.css";
 import {
   Paper,
@@ -32,6 +35,7 @@ import {
   TableContainer,
   TableFooter,
   Table,
+  getVouNo,
 } from "@material-ui/core";
 import Validate from "./validateItem";
 const headcells = [
@@ -69,19 +73,24 @@ export default function GeneralItemForm(props) {
     setCommon,
     common,
     setTabValue,
+    adress,
+    handleSubmit,
+    item,
+    setItem,
+    setInput,
+    getVouNo,
   } = props;
   const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
   const validateValues = { ...initialVouItem, vouNo: "", expDate: "" };
   const initialSettings = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   );
-  const [item, setItem] = useState(initialVouItem);
   const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(headcells);
   const [disabled1, setDisabled1] = useState(false);
   const [isPaused, setIsPaused] = useState(initialPause);
   const [settings, setSettings] = useState(initialSettings);
-  console.log(settings);
+  console.log(settings, input);
 
   const [notify, setNotify] = useState({
     isOpen: false,
@@ -131,13 +140,11 @@ export default function GeneralItemForm(props) {
     "cgst",
     "sgst",
     "igst",
-    "cess",
-    "itemAmount"
+    "cess"
   );
   const token = AuthHandler.getLoginToken();
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const count = [1, 2, 3, 4, 5, 6, 7, 8];
   console.log(totalBeforeDs(), totalAfterDs());
   if (totalBeforeDs()) {
     console.log(item, totalBeforeDs());
@@ -150,7 +157,9 @@ export default function GeneralItemForm(props) {
   if (parseFloat(Final()).toFixed(2) !== item.itemAmount) {
     setItem({ ...item, itemAmount: parseFloat(Final()).toFixed(2) });
   }
-
+  const generalAccName = common.accounts
+    .filter((item) => item.preFix == "G")
+    .map((item) => item.acName);
   function getDisable(vouNo) {
     let x = true;
     records.map((items) => {
@@ -196,21 +205,30 @@ export default function GeneralItemForm(props) {
     }
   }
   const [batchList, setBatchlist] = useState(getBatchlist());
-  // useEffect(() => {
-  //   if ("batchList" in item) {
-  //     let x = true;
-  //     if (batchList.length == item.batchList.length)
-  //       batchList.map((batch, i) => {
-  //         if (batch.sell == item.batchList[i].sell) x = false;
-  //       });
-  //     if (x) setBatchlist(item.batchList);
-  //   }
-  // });
+  let x = 0;
+  itemList.map((item) => {
+    x = Number(x) + Number(item.itemAmount);
+  });
+  const amt = x;
+  if (amt.toFixed(2) !== input.itemTotal) {
+    setInput({ ...input, itemTotal: amt.toFixed(2) });
+  }
+  let k =
+    Number(input.itemTotal) + Number(input.fright) - Number(input.billDis);
+
+  if (Number(input.netAmount) !== Math.round(k)) {
+    setInput({ ...input, netAmount: Math.round(k) });
+  }
   console.log(
-    batchList,
-    isPaused,
-    Object.values(isPaused).every((x) => x !== true)
+    Number(input.roundOff),
+    (k.toFixed(2) - Math.round(k)).toFixed(2)
   );
+  if (
+    Number(input.roundOff).toFixed(2) !==
+    (k.toFixed(2) - Math.round(k)).toFixed(2)
+  ) {
+    setInput({ ...input, roundOff: (k.toFixed(2) - Math.round(k)).toFixed(2) });
+  }
 
   function rnd(no) {
     return Number(no)
@@ -238,7 +256,7 @@ export default function GeneralItemForm(props) {
       ...item,
       vouSrNo: 1,
     });
-  const handleSubmit = (e) => {
+  const handleItemSubmit = (e) => {
     setPopup(false);
     e.preventDefault();
     let x = true;
@@ -296,13 +314,14 @@ export default function GeneralItemForm(props) {
           });
           y = false;
         }
-        if (y) handleSubmit(e);
+        if (y) handleItemSubmit(e);
         console.log(Data, y);
       });
     return y;
   }
-  console.log(itemList, recordsAfterAndSorting());
+  console.log(item);
   const classesContainer = useStylesContainer();
+
   return (
     <>
       <Grid
@@ -310,6 +329,55 @@ export default function GeneralItemForm(props) {
         spacing={2}
         // style={{ display: "flex", justifyContent: "flex-end" }}
       >
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Controls.Input
+            name="vouNo"
+            label="Voucher No"
+            value={getVouNo()}
+            onChange={handleChange}
+            error={errors.vouNo}
+            disabled={true}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Controls.Input
+            style={{ width: "100%" }}
+            name="docCode"
+            label="Doc Code"
+            value={input.docCode}
+            onChange={handleChange}
+            disabled={true}
+            // error={errors.docCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <StaticDatePickerLandscape
+            name="vouDate"
+            size="small"
+            label="Voucher Date"
+            value={input}
+            setValue={setInput}
+            disabled={true}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Controls.Input
+            style={{ width: "100%" }}
+            name=""
+            label="Party"
+            value={input.partyName}
+            disabled={true}
+            // error={errors.docCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} className={classes.input}>
+          <Divider
+            variant="middle"
+            color="blue"
+            sx={{ borderBottomWidth: 2 }}
+          />
+        </Grid>
+
         <Grid item xs={12} sm={6} className={classes.input}>
           <ProductAutoSuggest
             style={{ borderRadius: "0px" }}
@@ -323,6 +391,8 @@ export default function GeneralItemForm(props) {
             options1={prodOptions}
             options2={products}
             error={errors.prodCode}
+            input={input}
+            adress={adress}
           />
         </Grid>
         {settings.itemDescription == "Yes" && (
@@ -372,7 +442,7 @@ export default function GeneralItemForm(props) {
         )}
         {(input.docCode == "DC" || input.docCode == "SI") &&
         settings.userBatchNo == "Yes" ? (
-          <Grid item xs={12} sm={3} className={classes.input}>
+          <Grid item xs={12} sm={2} className={classes.input}>
             <Grouped
               values={item}
               setValues={setItem}
@@ -519,7 +589,7 @@ export default function GeneralItemForm(props) {
         <Grid
           item
           xs={12}
-          sm={12}
+          sm="auto"
           className={classes.input}
           style={{ display: "flex", justifyContent: "flex-end", flexGrow: "1" }}
         >
@@ -540,14 +610,14 @@ export default function GeneralItemForm(props) {
                   getStock(e);
                 } else {
                   console.log("hi else");
-                  handleSubmit(e);
+                  handleItemSubmit(e);
                 }
               }
             }}
           />
         </Grid>
       </Grid>
-      <Grid container className={classesContainer.root}>
+      <Grid container className={classesContainer.root} spacing={2}>
         <Grid Item style={{}} xs={12} sm={12}>
           <TableContainer sx={{ minHeight: 500 }}>
             <TblContainer>
@@ -614,36 +684,150 @@ export default function GeneralItemForm(props) {
                   ))}
                   <TableRow>
                     <TableCell colSpan={7}>Total Amount</TableCell>
-                    <TableCell colSpan={3}>{Number(input.netAmount)}</TableCell>
+                    <TableCell colSpan={3}>{Number(input.itemTotal)}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </TblContainer>
           </TableContainer>
+        </Grid>{" "}
+        <Grid item xs={12} sm={3} className={classes.input}>
+          <Percent
+            name1="billDis"
+            name2="billDisPer"
+            name3="itemTotal"
+            label="Discount"
+            value={input}
+            setValue={setInput}
+            onChange={(e) => {
+              setInput({
+                ...input,
+                [e.target.name]: e.target.value,
+              });
+            }}
+            error={errors.billDis}
+          />
+        </Grid>
+        <Grid item xs={12} sm={2} className={classes.input}>
+          <Controls.Input
+            name="roundOff"
+            label="Round Off"
+            value={input.roundOff}
+            onChange={() => {}}
+            error={errors.roundOff}
+          />
+        </Grid>
+        <Grid item xs={12} sm={5} className={classes.input}>
+          <SmartAutoSuggest
+            name1="agentName"
+            code1="agentCode"
+            name2="acName"
+            code2="acCode"
+            label="Payment Through"
+            value={input}
+            setValue={setInput}
+            options1={generalAccName}
+            options2={common.accounts}
+            error={errors.agentName}
+            style={{ height: "40px" }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={2} className={classes.input}>
+          <Controls.Input
+            name="netAmount"
+            label="Net Amount"
+            value={input.netAmount}
+            onChange={() => {}}
+            error={errors.netAmount}
+            onFocus={() => {
+              setIsPaused((prev) => ({ ...prev, netAmount: false }));
+            }}
+            onBlur={() => {
+              setIsPaused((prev) => ({ ...prev, netAmount: true }));
+            }}
+            classname={classes.root}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lottie
+                    options={play}
+                    height={60}
+                    width={30}
+                    isStopped={isPaused.netAmount}
+                  />
+                </InputAdornment>
+              ),
+              classes: { root: classes.inputRoot },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4} className={classes.input}>
+          <button
+            class="button"
+            onClick={() => {
+              setTabValue("1");
+            }}
+          >
+            <span>Prev</span>
+          </button>{" "}
         </Grid>
         <Grid
-          Item
+          item
+          xs={12}
+          sm={4}
+          className={classes.input}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <button
+            class="buttonSave"
+            onClick={() => {
+              setTabValue("1");
+            }}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+
+              backgroundColor: "rgb(116, 100, 100)",
+            }}
+          >
+            <LocalPrintshopIcon htmlColor="white" />
+            <span>Submit & Print</span>
+          </button>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={4}
+          className={classes.input}
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            alignItems: "bottom",
-            marginTop: "50px",
+            alignItems: "center",
           }}
-          xs={12}
-          sm={12}
         >
-          {" "}
           <button
-            class="buttonNext"
+            class="buttonSave"
             onClick={() => {
-              setTabValue("2");
+              setTabValue("1");
+              handleSubmit(input, itemList);
+            }}
+            style={{
+              backgroundColor: "blue",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <span>Next</span>
+            <DoneIcon htmlColor="white" style={{ marginRight: "20px" }} />
+            <span>Submit</span>
           </button>
         </Grid>
       </Grid>
-
       <Notification notify={notify} setNotify={setNotify} />
     </>
   );

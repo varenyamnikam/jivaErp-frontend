@@ -1,11 +1,11 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import AuthHandler from "../Utils/AuthHandler";
 
 class LogoutComponent extends React.Component {
   render() {
     AuthHandler.logoutUser();
-    return <Redirect to="/" />;
+    return <Navigate to="/" />;
   }
 }
 export default LogoutComponent;

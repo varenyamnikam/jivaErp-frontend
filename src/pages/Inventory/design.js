@@ -65,6 +65,7 @@ export default function GeneralForm(props) {
     itemList,
     setItemList,
     reference,
+    handleSubmit,
   } = props;
   const validateValues = {
     ...initialValues,
@@ -76,61 +77,40 @@ export default function GeneralForm(props) {
     partyBillDate: "",
     partyChallanDate: "",
   };
-  const [input, setInput] = useState(values);
+  const [input, setInput] = useState(values); //for customer form
+  const [item, setItem] = useState(initialVouItem); //for product form
+
   const [tabValue, setTabValue] = useState("1");
   const prodOptions = products.map((item) => item.prodName);
+  let y = true;
+  records.map((item) => {
+    if (item.vouNo == input.vouNo) {
+      console.log(item);
+      y = false;
+    }
+  });
 
+  function getVouNo() {
+    if (y) {
+      return " NEW ";
+    } else {
+      return input.vouNo;
+    }
+  }
+  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const openOnRender = newParty.transactnOpen;
+  if (openOnRender) {
+    newParty.transactnValue && setInput(newParty.transactnValue);
+    newParty.transactnList && setItemList(newParty.transactnList);
+    newParty = AuthHandler.getResetParty();
+    localStorage.setItem("newParty", JSON.stringify(newParty));
+  }
   return (
     <>
       {" "}
       <TabContext value={tabValue}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={tabValue}
-            onChange={(e, newValue) => {
-              setTabValue(newValue);
-            }}
-            indicatorColor="primary"
-            textColor="inherit"
-            variant="fullWidth"
-            aria-label="full width tabs example"
-          >
-            <Tab
-              label="Item Details"
-              value="1"
-              icon={
-                tabValue == 1 ? (
-                  <ListAltIcon color="primary" />
-                ) : (
-                  <CheckCircleIcon color="success" />
-                )
-              }
-              iconPosition="start"
-            />
-            <Tab
-              label="Customer Details"
-              value="2"
-              disabled={!Number(values.netAmount) == 0}
-              icon={<PersonIcon color="primary" />}
-              iconPosition="start"
-            />
-          </Tabs>
-        </Box>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}></Box>
         <TabPanel value="1" sx={{ height: "90%" }}>
-          <ItemForm
-            itemList={itemList}
-            setItemList={setItemList}
-            records={records}
-            products={products}
-            prodOptions={prodOptions}
-            initialVouItem={initialVouItem}
-            input={input}
-            setCommon={setCommon}
-            common={common}
-            setTabValue={setTabValue}
-          />
-        </TabPanel>{" "}
-        <TabPanel value="2">
           <CustomerForm
             records={records}
             values={values}
@@ -148,6 +128,27 @@ export default function GeneralForm(props) {
             input={input}
             setInput={setInput}
             setTabValue={setTabValue}
+            getVouNo={getVouNo}
+          />
+        </TabPanel>{" "}
+        <TabPanel value="2">
+          <ItemForm
+            itemList={itemList}
+            setItemList={setItemList}
+            records={records}
+            products={products}
+            prodOptions={prodOptions}
+            initialVouItem={initialVouItem}
+            input={input}
+            setInput={setInput}
+            setCommon={setCommon}
+            common={common}
+            setTabValue={setTabValue}
+            adress={adress}
+            handleSubmit={handleSubmit}
+            item={item}
+            setItem={setItem}
+            getVouNo={getVouNo}
           />
         </TabPanel>
       </TabContext>

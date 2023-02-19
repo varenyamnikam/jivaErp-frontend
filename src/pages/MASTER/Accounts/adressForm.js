@@ -16,6 +16,7 @@ import Districts from "../../../components/districtSelect";
 import Talukas from "../../../components/talukaSelect";
 import DoneIcon from "@mui/icons-material/Done";
 import * as roleService from "../../../services/roleService";
+import { useNavigate } from "react-router-dom";
 
 const Firms = [
   "N.A.",
@@ -52,6 +53,7 @@ export default function Adressform(props) {
   console.log(adressData);
   console.log(adresses);
   console.log(currentAdress);
+  let history = useNavigate();
 
   // const [input, setInput] = useState({
   //   acCode: acCode,
@@ -118,6 +120,12 @@ export default function Adressform(props) {
       console.log(updatedData);
       setAdressData([...updatedData, ...updatedAdresses]);
       roleService.insertAcAdress(input);
+      let newParty = JSON.parse(localStorage.getItem("newParty"));
+      newParty.partyOpen = false;
+
+      localStorage.setItem("newParty", JSON.stringify(newParty));
+
+      history.push(newParty.path);
     }
   }
   //

@@ -1,7 +1,11 @@
 import React from "react";
 import Config from "./Utils/Config";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import ReactDOM from "react-dom/client";
+import {
+  BrowserRouter as Router,
+  Routes as Switch,
+  Route,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import LogoutComponent from "./pages/LogoutComponent";
 import MainComponent from "./components/MainComponent";
@@ -9,7 +13,6 @@ import Dashboard from "./pages/dashboard";
 import Rolemaster from "./pages/Rolemaster/rolemaster";
 import Usermaster from "./pages/Usermaster/usermaster";
 import Branchmaster from "./pages/Branchmaster/branchmaster";
-import { PrivateRoute } from "./Utils/PrivateRoute";
 import { PrivateRouteNew } from "./Utils/PrivateRouteNew";
 import Countrymaster from "./pages/MASTER/Geography/countryMaster";
 import Statemaster from "./pages/MASTER/Geography/stateMaster";
@@ -59,148 +62,251 @@ import BankBook from "./pages/Report/bankBook";
 import CashBook from "./pages/Report/cashBook";
 import Sidemenu from "./components/sidemenu";
 import jQuery from "jquery";
-
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
   <>
     <Router>
       <Switch>
-        <Route exact path="/" component={SignIn}></Route>
-        <Route exact path="/register" component={RegisterForm}></Route>
-        <Route exact path="/login" component={SignIn}></Route>
-        <PrivateRouteNew
+        <Route path="/" element={<SignIn />}></Route>
+        <Route path="/register" element={<RegisterForm />}></Route>
+        <Route path="/login" element={<SignIn />}></Route>
+        <Route
           exact
           path="/home"
-          page={<Dashboard />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Dashboard} />}
+        ></Route>
+        <Route
           path="/Admin/RoleMaster"
-          page={<Rolemaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Rolemaster} />}
+        ></Route>
+        <Route
           exact
           path="/Admin/UserMaster"
-          page={<Usermaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Usermaster} />}
+        ></Route>
+        <Route
           exact
           path="/Admin/Branch"
-          page={<Branchmaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Branchmaster} />}
+        ></Route>
+        <Route
           path="/Admin/FinancialYearMaster"
-          page={<FinancialYearMaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew path="/Admin/SoftwareSetting" page={<Settings />} />
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={FinancialYearMaster} />}
+        ></Route>
+        <Route
+          path="/Admin/SoftwareSetting"
+          element={<PrivateRouteNew Page={Settings} />}
+        />
+        <Route
           exact
           path="/Master/Geography/Country"
-          page={<Countrymaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Countrymaster} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Geography/State"
-          page={<Statemaster />}
-        ></PrivateRouteNew>{" "}
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Statemaster} />}
+        ></Route>{" "}
+        <Route
           exact
           path="/Master/Geography/District"
-          page={<Districtmaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Districtmaster} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Geography/Taluka"
-          page={<Talukamaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={Talukamaster} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Geography/MarketingArea"
-          page={<MarketingArea />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={MarketingArea} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Accounts/AccountGroupMaster"
-          page={<AcGlGroup />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={AcGlGroup} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Accounts/AccountTypesMaster"
-          page={<AccountTypesMaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={AccountTypesMaster} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Accounts/AccountMaster"
-          page={<AccountMaster />}
-        ></PrivateRouteNew>
-        <PrivateRouteNew
+          element={<PrivateRouteNew Page={AccountMaster} />}
+        ></Route>
+        <Route
           exact
           path="/Master/Accounts/Customers"
-          page={<Customers />}
+          element={<PrivateRouteNew Page={Customers} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Master/Accounts/Suppliers"
-          page={<Suppliers />}
+          element={<PrivateRouteNew Page={Suppliers} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Master/Accounts/Employees"
-          page={<Employees />}
+          element={<PrivateRouteNew Page={Employees} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Inventory/ProductMaster"
-          page={<ProductMaster />}
+          element={<PrivateRouteNew Page={ProductMaster} />}
         />
-        <PrivateRouteNew exact path="/Inventory/D.C" page={<DCMaster />} />
-        <PrivateRouteNew exact path="/Inventory/Q.T" page={<QTMaster />} />
-        <PrivateRouteNew exact path="/Inventory/S.I" page={<SIMaster />} />
-        <PrivateRouteNew exact path="/Inventory/G.R" page={<GrMaster />} />
-        <PrivateRouteNew exact path="/Inventory/P.I" page={<PIMaster />} />
-        <PrivateRouteNew exact path="/Inventory/S.O" page={<SOMaster />} />
-        <PrivateRouteNew exact path="/Inventory/S.R" page={<SRMaster />} />
-        <PrivateRouteNew exact path="/Inventory/P.O" page={<POMaster />} />
-        <PrivateRouteNew exact path="/Inventory/P.V" page={<PVMaster />} />
-        <PrivateRouteNew exact path="/Inventory/P.R" page={<PRMaster />} />
-        <PrivateRouteNew exact path="/Inventory/C.N" page={<CNMaster />} />
-        <PrivateRouteNew exact path="/Inventory/D.N" page={<DNMaster />} />
-        <PrivateRouteNew exact path="/AcTransaction/BR" page={<BR />} />
-        <PrivateRouteNew exact path="/AcTransaction/BP" page={<BP />} />
-        <PrivateRouteNew exact path="/AcTransaction/CR" page={<CR />} />
-        <PrivateRouteNew exact path="/AcTransaction/CP" page={<CP />} />
-        <PrivateRouteNew exact path="/AcTransaction/JV" page={<JV />} />
-        <PrivateRouteNew exact path="/AcTransaction/CV" page={<CV />} />
-        <PrivateRouteNew exact path="/AcTransaction/OB" page={<OB />} />
-        <PrivateRouteNew
+        <Route
+          exact
+          path="/Inventory/D.C"
+          element={<PrivateRouteNew Page={DCMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/Q.T"
+          element={<PrivateRouteNew Page={QTMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/S.I"
+          element={<PrivateRouteNew Page={SIMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/G.R"
+          element={<PrivateRouteNew Page={GrMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/P.I"
+          element={<PrivateRouteNew Page={PIMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/S.O"
+          element={<PrivateRouteNew Page={SOMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/S.R"
+          element={<PrivateRouteNew Page={SRMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/P.O"
+          element={<PrivateRouteNew Page={POMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/P.V"
+          element={<PrivateRouteNew Page={PVMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/P.R"
+          element={<PrivateRouteNew Page={PRMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/C.N"
+          element={<PrivateRouteNew Page={CNMaster} />}
+        />
+        <Route
+          exact
+          path="/Inventory/D.N"
+          element={<PrivateRouteNew Page={DNMaster} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/BR"
+          element={<PrivateRouteNew Page={BR} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/BP"
+          element={<PrivateRouteNew Page={BP} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/CR"
+          element={<PrivateRouteNew Page={CR} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/CP"
+          element={<PrivateRouteNew Page={CP} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/JV"
+          element={<PrivateRouteNew Page={JV} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/CV"
+          element={<PrivateRouteNew Page={CV} />}
+        />
+        <Route
+          exact
+          path="/AcTransaction/OB"
+          element={<PrivateRouteNew Page={OB} />}
+        />
+        <Route
           exact
           path="/Inventory/PaymentTerm"
-          page={<PayTermMaster />}
+          element={<PrivateRouteNew Page={PayTermMaster} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Inventory/StockMaster"
-          page={<StockMaster />}
+          element={<PrivateRouteNew Page={StockMaster} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Inventory/StockReport"
-          page={<StockReport />}
+          element={<PrivateRouteNew Page={StockReport} />}
         />
-        <PrivateRouteNew
+        <Route
           exact
           path="/Inventory/StockReport"
-          page={<StockReport />}
+          element={<PrivateRouteNew Page={StockReport} />}
         />
-        <PrivateRouteNew exact path="/Report/POReport" page={<POReport />} />
-        <PrivateRouteNew exact path="/Report/DCReport" page={<DCReport />} />
-        <PrivateRouteNew exact path="/Report/AcReport" page={<AcReport />} />
-        <PrivateRouteNew exact path="/Report/SIReport" page={<SIReport />} />
-        <PrivateRouteNew exact path="/Report/BankBook" page={<BankBook />} />
-        <PrivateRouteNew exact path="/Report/CashBook" page={<CashBook />} />
+        <Route
+          exact
+          path="/Report/POReport"
+          element={<PrivateRouteNew Page={POReport} />}
+        />
+        <Route
+          exact
+          path="/Report/DCReport"
+          element={<PrivateRouteNew Page={DCReport} />}
+        />
+        <Route
+          exact
+          path="/Report/AcReport"
+          element={<PrivateRouteNew Page={AcReport} />}
+        />
+        <Route
+          exact
+          path="/Report/SIReport"
+          element={<PrivateRouteNew Page={SIReport} />}
+        />
+        <Route
+          exact
+          path="/Report/BankBook"
+          element={<PrivateRouteNew Page={BankBook} />}
+        />
+        <Route
+          exact
+          path="/Report/CashBook"
+          element={<PrivateRouteNew Page={CashBook} />}
+        />
       </Switch>
     </Router>
-  </>,
-  document.getElementById("root")
+  </>
 );
+// reportWebVitals();
 // <Branchmaster />
 (function ($) {
   "use strict";

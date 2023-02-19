@@ -132,9 +132,13 @@ export default function ReuseMaster(props) {
       return newRecords;
     },
   };
+  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const openOnRender = newParty.transactnOpen;
 
   const [filterFn, setFilterFn] = useState(initialFilterFn);
-  const [buttonPopup, setButtonPopup] = useState(false);
+  const [buttonPopup, setButtonPopup] = useState(
+    openOnRender ? openOnRender : false
+  );
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -170,6 +174,7 @@ export default function ReuseMaster(props) {
   } = useTable(records, headcells, filterFn);
   console.log(values);
   console.log("filter=>", filter);
+
   function getName(code) {
     let name = "";
     common.accounts.map((item) => {
@@ -189,7 +194,7 @@ export default function ReuseMaster(props) {
     }
   }
   console.log(Config[route]);
-  if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
+  if (loading1 || refresh) {
     let qry = initialValues.docCode;
     if (initialValues.docCode == "GR") {
       qry = JSON.stringify({ $in: ["GR", "PO"] });
@@ -210,6 +215,7 @@ export default function ReuseMaster(props) {
       })
       .then((response) => {
         console.log(response.data);
+        if (loading1) setLoading1(false);
         if (refresh) setRefresh(false);
 
         const gr = response.data.inv_voucher
@@ -269,7 +275,6 @@ export default function ReuseMaster(props) {
         } else {
           setRecords([{ ...initialValues, vouNo: "" }]);
         }
-        if (loading1) setLoading1(false);
       })
       .catch((error) => {
         setNotify({

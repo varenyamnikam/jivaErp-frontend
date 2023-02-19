@@ -9,6 +9,17 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
     margin: "0px",
     marginLeft: "10px",
+    height: "21px",
+    width: "21px",
+    backgroundColor: theme.palette.primary.light,
+    color: "white",
+
+    // borderRadius: "50%",
+    "&:hover": {
+      cursor: "pointer",
+      color: theme.palette.primary.main,
+      backgroundColor: "white",
+    },
   },
   secondary: {
     backgroundColor: theme.palette.secondary.light,
@@ -19,8 +30,15 @@ const useStyles = makeStyles((theme) => ({
   primary: {
     backgroundColor: theme.palette.primary.light,
     "& .MuiButton-label": {
-      color: theme.palette.primary.main,
+      color: "white",
     },
+    "&:hover": {
+      "& $addIcon": {
+        color: theme.palette.primary.main,
+      },
+    },
+
+    color: "whitesmoke",
   },
 }));
 
@@ -33,7 +51,7 @@ export default function ActionButton(props) {
   }, [value]);
   return (
     <Button
-      className={`${classes.root} ${classes[color]}`}
+      className={classes.root}
       onClick={(e) => {
         onClick(e);
         setLoading(true);
@@ -56,8 +74,8 @@ export default function ActionButton(props) {
               strokeLinecap: "round",
             },
           }}
-          size={18}
-          thickness={4}
+          size={11}
+          thickness={5}
         />
       )}
     </Button>

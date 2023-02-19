@@ -138,37 +138,41 @@ export default function Branchform(props) {
       }
     });
 
-    if (validate() && y) {
-      setButtonPopup(false);
+    if (validate()) {
       if (x) {
         const token = AuthHandler.getLoginToken();
         const body = { hello: "hello" };
-        axios
-          .post(
-            Config.Branch + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            const value = response.data.values;
-            setRecords([...records, value]);
-            setNotify({
-              isOpen: true,
-              message: "Branch created  successfully",
-              type: "success",
-            });
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
+        //while creating new branch prevent duplicate name
+        y
+          ? axios
+              .post(
+                Config.Branch + query,
+                { input },
+                {
+                  headers: {
+                    authorization: "Bearer" + token,
+                  },
+                }
+              )
+              .then((response) => {
+                const value = response.data.values;
+                setRecords([...records, value]);
+                setNotify({
+                  isOpen: true,
+                  message: "Branch created  successfully",
+                  type: "success",
+                });
+                setButtonPopup(false);
+              })
+              .catch((error) => {
+                setNotify({
+                  isOpen: true,
+                  message: "Unable to connect to servers",
+                  type: "warning",
+                });
+              })
+          : setErrors({ ...errors, branchName: "this name already exists" });
+
         // scroll.scrollToBottom();
       } else {
         const token = AuthHandler.getLoginToken();
@@ -188,6 +192,7 @@ export default function Branchform(props) {
               message: "Branch updated  successfully",
               type: "success",
             });
+            setButtonPopup(false);
           })
           .catch((error) => {
             setNotify({
@@ -205,8 +210,6 @@ export default function Branchform(props) {
         setRecords([...newrecord, input]);
         // scroll.scrollToBottom();
       }
-    } else {
-      setErrors({ ...errors, branchName: "this name already exists" });
     }
   };
   // console.log(checkstate);

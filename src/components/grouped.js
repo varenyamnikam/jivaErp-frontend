@@ -61,7 +61,7 @@ const statusItems = [
   { id: "batch no", title: "batch no" },
   { id: "exp date", title: "exp date" },
 ];
-
+const initialBatch = [{ batchNo: "", qty: "" }];
 export default function Grouped(props) {
   // const { value, setValue, error = null, onChange, disabled, ...other } = props;
   const { values, setValues, batchList, setBatchlist, error = null } = props;
@@ -153,8 +153,10 @@ export default function Grouped(props) {
         let data = res.data.stock;
         let arr = data.map((item) => ({ ...item, sell: "0" }));
         //setRecords(arr);
-        if (integrate()) setRecords(arr);
-        else {
+        console.log(integrate(), arr);
+        if (integrate()) {
+          arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
+        } else {
           let x = true;
           let total = 0;
           batchList.map((item) => {
@@ -166,7 +168,7 @@ export default function Grouped(props) {
             });
           });
           console.log(arr);
-          setRecords(arr);
+          arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
           data = arr;
           if (total !== values.qty) calcStock();
         }
@@ -186,6 +188,7 @@ export default function Grouped(props) {
     console.log(saviour);
   }
   function calcStock() {
+    console.log(records);
     if (Number(values.qty) > 0 && Number(records[0].qty > 0)) {
       let final = Number(values.qty);
       let newArr = records;
@@ -267,7 +270,7 @@ export default function Grouped(props) {
   return (
     <>
       <Grid container>
-        <Grid Item sm={8} xs={12}>
+        <Grid Item sm={6} xs={6}>
           <TextField
             fullWidth
             size="small"
@@ -286,11 +289,11 @@ export default function Grouped(props) {
             }}
           />
         </Grid>
-        <Grid Item sm={4} xs={12}>
+        <Grid Item sm={6} xs={6}>
           <Button
             disableElevation
             variant="contained"
-            size="large"
+            size="small"
             color="primary"
             style={{
               borderTopLeftRadius: 0,

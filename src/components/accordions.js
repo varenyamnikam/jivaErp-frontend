@@ -27,6 +27,8 @@ const AccordionSummary = withStyles({
     "&$expanded": {
       margin: "13px 0",
     },
+    display: "flex",
+    justifyContent: "space-between",
   },
   expanded: {},
   expandIcon: {
@@ -40,7 +42,18 @@ const AccordionDetails = withStyles((theme) => ({
   },
 }))(MuiAccordionDetails);
 
-export default function QuestionSection({ primary, seconadry, children }) {
+export default function QuestionSection({
+  primary,
+  seconadry,
+  children,
+  feildInLocalStorage,
+  label = "Keep Open Permanantly",
+}) {
+  const setting = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  const initialkeepOpen = setting[feildInLocalStorage]
+    ? setting[feildInLocalStorage]
+    : false;
+  const [keepOpen, setKeepOpen] = React.useState(initialkeepOpen);
   const [expanded, setExpanded] = React.useState(false);
 
   const handleChange = (panel) => (event, newExpanded) => {
@@ -51,7 +64,7 @@ export default function QuestionSection({ primary, seconadry, children }) {
     <div>
       <Accordion
         square
-        expanded={expanded === "panel1"}
+        expanded={keepOpen ? keepOpen : expanded === "panel1"}
         onChange={handleChange("panel1")}
       >
         <AccordionSummary
@@ -59,8 +72,14 @@ export default function QuestionSection({ primary, seconadry, children }) {
           expandIcon={<ExpandMoreIcon />}
           id="panel1d-header"
         >
-          <AddCircleOutlineRoundedIcon style={{ marginRight: "15px" }} />
-          <Typography> {primary}</Typography>
+          <div style={{ display: "flex" }}>
+            <AddCircleOutlineRoundedIcon style={{ marginRight: "15px" }} />
+            <Typography> {primary}</Typography>
+          </div>
+          <div style={{ display: "flex" }}>
+            <Typography> {label}</Typography>
+            <Switch checked={keepOpen} setChecked={setKeepOpen} />
+          </div>
         </AccordionSummary>
         <AccordionDetails>{children}</AccordionDetails>
       </Accordion>

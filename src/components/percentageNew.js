@@ -120,29 +120,7 @@ export default function Percent(props) {
 
   return (
     <Grid container>
-      <Grid Item sm={7} xs={6}>
-        <TextField
-          fullWidth
-          size="small"
-          variant="outlined"
-          type={"number"}
-          style={{
-            borderRadius: "0px",
-          }}
-          label={label}
-          name={name1}
-          value={value[name1]}
-          onChange={(e) => {
-            onChange(e);
-            setPriority(name1);
-          }}
-          className={classes.root1}
-          {...other}
-          {...(error && { error: true, helperText: error })}
-          disabled={disabled}
-        />
-      </Grid>
-      <Grid Item sm={5} xs={6}>
+      <Grid Item sm={6} xs={6}>
         <TextField
           fullWidth
           size="small"
@@ -150,12 +128,12 @@ export default function Percent(props) {
           type={"number"}
           style={{ borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px" }}
           name={name2}
-          value={value[name2]}
+          value={Number(value[name2]).toFixed(2)}
           onChange={(e) => {
             onChange(e);
             setPriority(name2);
           }}
-          className={classes.root2}
+          className={classes.root1}
           {...other}
           {...(error && { error: true, helperText: error })}
           // disabled={disabled}
@@ -167,6 +145,28 @@ export default function Percent(props) {
               />
             ),
           }}
+        />
+      </Grid>{" "}
+      <Grid Item sm={6} xs={6}>
+        <TextField
+          fullWidth
+          size="small"
+          variant="outlined"
+          type={"number"}
+          style={{
+            borderRadius: "0px",
+          }}
+          label={label}
+          name={name1}
+          value={Number(value[name1]).toFixed(2)}
+          onChange={(e) => {
+            onChange(e);
+            setPriority(name1);
+          }}
+          className={classes.root2}
+          {...other}
+          {...(error && { error: true, helperText: error })}
+          disabled={disabled}
         />
       </Grid>
     </Grid>

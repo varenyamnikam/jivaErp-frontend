@@ -32,7 +32,6 @@ import ERP from "../img/ERP.jpg";
 import Divider from "@mui/material/Divider";
 import background from "../components/loginBackground";
 import unlock from "../img/unlock-24.png";
-import { useHistory } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import BusinessIcon from "@mui/icons-material/Business";
 import "../index.css";
@@ -80,7 +79,7 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
-  let history = useHistory();
+  let history = useNavigate();
   // window.onunload = function () {
   //   window.scrollTo(0, 50);
   // };
@@ -183,7 +182,7 @@ export default function SignIn() {
     } else {
       setState({ ...state, loginStatus: 3 });
       // window.location = Config.homeUrl;
-      history.push("/home");
+      history("/home");
       document.location.reload(true);
       // setnotify({
       //   isOpen: true,

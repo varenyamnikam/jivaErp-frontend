@@ -11,17 +11,19 @@ import Controls from "./controls/Controls";
 import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
 import VerticalTabs from "./verticalTabs";
-
+import AuthHandler from "../Utils/AuthHandler";
 const useStyles = makeStyles((theme) => ({
   dialogWrapper: {
     // padding: theme.spacing(2),
     position: "absolute",
     // top: theme.spacing(2),
+    border: `1px solid ${theme.palette.primary.light}`,
   },
   dialogTitle: {
     padding: "0px",
     paddingLeft: "16px",
-    backgroundColor: "#e2e9f3",
+    backgroundColor: theme.palette.primary.light,
+    color: "white",
   },
   dialogContent: {
     // padding: "0px",
@@ -39,6 +41,14 @@ export default function Popup(props) {
     }
   }
   console.log(getSize());
+  function resetAddParty() {
+    // reset if user closes dailogue ,while adding party thru transaction form
+    let newParty = JSON.parse(localStorage.getItem("newParty"));
+    let openOnRender = newParty.partyOpen;
+    newParty = AuthHandler.getResetParty();
+    if (openOnRender)
+      localStorage.setItem("newParty", JSON.stringify(newParty));
+  }
   return (
     <Dialog
       open={openPopup}
@@ -57,7 +67,7 @@ export default function Popup(props) {
           <Typography
             variant="h6"
             component="div"
-            style={{ paddingTop: "10px" }}
+            style={{ paddingTop: "5px", color: "white" }}
           >
             {title}
           </Typography>
@@ -66,6 +76,7 @@ export default function Popup(props) {
             color="secondary"
             onClick={() => {
               setOpenPopup(false);
+              resetAddParty();
             }}
             style={{
               height: "30px",

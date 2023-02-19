@@ -14,10 +14,11 @@ import {
   Toolbar,
   InputAdornment,
 } from "@material-ui/core";
+import useTable from "../../../../components/useTable";
+
 import ControlledAccordions from "../../../../components/accordions";
 import { useForm, Form } from "../../../../components/useForm";
 import { Grid } from "@material-ui/core";
-import useTable from "../../../../components/useTable";
 import Controls from "../../../../components/controls/Controls";
 import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
@@ -38,11 +39,12 @@ import Table from "@mui/material/Table";
 import "../../../../components/public.css";
 import MuiSkeleton from "../../../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import GstForm from "./gstForm";
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "name", label: "NAME" },
   { id: "M.R.P", label: "M.R.P" },
+  { id: "G.S.T", label: "G.S.T" },
   { id: "Status", label: "Status" },
   { id: "EDIT", label: "EDIT" },
 ];
@@ -69,16 +71,29 @@ const useStyles = makeStyles((theme) => ({
     right: "10px",
   },
   Active: {
-    padding: "5px",
+    padding: "4px",
     borderRadius: "5px",
+    fontSize: "13px",
     color: "green",
     backgroundColor: "rgba(0, 128, 0, 0.151)",
+    boxShadow: "none",
   },
   Inactive: {
-    padding: "5px",
+    padding: "4px",
     borderRadius: "5px",
+    fontSize: "13px",
     color: "goldenrod",
+    boxShadow: "none",
     backgroundColor: "rgba(189, 189, 3, 0.103)",
+  },
+  gst: {
+    padding: "3px",
+    borderRadius: "5px",
+    fontSize: "13px",
+    color: "rgb(0, 119, 128)",
+    backgroundColor: "rgba(0, 119, 128, 0.363)",
+    boxShadow: "none",
+    // height: "20px",
   },
 }));
 const initialValues = {
@@ -95,6 +110,7 @@ const initialValues = {
   maintainStock: "",
   useBatchNo: "",
   prodStatus: "",
+  gst: [],
 };
 const initialFilterValues = {
   ...initialValues,
@@ -120,6 +136,7 @@ export default function ProductMaster(props) {
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [values, setValues] = useState(initialValues);
+  const [popup, setPopup] = useState(false);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -445,11 +462,26 @@ export default function ProductMaster(props) {
                         <TableRow key={item._id}>
                           <TableCell>{item.prodCode}</TableCell>
                           <TableCell>{item.prodName}</TableCell>
-                          <TableCell>{item.MRP}</TableCell>
+                          <TableCell>{item.MRP}</TableCell>{" "}
                           <TableCell>
-                            <span className={item.prodStatus}>
+                            <IconButton
+                              className={classes.gst}
+                              aria-label="Example"
+                              onClick={() => {
+                                setValues(item);
+                                setPopup(true);
+                              }}
+                            >
+                              G.S.T
+                            </IconButton>
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              className={classes[item.prodStatus]}
+                              onClick={() => {}}
+                            >
                               {item.prodStatus}
-                            </span>
+                            </IconButton>
                           </TableCell>
                           <TableCell>
                             <Controls.ActionButton
@@ -549,6 +581,20 @@ export default function ProductMaster(props) {
                 <Controls.Button type="submit" text="Submit" />
               </div>
             </Form>
+          </Popup>
+          <Popup
+            size="md"
+            title="GST Form"
+            openPopup={popup}
+            setOpenPopup={setPopup}
+          >
+            <GstForm
+              setNotify={setNotify}
+              setPopup={setPopup}
+              values={values}
+              records={records}
+              setRecords={setRecords}
+            />
           </Popup>
 
           <Notification notify={notify} setNotify={setNotify} />

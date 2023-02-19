@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import AuthHandler from "../../Utils/AuthHandler";
-import axios from "axios";
-import Config from "../../Utils/Config";
 import { makeStyles } from "@material-ui/core";
 import Controls from "../../components/controls/Controls";
 import { Grid, InputAdornment } from "@material-ui/core";
@@ -10,7 +7,6 @@ import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import AnimatedSmartAutoSuggest from "../../components/animatedSmartAutoSuggest";
-import Calendar from "../../components/calendar";
 import NotSmartAutoSuggest from "../../components/haha";
 import Divider from "@mui/material/Divider";
 import ItemForm from "./generalItems";
@@ -24,11 +20,12 @@ import cashIcon from "../../components/lotties/g5mYcVtWJ1.json";
 import CustomerAutoSuggest from "../../components/customerAutoSuggest.js";
 import "../../components/reverse-arrow.css";
 import SaveIcon from "@mui/icons-material/Save";
-import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
-import DoneIcon from "@mui/icons-material/Done";
 import MenuPopupState from "../../components/checkBoxMenu";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import Accordion from "../../components/accordions";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -75,6 +72,7 @@ export default function CustomerForm(props) {
     input,
     setInput,
     setTabValue,
+    getVouNo,
   } = props;
   const validateValues = {
     ...initialValues,
@@ -177,8 +175,21 @@ export default function CustomerForm(props) {
       (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
     )
     .map((item) => item.addressLine1);
+  let cntry = adress.find(
+    (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
+  );
+  let cntryName = cntry ? cntry.countryName : "";
+  let state = adress.find(
+    (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
+  );
+  let stName = state ? state.stateName : "";
+
   if (input.partyCode && !input.billingAdress && !input.shippingAdress) {
-    setInput({ ...input, billingAdress: ad1, shippingAdress: ad1 });
+    setInput({
+      ...input,
+      billingAdress: ad1,
+      shippingAdress: ad1,
+    });
   }
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -198,45 +209,6 @@ export default function CustomerForm(props) {
       vouNo: input.branchCode + input.docCode + input.finYear,
     });
 
-  let x = 0;
-  itemList.map((item) => {
-    x = Number(x) + Number(item.itemAmount);
-  });
-  const amt = x;
-  if (amt.toFixed(2) !== input.itemTotal) {
-    setInput({ ...input, itemTotal: amt.toFixed(2) });
-  }
-  let k =
-    Number(input.itemTotal) + Number(input.fright) - Number(input.billDis);
-
-  if (Number(input.netAmount) !== Math.round(k)) {
-    setInput({ ...input, netAmount: Math.round(k) });
-  }
-  console.log(
-    Number(input.roundOff),
-    (k.toFixed(2) - Math.round(k)).toFixed(2)
-  );
-  if (
-    Number(input.roundOff).toFixed(2) !==
-    (k.toFixed(2) - Math.round(k)).toFixed(2)
-  ) {
-    setInput({ ...input, roundOff: (k.toFixed(2) - Math.round(k)).toFixed(2) });
-  }
-  let y = true;
-  records.map((item) => {
-    if (item.vouNo == input.vouNo) {
-      console.log(item);
-      y = false;
-    }
-  });
-
-  function getVouNo() {
-    if (y) {
-      return " NEW ";
-    } else {
-      return input.vouNo;
-    }
-  }
   const play = {
     loop: false,
     autoplay: false,
@@ -347,7 +319,9 @@ export default function CustomerForm(props) {
                 setValue={setInput}
                 options1={partyOptions}
                 options2={accounts}
+                getAccType={getAccType}
                 error={errors.partyCode}
+                itemList={itemList}
                 height={28}
                 icon="user"
               />{" "}
@@ -387,16 +361,20 @@ export default function CustomerForm(props) {
           />
         </Grid>
         <Grid item xs={12} sm={2} className={classes.input}>
-          <Controls.Input disabled={true} label="country" />
+          <Controls.Input disabled={true} label="country" value={cntryName} />
         </Grid>
         <Grid item xs={12} sm={2} className={classes.input}>
-          <Controls.Input disabled={true} label="state" />
+          <Controls.Input disabled={true} label="state" value={stName} />
         </Grid>
         <Grid item xs={12} sm={12} className={classes.input}>
-          <Accordion primary="Additional Information" secondary="optional">
+          <Accordion
+            primary="Additional Information"
+            secondary="optional"
+            feildInLocalStorage="keepTransactionAccordionOpen"
+          >
             <>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={4} className={classes.input}>
+                <Grid item xs={12} sm={6} className={classes.input}>
                   <AnimatedSmartAutoSuggest
                     style={{
                       width: "100%",
@@ -424,6 +402,13 @@ export default function CustomerForm(props) {
                     value={input.partyBillNo}
                     onChange={handleChange}
                     error={errors.partyBillNo}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ReceiptLongIcon style={{ color: "#3b3b3b4d" }} />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={2} className={classes.input}>
@@ -442,18 +427,16 @@ export default function CustomerForm(props) {
                     value={input.partyChallanNo}
                     onChange={handleChange}
                     error={errors.partyChallanNo}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ReceiptIcon style={{ color: "#3b3b3b4d" }} />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={2} className={classes.input}>
-                  <StaticDatePickerLandscape
-                    style={{ width: "100%" }}
-                    name="partyChallanDate"
-                    label="Party Challan Date"
-                    value={input}
-                    setValue={setInput}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} className={classes.input}>
+                <Grid item xs={12} sm={4} className={classes.input}>
                   <AnimatedSmartAutoSuggest
                     style={{
                       width: "100%",
@@ -474,6 +457,15 @@ export default function CustomerForm(props) {
                     icon="pay"
                   />
                 </Grid>
+                <Grid item xs={12} sm={2} className={classes.input}>
+                  <StaticDatePickerLandscape
+                    style={{ width: "100%" }}
+                    name="partyChallanDate"
+                    label="Party Challan Date"
+                    value={input}
+                    setValue={setInput}
+                  />
+                </Grid>
 
                 <Grid item xs={12} sm={2} className={classes.input}>
                   <Controls.Input
@@ -482,6 +474,13 @@ export default function CustomerForm(props) {
                     value={input.transportation}
                     onChange={handleChange}
                     error={errors.transportation}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LocalShippingIcon style={{ color: "#3b3b3b4d" }} />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={2} className={classes.input}>
@@ -529,7 +528,7 @@ export default function CustomerForm(props) {
                     error={errors.returnCash}
                   />
                 </Grid>
-                <Grid item xs={12} sm={2} className={classes.input}>
+                <Grid item xs={12} sm={3} className={classes.input}>
                   <SmartAutoSuggest
                     name1="agentName"
                     code1="agentCode"
@@ -557,165 +556,25 @@ export default function CustomerForm(props) {
             alignItems: "center",
           }}
         >
-          <Grid item xs={12} sm={2} className={classes.input}>
-            <Controls.Input
-              name="itemTotal"
-              label="Item Total"
-              value={input.itemTotal}
-              onChange={handleChange}
-              error={errors.itemTotal}
-              onFocus={() => {
-                setIsPaused((prev) => ({ ...prev, itemAmount: false }));
-              }}
-              onBlur={() => {
-                setIsPaused((prev) => ({ ...prev, itemAmount: true }));
-              }}
-              classname={classes.root}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lottie
-                      options={play}
-                      height={60}
-                      width={30}
-                      isStopped={isPaused.itemAmount}
-                    />
-                  </InputAdornment>
-                ),
-                classes: { root: classes.inputRoot },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <Percent
-              name1="billDis"
-              name2="billDisPer"
-              name3="itemTotal"
-              label="Discount"
-              value={input}
-              setValue={setInput}
-              onChange={handleChange}
-              error={errors.billDis}
-            />
-          </Grid>
-          <Grid item xs={12} sm={2} className={classes.input}>
-            <Controls.Input
-              name="roundOff"
-              label="Round Off"
-              value={input.roundOff}
-              onChange={() => {}}
-              error={errors.roundOff}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} className={classes.input}>
-            <SmartAutoSuggest
-              name1="agentName"
-              code1="agentCode"
-              name2="acName"
-              code2="acCode"
-              label="Payment To"
-              value={input}
-              setValue={setInput}
-              options1={agentOptions}
-              options2={accounts}
-              error={errors.agentName}
-              style={{ height: "40px" }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={2} className={classes.input}>
-            <Controls.Input
-              name="netAmount"
-              label="Net Amount"
-              value={input.netAmount}
-              onChange={() => {}}
-              error={errors.netAmount}
-              onFocus={() => {
-                setIsPaused((prev) => ({ ...prev, netAmount: false }));
-              }}
-              onBlur={() => {
-                setIsPaused((prev) => ({ ...prev, netAmount: true }));
-              }}
-              classname={classes.root}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lottie
-                      options={play}
-                      height={60}
-                      width={30}
-                      isStopped={isPaused.netAmount}
-                    />
-                  </InputAdornment>
-                ),
-                classes: { root: classes.inputRoot },
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4} className={classes.input}>
-            <button
-              class="button"
-              onClick={() => {
-                setTabValue("1");
-              }}
-            >
-              <span>Prev</span>
-            </button>{" "}
-          </Grid>
           <Grid
-            item
-            xs={12}
-            sm={4}
-            className={classes.input}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <button
-              class="buttonSave"
-              onClick={() => {
-                setTabValue("1");
-              }}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-
-                backgroundColor: "rgb(116, 100, 100)",
-              }}
-            >
-              <LocalPrintshopIcon htmlColor="white" />
-              <span>Submit & Print</span>
-            </button>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={4}
-            className={classes.input}
+            Item
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              alignItems: "center",
+              alignItems: "bottom",
+              marginTop: "20px",
             }}
+            xs={12}
+            sm={12}
           >
+            {" "}
             <button
-              class="buttonSave"
+              class="buttonNext"
               onClick={() => {
-                setTabValue("1");
-              }}
-              style={{
-                backgroundColor: "blue",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                setTabValue("2");
               }}
             >
-              <DoneIcon htmlColor="white" style={{ marginRight: "20px" }} />
-              <span>Submit</span>
+              <span>Next</span>
             </button>
           </Grid>
         </Grid>{" "}

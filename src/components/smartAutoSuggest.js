@@ -52,6 +52,7 @@ const tfStyle = {
     // probably the width of your search IconButton or more if needed
     // color: "red",
     paddingTop: "0px",
+    height: "40px",
   },
   ".MuiInputBase-input": {
     height: "1.5rem",

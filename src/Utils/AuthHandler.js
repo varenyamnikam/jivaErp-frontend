@@ -3,7 +3,14 @@ import Config from "./Config";
 import { Redirect } from "react-router-dom";
 import { reactLocalStorage } from "reactjs-localstorage";
 import PropTypes from "prop-types";
+const newParty = {
+  transactnValue: null,
+  transactnList: null,
 
+  path: "/home",
+  transactnOpen: false,
+  partyOpen: false,
+};
 class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
     axios
@@ -24,6 +31,8 @@ class AuthHandler {
             "adm_userrights",
             JSON.stringify(response.data.adm_userrights)
           );
+          localStorage.setItem("newParty", JSON.stringify(newParty));
+
           localStorage.setItem(
             "adm_softwareSettings",
             JSON.stringify(response.data.adm_softwareSettings)
@@ -92,6 +101,9 @@ class AuthHandler {
 
   static getLoginToken() {
     return reactLocalStorage.get("token");
+  }
+  static getResetParty() {
+    return newParty;
   }
 
   static getMenuItem() {

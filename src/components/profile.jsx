@@ -100,7 +100,8 @@ const Profile = () => {
                     value={values.companyName}
                     onChange={handleInputChange}
                     error={errors.companyName}
-                    fullWidths
+                    fullWidth
+                    disabled={true}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>

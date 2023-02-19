@@ -1,18 +1,28 @@
-import * as React from "react";
-import Switch from "@mui/material/Switch";
+import React, { useState } from "react";
+import { Switch } from "@material-ui/core";
 
-export default function Switches({ label }) {
-  const [checked, setChecked] = React.useState(true);
-
+function ToggleSwitch({ checked, setChecked, label = "Keep Open" }) {
   const handleChange = (event) => {
     setChecked(event.target.checked);
+    const prevSetting = JSON.parse(
+      localStorage.getItem("adm_softwareSettings")
+    );
+    const newSetting = {
+      ...prevSetting,
+      keepTransactionAccordionOpen: event.target.checked,
+    };
+    localStorage.setItem("adm_softwareSettings", JSON.stringify(newSetting));
   };
-
   return (
     <Switch
       checked={checked}
       onChange={handleChange}
-      inputProps={{ "aria-label": "controlled" }}
+      name="checked"
+      color="primary"
+      size="small"
+      label={label}
     />
   );
 }
+
+export default ToggleSwitch;

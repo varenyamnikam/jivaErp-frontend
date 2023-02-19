@@ -100,7 +100,8 @@ export default function UnusedAutosuggest(props) {
     name2,
     code2,
     error = null,
-
+    input,
+    adress,
     ...other
   } = props;
   const [inputValue, setInputValue] = React.useState("");
@@ -108,7 +109,7 @@ export default function UnusedAutosuggest(props) {
   console.log(options1, options2);
   const classes = useStyles();
 
-  console.log(value[name1]);
+  console.log(value);
   if (value[name1]) {
     options2.map((item) => {
       if (value[name1] == item[name2] && value[code1] !== item[code2]) {
@@ -127,7 +128,98 @@ export default function UnusedAutosuggest(props) {
       }
     });
   }
+  if (value[code1]) {
+    let currentItem = { gst: [] };
+    options2.map((item) => {
+      if (value[code1] == item[code2] && value[name1] == item[name2]) {
+        currentItem = item;
+      }
+    });
+    if (currentItem.gst.length != 0) {
+      console.log(currentItem, currentItem.gst);
+      const gstInfo = findCurrentGst(currentItem.gst);
+      console.log(gstInfo);
+      let partyStateCode = adress.find(
+        (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
+      );
+      partyStateCode = partyStateCode ? partyStateCode.stateCode : "0";
+      const companyStateCode = Number(
+        JSON.parse(localStorage.getItem("company")).stateCode
+      );
+      const insideOfMaharashtra = companyStateCode == partyStateCode;
+      const igst = String(Number(gstInfo.cgst) + Number(gstInfo.sgst));
+
+      console.log(
+        JSON.parse(localStorage.getItem("company")).stateCode,
+        partyStateCode,
+        insideOfMaharashtra
+      );
+      if (
+        (insideOfMaharashtra &&
+          value.cgstP !== gstInfo.cgst &&
+          value.sgstP !== gstInfo.sgst &&
+          value.cessP !== gstInfo.cess) ||
+        !companyStateCode
+      ) {
+        setValue({
+          ...value,
+          cgstP: gstInfo.cgst,
+          sgstP: gstInfo.sgst,
+          cessP: gstInfo.cess,
+        });
+      }
+      if (
+        !insideOfMaharashtra &&
+        value.igstP !== igst &&
+        value.cessP !== gstInfo.cess
+      ) {
+        setValue({
+          ...value,
+          igstP: igst,
+          cessP: gstInfo.cess,
+        });
+      }
+    }
+  }
+  function findCurrentGst(arr) {
+    const prevDates = arr
+      .filter((item) => new Date(item.startDate) < new Date())
+      .map((item) => new Date(item.startDate));
+
+    console.log(prevDates);
+    if (prevDates.length != 0) {
+      const latestGstDate = new Date(Math.max.apply(null, prevDates));
+      console.log(latestGstDate, arr);
+      const latestGst = arr.find(
+        (item) =>
+          new Date(item.startDate).getTime() ==
+          new Date(latestGstDate).getTime()
+      );
+
+      return latestGst;
+    } else return null;
+  }
   let inputRef;
+  function setProductDetails(event, newValue, reason, prod) {
+    inputRef.focus();
+    if (newValue) {
+      if (reason === "reset") {
+        console.log("reset*****************", reason);
+        setInputValue("");
+      } else {
+        setValue({
+          ...value,
+          [name1]: newValue,
+          cgstP: "",
+          sgstP: "",
+          cessP: "",
+          igstP: "",
+        });
+        console.log("onchange" + newValue, prod);
+      }
+    }
+    console.log("onchange" + newValue);
+  }
   return (
     <>
       <Grid container>
@@ -145,21 +237,8 @@ export default function UnusedAutosuggest(props) {
             }}
             style={{ width: "100%" }}
             value={value[name1]}
-            onChange={(event, newValue, reason) => {
-              inputRef.focus();
-              if (newValue) {
-                if (reason === "reset") {
-                  console.log("reset*****************", reason);
-                  setInputValue("");
-                } else {
-                  setValue({
-                    ...value,
-                    [name1]: newValue,
-                  });
-                  console.log("onchange" + newValue);
-                }
-              }
-              console.log("onchange" + newValue);
+            onChange={(event, newValue, reason, value) => {
+              setProductDetails(event, newValue, reason, value);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue, reason) => {

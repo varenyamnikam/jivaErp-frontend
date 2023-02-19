@@ -87,12 +87,14 @@ const initialValues = {
   parentGroupCode: "",
   acGroupName: "",
   acGroupStatus: "",
+  groupType: "",
 };
 const initialFilterValues = {
   acGroupCode: "",
   acGroupName: "",
   acGroupStatus: "",
   allFields: "",
+  groupType: "",
 };
 
 export default function AcGlGroup() {
@@ -419,35 +421,39 @@ export default function AcGlGroup() {
                                   </span>
                                 </TableCell>
                                 <TableCell>
-                                  <Controls.ActionButton
-                                    color="primary"
-                                    onClick={() => {
-                                      setValues(item);
-                                      setButtonPopup(true);
-                                    }}
-                                  >
-                                    <EditOutlinedIcon fontSize="small" />
-                                  </Controls.ActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      console.log(item);
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
+                                  {item.userCompanyCode !== "all" && (
+                                    <>
+                                      <Controls.ActionButton
+                                        color="primary"
+                                        onClick={() => {
+                                          setValues(item);
+                                          setButtonPopup(true);
+                                        }}
+                                      >
+                                        <EditOutlinedIcon fontSize="small" />
+                                      </Controls.ActionButton>
+                                      <Controls.ActionButton
+                                        color="secondary"
+                                        onClick={(e) => {
+                                          console.log(item);
+                                          setConfirmDialog({
+                                            isOpen: true,
+                                            title:
+                                              "Are you sure to delete this record?",
+                                            subTitle:
+                                              "You can't undo this operation",
+                                            onConfirm: (e) => {
+                                              onDelete(item);
+                                              e.preventDefault();
+                                            },
+                                          });
                                           e.preventDefault();
-                                        },
-                                      });
-                                      e.preventDefault();
-                                    }}
-                                  >
-                                    <DeleteIconOutline fontSize="small" />
-                                  </Controls.ActionButton>
+                                        }}
+                                      >
+                                        <DeleteIconOutline fontSize="small" />
+                                      </Controls.ActionButton>
+                                    </>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}{" "}
@@ -458,7 +464,7 @@ export default function AcGlGroup() {
                     <TblPagination />
                   </section>
                   <Popup
-                    title="Gl Group Master Form"
+                    title="Group Master Form"
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
                   >
@@ -496,6 +502,14 @@ export default function AcGlGroup() {
                           onChange={handleInputChange}
                           items={statusItems}
                           error={errors.acGroupStatus}
+                        />
+                        <UnusedAutosuggest
+                          name="groupType"
+                          label="Group Type"
+                          value={values}
+                          setValue={setValues}
+                          options={["Asset", "Laibality", "Income"]}
+                          error={errors.groupType}
                         />
                       </Grid>
                       <div>

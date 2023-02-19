@@ -174,12 +174,6 @@ export default function ReuseMaster(props) {
         },
       })
       .then((response) => {
-        if (response.data.mst_accounts.length !== 0) {
-          setAccounts(response.data.mst_accounts);
-        } else {
-          setAccounts([initialAc]);
-        }
-
         const gr = response.data.inv_voucher
           .filter((item) => item.docCode == "DC")
           .map((item) => {
@@ -195,6 +189,13 @@ export default function ReuseMaster(props) {
         } else {
           setRecords([{ ...initialValues, vouNo: "" }]);
         }
+
+        if (response.data.mst_accounts.length !== 0) {
+          setAccounts(response.data.mst_accounts);
+        } else {
+          setAccounts([initialAc]);
+        }
+
         if (response.d.length !== 0) {
           setVoucherItems(response.data.inv_voucherItems);
         } else {
@@ -220,7 +221,7 @@ export default function ReuseMaster(props) {
       .catch((error) => {
         setNotify({
           isOpen: true,
-          message: "Unable to connect to servers",
+          message: `Unable to get ${docCode}`,
           type: "warning",
         });
       });

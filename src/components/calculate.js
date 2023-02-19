@@ -56,6 +56,17 @@ export default function Calculate(
       return null;
     }
   }
+  function billDiscount(amt, discount) {
+    console.log(values, qr, values[qr]);
+    if (
+      Number(values[dqr]) !== subStractFromAmt(values[discount], values[qr])
+    ) {
+      return subStractFromAmt(values[discount], values[qr]);
+    } else {
+      return null;
+    }
+  }
+
   function Final() {
     let x = addFromAmt(Number(values[name1]), Number(values[dqr]));
     let y = addFromAmt(Number(values[name2]), x);

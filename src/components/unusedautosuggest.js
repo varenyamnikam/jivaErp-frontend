@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      color: "#D3D3D3",
+      // color: "#D3D3D3",
       position: "absolute",
       // p: 5,
       // right: 40,
@@ -133,7 +133,7 @@ export default function UnusedAutosuggest(props) {
           }
         }}
         options={options}
-        renderInput={(params) => (
+        renderInput={(params, InputLabelProps) => (
           <TextField
             className={classes.root}
             {...params}
@@ -150,6 +150,10 @@ export default function UnusedAutosuggest(props) {
             sx={tfStyle}
             inputRef={(input) => {
               inputRef = input;
+            }}
+            InputLabelProps={{
+              shrink: true,
+              ...InputLabelProps,
             }}
           />
         )}

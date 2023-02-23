@@ -8,7 +8,6 @@ import { Icon } from "react-icons-kit";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { getIconButtonUtilityClass } from "@mui/material";
 import { user } from "react-icons-kit/fa/user";
-import admin from "../img/admin.svg";
 import { cube } from "react-icons-kit/ionicons/cube";
 import man from "../img/man.png";
 import "./glow.css";

@@ -41,7 +41,9 @@ export default function Filter(props) {
             onClick={() => {
               setFilterIcon(true);
               setFilter(initialFilterValues);
-              setFilterFn(initialFilterFn);
+              setFilterFn({
+                fn: (items) => items,
+              });
               setRefresh(true);
             }}
             style={{

@@ -14,6 +14,7 @@ import UnusedAutosuggest from "../../../components/unusedautosuggest";
 import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
+import Divider from "@mui/material/Divider";
 
 export default function Customersform(props) {
   const userCode = localStorage.getItem("userCode");
@@ -243,228 +244,249 @@ export default function Customersform(props) {
   }
   return (
     <>
-      <Form onSubmit={handleSubmit}>
-        <Grid container alignContent="flex-end">
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="acCode"
-              label="Code"
-              value={input.acCode}
-              onChange={handleInputChange}
-              disabled={true}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="acName"
-              label="Name"
-              value={input.acName}
-              onChange={handleChange}
-              error={errors.acName}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="acRegMob"
-              label="Reg. Mobile no."
-              value={input.acRegMob}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item sm={6} xs={12}>
-            <UnusedAutosuggest
-              name="acType"
-              label="A C Type "
-              value={input}
-              setValue={setInput}
-              options={acTypeOptions}
-              error={errors.acType}
-            />
-          </Grid>
-          <Grid item sm={6} xs={12}>
-            <UnusedAutosuggest
-              name="acGroupName"
-              label="A C Group "
-              value={input}
-              setValue={setInput}
-              options={acGroupOptions}
-              error={errors.acGroupName}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="panNo"
-              label="PAN No"
-              value={getValue(input.panNo)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="aadharNo"
-              label="Aadhar No"
-              value={getValue(input.aadharNo)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="gstNo"
-              label="GST Number"
-              value={getValue(input.gstNo)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="bankName"
-              label="Bank Name"
-              value={getValue(input.bankName)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="bankAcNo"
-              label="Bank A/c No"
-              value={getValue(input.bankAcNo)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="ifscCode"
-              label="IFSC Code"
-              value={getValue(input.ifscCode)}
-              onChange={handleChange}
-              // error={errors.stateCode}
-            />
-          </Grid>
-          {values.preFix != "E" && (
-            <>
-              <Grid item sm={6} xs={12}>
-                <UnusedAutosuggest
-                  name="firmType"
-                  label="Firm type"
-                  value={input}
-                  setValue={setInput}
-                  options={firmTypeOptions}
-                  error={errors.firmType}
-                />
-              </Grid>{" "}
-              <Grid item xs={12} sm={6}>
-                <Controls.Input
-                  name="propritorName"
-                  label="Propritor Name"
-                  value={input.propritorName}
-                  onChange={handleChange}
-                  // error={errors.stateCode}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controls.Input
-                  name="tradeName"
-                  label="Trade Name"
-                  value={input.tradeName}
-                  onChange={handleChange}
-                  // error={errors.stateCode}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controls.Input
-                  name="seedLicenNo"
-                  label="Seed Licen No"
-                  value={getValue(input.seedLicenNo)}
-                  onChange={handleChange}
-                  // error={errors.stateCode}
-                />
-              </Grid>{" "}
-              <Grid item xs={12} sm={6}>
-                <Controls.Input
-                  name="creditDays"
-                  label="Credit Days"
-                  value={input.creditDays}
-                  onChange={handleChange}
-                  // error={errors.stateCode}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controls.Input
-                  name="creditAmount"
-                  label="Credit Limit (Amount)"
-                  value={input.creditAmount}
-                  onChange={handleChange}
-                  // error={errors.stateCode}
-                />
-              </Grid>
-            </>
-          )}
-          {values.preFix == "E" && (
-            <>
-              <Grid item container xs={4} justifyContent={"flex-end"}>
-                <Controls.Input
-                  name=""
-                  label="Marketing Area"
-                  value={input.mktArea}
-                  onChange={() => {}}
-                  error={errors.mktArea}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <div style={{ marginTop: 20 }}>
-                  <Stack spacing={2} direction="row">
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setButtonPopup(true);
-                      }}
-                    >
-                      choose
-                    </Button>
-                  </Stack>
-                </div>
-              </Grid>
-            </>
-          )}{" "}
-          <Grid item xs={5}>
-            <Controls.RadioGroup
-              name="acStatus"
-              label="Status"
-              value={input.acStatus}
-              onChange={handleChange}
-              items={statusItems}
-              error={errors.acStatus}
-            />
-          </Grid>{" "}
-          <Grid
-            item
-            xs={12}
-            sm={12}
-            style={{ display: "flex", justifyContent: "flex-end" }}
-          >
-            <div>{getButton()}</div>
-          </Grid>
-        </Grid>
-        <Popup
-          title="Customer form"
-          openPopup={buttonPopup}
-          setOpenPopup={setButtonPopup}
-          size={"md"}
-        >
-          <PopupMarketingArea
-            setButtonPopup={setButtonPopup}
-            setValue={setInput}
-            value={input}
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={4}>
+          <Controls.Input
+            name="acCode"
+            label="Code"
+            value={input.acCode}
+            onChange={handleInputChange}
+            disabled={true}
+            // error={errors.stateCode}
           />
-        </Popup>
-      </Form>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Controls.Input
+            name="acName"
+            label="Name"
+            value={input.acName}
+            onChange={handleChange}
+            error={errors.acName}
+          />
+        </Grid>
+        <Grid item xs={6} sm={2}>
+          <Controls.Input
+            name="acRegMob"
+            label="Reg. Mobile no."
+            value={input.acRegMob}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Controls.Input
+            name="panNo"
+            label="PAN No"
+            value={getValue(input.panNo)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="aadharNo"
+            label="Aadhar No"
+            value={getValue(input.aadharNo)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="gstNo"
+            label="GST Number"
+            value={getValue(input.gstNo)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>{" "}
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="bankName"
+            label="Bank Name"
+            value={getValue(input.bankName)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="bankAcNo"
+            label="Bank A/c No"
+            value={getValue(input.bankAcNo)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="ifscCode"
+            label="IFSC Code"
+            value={getValue(input.ifscCode)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>
+        {values.preFix != "E" && (
+          <>
+            <Grid item xs={12} sm={3}>
+              <Controls.Input
+                name="propritorName"
+                label="Propritor Name"
+                value={input.propritorName}
+                onChange={handleChange}
+                // error={errors.stateCode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Controls.Input
+                name="tradeName"
+                label="Trade Name"
+                value={input.tradeName}
+                onChange={handleChange}
+                // error={errors.stateCode}
+              />
+            </Grid>
+          </>
+        )}
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="seedLicenNo"
+            label="Seed Licen No"
+            value={getValue(input.seedLicenNo)}
+            onChange={handleChange}
+            // error={errors.stateCode}
+          />
+        </Grid>{" "}
+        <Grid item xs={12} sm={12}>
+          <Divider
+            variant="middle"
+            color="blue"
+            sx={{ borderBottomWidth: 2 }}
+          />
+        </Grid>
+        <Grid item sm={4} xs={12}>
+          <UnusedAutosuggest
+            name="acType"
+            label="A C Type "
+            value={input}
+            setValue={setInput}
+            options={acTypeOptions}
+            error={errors.acType}
+          />
+        </Grid>
+        <Grid item sm={4} xs={12}>
+          <UnusedAutosuggest
+            name="acGroupName"
+            label="A C Group "
+            value={input}
+            setValue={setInput}
+            options={acGroupOptions}
+            error={errors.acGroupName}
+          />
+        </Grid>
+        {values.preFix != "E" && (
+          <>
+            <Grid item sm={4} xs={12}>
+              <UnusedAutosuggest
+                name="firmType"
+                label="Firm type"
+                value={input}
+                setValue={setInput}
+                options={firmTypeOptions}
+                error={errors.firmType}
+              />
+            </Grid>{" "}
+            <Grid item xs={12} sm={3}>
+              <Controls.Input
+                name="creditDays"
+                label="Credit Days"
+                value={input.creditDays}
+                onChange={handleChange}
+                // error={errors.stateCode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Controls.Input
+                name="creditAmount"
+                label="Credit Limit (Amount)"
+                value={input.creditAmount}
+                onChange={handleChange}
+                // error={errors.stateCode}
+              />
+            </Grid>
+          </>
+        )}
+        {values.preFix == "E" && (
+          <>
+            <Grid
+              item
+              xs={3}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Controls.Input
+                name=""
+                label="Marketing Area"
+                value={input.mktArea}
+                onChange={() => {}}
+                error={errors.mktArea}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={1}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setButtonPopup(true);
+                }}
+              >
+                choose
+              </Button>
+            </Grid>
+          </>
+        )}{" "}
+        <Grid item xs={5} style={{ display: "flex", justifyContent: "center" }}>
+          <Controls.RadioGroup
+            name="acStatus"
+            label="Status"
+            value={input.acStatus}
+            onChange={handleChange}
+            items={statusItems}
+            error={errors.acStatus}
+          />
+        </Grid>{" "}
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          style={{ display: "flex", justifyContent: "flex-end" }}
+        >
+          <div>{getButton()}</div>
+        </Grid>
+      </Grid>
+      <Popup
+        title="Customer form"
+        openPopup={buttonPopup}
+        setOpenPopup={setButtonPopup}
+        size={"md"}
+      >
+        <PopupMarketingArea
+          setButtonPopup={setButtonPopup}
+          setValue={setInput}
+          value={input}
+        />
+      </Popup>
     </>
   );
 }

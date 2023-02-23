@@ -45,6 +45,7 @@ import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import "../../../components/public.css";
 import MuiSkeleton from "../../../components/skeleton";
 import ControlledAccordions from "../../../components/accordions";
+import UnusedAutosuggest from "../../../components/unusedautosuggest";
 
 const statusItems = [
   { id: "Active", title: "Active" },
@@ -170,6 +171,7 @@ export default function Customers({ acTypeFor, initialValues }) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   function getAdress() {}
   // if (adressData[0] && !adressData[0].acCode) {
   //   const token = AuthHandler.getLoginToken();
@@ -375,8 +377,9 @@ export default function Customers({ acTypeFor, initialValues }) {
   }
   function handleFilter(e) {
     const value = e.target.value;
-    setFilter({ ...filter, allFields: value });
-    search(value);
+    const name = e.target.name;
+    setFilter({ ...filter, [name]: value });
+    if (name == "allFields") search(value);
   }
   console.log(filter.allFields);
   function search(allfields) {
@@ -388,7 +391,8 @@ export default function Customers({ acTypeFor, initialValues }) {
           console.log(item, allfields);
           if (
             item.acCode.toLowerCase().includes(allfields.toLowerCase()) ||
-            item.acName.toLowerCase().includes(allfields.toLowerCase())
+            item.acName.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.acRegMob.toLowerCase().includes(allfields.toLowerCase())
           )
             return item;
           // item.talukaName == filter.allfields ||
@@ -435,11 +439,17 @@ export default function Customers({ acTypeFor, initialValues }) {
         newRecords = sort(newRecords, "acCode");
         newRecords = sort(newRecords, "acRegMob");
         newRecords = sort(newRecords, "acStatus");
+        newRecords = sort(newRecords, "acType");
 
         return newRecords;
       },
     });
   }
+  const acGroupOptions = acGroupData
+    .filter((item) => item.acGroupStatus == "Active")
+    .map((item) => {
+      return item.acGroupName;
+    });
 
   return (
     <>
@@ -460,6 +470,7 @@ export default function Customers({ acTypeFor, initialValues }) {
                         <Grid item xs={12} sm={8}>
                           <Controls.Input
                             label="Search Role Name"
+                            name="allFields"
                             className={classes.searchInput}
                             InputProps={{
                               startAdornment: (
@@ -473,7 +484,16 @@ export default function Customers({ acTypeFor, initialValues }) {
                             onChange={handleFilter}
                           />
                         </Grid>
-                        <Grid item sm={1} xs={4}>
+                        <Grid
+                          item
+                          sm={1}
+                          xs={4}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           {filterIcon ? (
                             <>
                               <IconButton
@@ -482,9 +502,8 @@ export default function Customers({ acTypeFor, initialValues }) {
                                   setFilter(initialFilterValues);
                                 }}
                                 style={{
-                                  borderRadius: 0,
-                                  marginTop: "5px",
-                                  marginLeft: "10px",
+                                  borderRadius: 5,
+                                  padding: "7px",
                                 }}
                               >
                                 <FilterAltOutlinedIcon color="success" />
@@ -502,9 +521,8 @@ export default function Customers({ acTypeFor, initialValues }) {
                                   setFilterIcon(true);
                                 }}
                                 style={{
-                                  borderRadius: 0,
-                                  marginTop: "5px",
-                                  marginLeft: "10px",
+                                  borderRadius: 5,
+                                  padding: "7px",
                                 }}
                               >
                                 <FilterAltOffOutlinedIcon color="error" />
@@ -600,10 +618,11 @@ export default function Customers({ acTypeFor, initialValues }) {
                     openPopup={buttonPopup}
                     setOpenPopup={setButtonPopup}
                     size="md"
+                    style={{ padding: "0px" }}
                   >
-                    <Box sx={{ width: "100%", typography: "body1" }}>
+                    <Box>
                       <TabContext value={value}>
-                        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                        <Box>
                           <Tabs
                             value={value}
                             onChange={handleChange}
@@ -640,7 +659,7 @@ export default function Customers({ acTypeFor, initialValues }) {
                             acTypeFor={acTypeFor}
                           />
                         </TabPanel>
-                        <TabPanel value="2">
+                        <TabPanel value="2" style={{ padding: "0px" }}>
                           <AdressMaster
                             adressData={adressData}
                             setAdressData={setAdressData}
@@ -669,35 +688,47 @@ export default function Customers({ acTypeFor, initialValues }) {
                         setFilterIcon(false);
                       }}
                     >
-                      <Grid container spacing={2} style={{ marginTop: "10px" }}>
-                        <Grid item xs={12} sm={6} style={{ flexGrow: 1 }}>
-                          <ControlledAccordions
+                      <Grid container spacing={1} style={{ marginTop: "10px" }}>
+                        <Grid item xs={12} sm={6}>
+                          <Controls.Input
                             name="acCode"
                             label="Code"
                             subLabel="Filter by  Code"
-                            value={filter}
+                            value={filter.acCode}
                             setValue={setFilter}
+                            onChange={handleFilter}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} style={{ flexGrow: 1 }}>
-                          <ControlledAccordions
+                        <Grid item xs={12} sm={6}>
+                          <Controls.Input
                             name="acName"
                             label="Name"
                             subLabel="Filter by  Name"
-                            value={filter}
+                            value={filter.acName}
                             setValue={setFilter}
+                            onChange={handleFilter}
+                          />
+                        </Grid>{" "}
+                        <Grid item sm={6} xs={12}>
+                          <UnusedAutosuggest
+                            name="acType"
+                            label="A C Type"
+                            value={filter.acType}
+                            setValue={setFilter}
+                            options={acTypeOptions}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} style={{ flexGrow: 1 }}>
-                          <ControlledAccordions
+                        <Grid item xs={12} sm={6}>
+                          <Controls.Input
                             name="acRegMob"
                             label=" Mobile no."
                             subLabel="Filter by Mobile no."
-                            value={filter}
+                            value={filter.acRegMob}
                             setValue={setFilter}
+                            onChange={handleFilter}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6} style={{ flexGrow: 1 }}>
+                        <Grid item xs={12} sm={6}>
                           <Controls.RadioGroup
                             name="acStatus"
                             label="Status"
@@ -711,10 +742,19 @@ export default function Customers({ acTypeFor, initialValues }) {
                             items={statusItems}
                           />
                         </Grid>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={6}
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Controls.Button type="submit" text="Submit" />
+                        </Grid>
                       </Grid>
-                      <div style={{ marginTop: "25px" }}>
-                        <Controls.Button type="submit" text="Submit" />
-                      </div>
                     </Form>
                   </Popup>
 

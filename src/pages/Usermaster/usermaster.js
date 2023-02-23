@@ -331,13 +331,15 @@ const Usermaster = (props) => {
                                     setPopup(true);
                                   }}
                                 >
-                                  <IconButton
-                                    className={classes.rights}
-                                    aria-label="Example"
-                                  >
-                                    <AdminPanelSettingsIcon />
-                                    Rights
-                                  </IconButton>
+                                  {Number(item.userCode) !== 1001 && (
+                                    <IconButton
+                                      className={classes.rights}
+                                      aria-label="Example"
+                                    >
+                                      <AdminPanelSettingsIcon />
+                                      Rights
+                                    </IconButton>
+                                  )}
                                 </TableCell>
                                 <TableCell>{item.userName}</TableCell>
                                 <TableCell>

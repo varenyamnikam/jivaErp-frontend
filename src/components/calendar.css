@@ -1,0 +1,33 @@
+.datepicker {
+    display: inline-block;
+    position: relative;
+    margin: 10px 0;
+  }
+  
+  .datepicker:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    background-image: url("https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-ios7-arrow-down-512.png");
+    background-size: cover;
+  }
+  
+  .datepicker input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    padding: 8px 28px 8px 8px;
+    font-size: 16px;
+  }
+  
+  .datepicker input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+  

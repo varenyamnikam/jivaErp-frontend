@@ -20,7 +20,7 @@ import AuthHandler from "../Utils/AuthHandler";
 import Controls from "./controls/Controls";
 const useStyles = makeStyles((theme) => ({
   root1: {
-    top: 5,
+    // top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
       // color: "#D3D3D3",
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   root2: {
-    top: 5,
+    // top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
       color: "#D3D3D3",
@@ -298,7 +298,7 @@ export default function Grouped(props) {
             style={{
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
-              top: 5,
+              // top: 5,
               height: "40px",
             }}
             onClick={() => {

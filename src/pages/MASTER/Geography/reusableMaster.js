@@ -196,69 +196,76 @@ const Reusemaster = (props) => {
   // console.log(count);
   return (
     <>
-      <PageHeader
-        title={title}
-        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-      />
+      <div className="hold-transition sidebar-mini">
+        <div className="wrapper">
+          <div className="content-wrapper">
+            <PageHeader
+              title={title}
+              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+            />
 
-      <div className="wrapper">
-        <div className="content-wrapper">
-          <br></br>
-          <Paper className={classes.pageContent}>
             <section className="content">
-              <Toolbar>
-                <Controls.Input
-                  label="Search Role Name"
-                  className={classes.searchInput}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search />
-                      </InputAdornment>
-                    ),
-                  }}
-                  onChange={() => {}}
-                />
-                <Controls.Button
-                  text="Add New"
-                  variant="outlined"
-                  startIcon={<AddIcon />}
-                  className={classes.newButton}
-                  onClick={(e) => {
-                    setButtonPopup(true);
-                    setValues(initialValues);
-                  }}
-                />
-              </Toolbar>
-              <TblContainer>
-                <TblHead />
-                <TableBody>
-                  <ReuseTable
-                    title={title}
-                    setValues={setValues}
-                    setButtonPopup={setButtonPopup}
-                    setConfirmDialog={setConfirmDialog}
-                    recordsAfterPagingAndSorting={recordsAfterPagingAndSorting}
-                    onDelete={onDelete}
-                  />
-                </TableBody>
-              </TblContainer>
-              <TblPagination />
-            </section>
-          </Paper>
-          <Popup
-            title="User form"
-            openPopup={buttonPopup}
-            setOpenPopup={setButtonPopup}
-          >
-            {getForm()}
-          </Popup>
+              <div className="card">
+                <div className="card-body">
+                  <section className="content">
+                    <Toolbar>
+                      <Controls.Input
+                        label="Search Role Name"
+                        className={classes.searchInput}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={() => {}}
+                      />
+                      <Controls.Button
+                        text="Add New"
+                        variant="outlined"
+                        startIcon={<AddIcon />}
+                        className={classes.newButton}
+                        onClick={(e) => {
+                          setButtonPopup(true);
+                          setValues(initialValues);
+                        }}
+                      />
+                    </Toolbar>
+                    <TblContainer>
+                      <TblHead />
+                      <TableBody>
+                        <ReuseTable
+                          title={title}
+                          setValues={setValues}
+                          setButtonPopup={setButtonPopup}
+                          setConfirmDialog={setConfirmDialog}
+                          recordsAfterPagingAndSorting={
+                            recordsAfterPagingAndSorting
+                          }
+                          onDelete={onDelete}
+                        />
+                      </TableBody>
+                    </TblContainer>
+                    <TblPagination />
+                  </section>
+                  <Popup
+                    title="User form"
+                    openPopup={buttonPopup}
+                    setOpenPopup={setButtonPopup}
+                  >
+                    {getForm()}
+                  </Popup>
 
-          <Notification notify={notify} setNotify={setNotify} />
-          <ConfirmDialog
-            confirmDialog={confirmDialog}
-            setConfirmDialog={setConfirmDialog}
-          />
+                  <Notification notify={notify} setNotify={setNotify} />
+                  <ConfirmDialog
+                    confirmDialog={confirmDialog}
+                    setConfirmDialog={setConfirmDialog}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </>

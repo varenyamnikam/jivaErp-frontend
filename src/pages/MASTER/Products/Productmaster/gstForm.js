@@ -50,6 +50,7 @@ export default function GstForm(props) {
     useTable(gstTable, headCells, {
       fn: (item) => item,
     });
+  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
@@ -250,17 +251,18 @@ export default function GstForm(props) {
                 type={"number"}
               />
             </Grid>
-            <Grid item xs={12} sm={12}>
-              <Controls.Input
-                name="cess"
-                label="Cess"
-                value={input.cess}
-                onChange={handleInputChange}
-                error={errors.cess}
-                type={"number"}
-              />
-            </Grid>
-
+            {settings.useCessitem == "Yes" && (
+              <Grid item xs={12} sm={12}>
+                <Controls.Input
+                  name="cess"
+                  label="Cess"
+                  value={input.cess}
+                  onChange={handleInputChange}
+                  error={errors.cess}
+                  type={"number"}
+                />
+              </Grid>
+            )}
             <Grid
               item
               xs={12}

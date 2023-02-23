@@ -41,7 +41,25 @@ const useStyles = makeStyles((theme) => ({
     color: "blue",
   },
 }));
-
+const tfStyle = {
+  "& .MuiButtonBase-root.MuiAutocomplete-clearIndicator": {
+    visibility: "visible",
+    boxShadow: "none",
+    position: "absolute",
+    p: 0,
+    right: 40,
+    top: 5,
+    //"calc(50% - 12px)"
+  },
+  "& .MuiButtonBase-root.MuiAutocomplete-popupIndicator": {
+    visibility: "visible",
+    boxShadow: "none",
+    position: "absolute",
+    p: 0,
+    right: 10,
+    top: 5,
+  },
+};
 export default function MultipleSelectPlaceholder({
   headcells,
   setheadcells,
@@ -88,7 +106,7 @@ export default function MultipleSelectPlaceholder({
             />
           }
           renderValue={(selected) => {
-            return <BiHide size={20} />;
+            return <BiHide size={20} style={{ bottom: 5 }} />;
           }}
           style={{
             height: "40px",
@@ -96,6 +114,7 @@ export default function MultipleSelectPlaceholder({
             color: "white",
             border: "none",
             paddingLeft: "10px",
+            paddingBottom: "15px",
             paddingRight: "0px",
             borderRadius: "5px",
             borderTopLeftRadius: "0px",

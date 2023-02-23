@@ -1,9 +1,10 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles, IconButton } from "@material-ui/core";
+
 const useStyles = makeStyles((theme) => ({
   root: {
-    top: 5,
+    //top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
       // color: "#D3D3D3",
@@ -25,6 +26,7 @@ export default function Input(props) {
     error = null,
     onChange,
     disabled,
+    InputLabelProps = {},
     ...other
   } = props;
   const classes = useStyles();
@@ -50,6 +52,10 @@ export default function Input(props) {
       {...other}
       {...(error && { error: true, helperText: error })}
       disabled={disabled}
+      InputLabelProps={{
+        shrink: true,
+        ...InputLabelProps,
+      }}
     />
   );
 }

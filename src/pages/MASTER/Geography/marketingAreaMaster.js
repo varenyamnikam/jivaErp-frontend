@@ -55,13 +55,20 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 const initialEValues = { acName: "", acCode: "X X X X" };
 const initialFilterEValues = { acName: "", acCode: "" };
+const userCode = localStorage.getItem("userCode");
+const userCompanyCode = localStorage.getItem("userCompanyCode");
+const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+
 let dataBase = [
   {
-    mktAreaCode: "X X X X",
+    mktAreaCode: "5001",
     parentAreaCode: "0",
     mktArea: "India",
-    child: ["50002", "1"],
+    child: [],
     assignTo: "",
+    userCompanyCode: userCompanyCode,
+    entryBy: userCode,
+    entryOn: new Date(),
   },
 ];
 export default function MarketingArea() {
@@ -89,33 +96,34 @@ export default function MarketingArea() {
   const [dataBases, setDataBases] = useState(dataBase);
   const [editText, setEditText] = useState("EDIT");
   const [disable, setDisable] = useState(false);
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (dataBases[0] && dataBases[0].mktAreaCode == "X X X X") {
-      const token = AuthHandler.getLoginToken();
-      axios
-        .get(Config.mktArea + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          console.log(
-            response.data.mst_mktArea.length,
-            response.data.mst_mktArea
-          );
-          if (response.data.mst_mktArea.length !== 0) {
-            setDataBases(response.data.mst_mktArea);
-          } else {
-            setDataBases([{ ...dataBase[0], mktAreaCode: "" }]);
-          }
-        });
-    }
+    // if (!loading) {
+    //   const token = AuthHandler.getLoginToken();
+    //   axios
+    //     .get(Config.mktArea + query, {
+    //       headers: {
+    //         authorization: "Bearer" + token,
+    //       },
+    //     })
+    //     .then((response) => {
+    //       console.log(
+    //         response.data.mst_mktArea.length,
+    //         response.data.mst_mktArea
+    //       );
+    //       if (response.data.mst_mktArea.length !== 0) {
+    //         setDataBases(response.data.mst_mktArea);
+    //       } else {
+    //         setDataBases([{ ...dataBase[0], mktAreaCode: "" }]);
+    //       }
+    //     })
+    //     .finally(() => {
+    //       setLoading(true);
+    //     });
+    // }
 
-    if (employeeData[0] && employeeData[0].acCode == "X X X X") {
+    if (!loading) {
       // console.log(employeeData);
       const token = AuthHandler.getLoginToken();
       const body = { hello: "hello" };
@@ -126,6 +134,7 @@ export default function MarketingArea() {
           },
         })
         .then((response) => {
+          console.log(response.data);
           if (response.data.mst_accounts.length !== 0) {
             setEmployeeData(function () {
               const temp = response.data.mst_accounts.filter((item) => {
@@ -137,9 +146,13 @@ export default function MarketingArea() {
                 return [initialFilterEValues];
               }
             });
-          } else {
-            setEmployeeData([initialFilterEValues]);
           }
+          if (response.data.mst_mktArea.length !== 0) {
+            setDataBases(response.data.mst_mktArea);
+          }
+        })
+        .finally(() => {
+          setLoading(true);
         });
     }
   });
@@ -216,7 +229,7 @@ export default function MarketingArea() {
               )
               .then((response) => {
                 setDataBases(response.data.mst_mktArea);
-                // console.log(response.data.mst_mktArea);
+                console.log(response.data.mst_mktArea);
               });
 
             console.log("hi");
@@ -246,7 +259,7 @@ export default function MarketingArea() {
               )
               .then((response) => {
                 setDataBases([...updatedDataBase, response.data.values]);
-                // console.log(response);
+                console.log([...updatedDataBase, response.data.values]);
               });
 
             console.log([...updatedDataBase, values]);
@@ -288,100 +301,110 @@ export default function MarketingArea() {
   });
   return (
     <>
-      <PageHeader
-        title={"Marketing Area Master"}
-        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-      />
+      <div className="hold-transition sidebar-mini">
+        <div className="wrapper">
+          <div className="content-wrapper">
+            <PageHeader
+              title="Marketing Area Master"
+              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+            />
 
-      <div className="wrapper">
-        <div className="content-wrapper">
-          <br></br>
-          <Paper className={classes.pageContent}>
-            <section className={classes.space}>
-              <div style={{ padding: 20, margin: 20 }}>
-                {" "}
-                <Grid
-                  container
-                  rowSpacing={1}
-                  columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-                >
-                  <Grid item xs={12} sm={6}>
-                    {" "}
-                    <RichObjectTreeView
-                      values={values}
-                      setValues={setValues}
-                      dataBase={dataBases}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={12}>
-                        <Controls.Input
-                          name="mktArea"
-                          label="Parent area"
-                          value={values.mktArea}
-                          onChange={handleChange}
-                          style={{ width: "100%" }}
-                          error={errors.mktArea}
-                        />
-                      </Grid>{" "}
-                      <Grid item xs={12} sm={12}>
-                        <Controls.Input
-                          name="newArea"
-                          label="Market area"
-                          value={values.newArea}
-                          onChange={handleChange}
-                          style={{ width: "100%" }}
-                          disabled={disable}
-                          error={errors.newArea}
-                        />
-                      </Grid>{" "}
-                      <Grid item xs={12} sm={12}>
-                        <UnusedAutosuggest
-                          value={values}
-                          setValue={setValues}
-                          name={"acName"}
-                          label={getLabel()}
-                          disable="false"
-                          options={employeeOptions}
-                          error={errors.acName}
-                        />
-                      </Grid>
+            <section className="content">
+              <div className="card">
+                <div className="card-body">
+                  <section className="content">
+                    <div style={{ padding: 20, margin: 20 }}>
+                      {" "}
                       <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                        }}
+                        container
+                        rowSpacing={1}
+                        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
                       >
-                        <Controls.Button
-                          value="Hello World"
-                          text={editText}
-                          color="default"
-                          onClick={() => {
-                            setEditText(editText == "EDIT" ? "CANCEL" : "EDIT");
-                            setDisable((prev) => {
-                              return !prev;
-                            });
-                            setValues({ ...values, newArea: "" });
-                          }}
-                        />
+                        <Grid item xs={12} sm={6}>
+                          {" "}
+                          <RichObjectTreeView
+                            values={values}
+                            setValues={setValues}
+                            dataBase={dataBases}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={12}>
+                              <Controls.Input
+                                name="mktArea"
+                                label="Parent area"
+                                value={values.mktArea}
+                                onChange={handleChange}
+                                style={{ width: "100%" }}
+                                error={errors.mktArea}
+                              />
+                            </Grid>{" "}
+                            <Grid item xs={12} sm={12}>
+                              <Controls.Input
+                                name="newArea"
+                                label="Market area"
+                                value={values.newArea}
+                                onChange={handleChange}
+                                style={{ width: "100%" }}
+                                disabled={disable}
+                                error={errors.newArea}
+                              />
+                            </Grid>{" "}
+                            <Grid item xs={12} sm={12}>
+                              <UnusedAutosuggest
+                                value={values}
+                                setValue={setValues}
+                                name={"acName"}
+                                label={getLabel()}
+                                disable="false"
+                                options={employeeOptions}
+                                error={errors.acName}
+                              />
+                            </Grid>
+                            <Grid
+                              item
+                              xs={12}
+                              sm={12}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                              }}
+                            >
+                              <Controls.Button
+                                value="Hello World"
+                                text={editText}
+                                color="default"
+                                onClick={() => {
+                                  setEditText(
+                                    editText == "EDIT" ? "CANCEL" : "EDIT"
+                                  );
+                                  setDisable((prev) => {
+                                    return !prev;
+                                  });
+                                  setValues({ ...values, newArea: "" });
+                                }}
+                              />
 
-                        <Controls.Button onClick={handleSubmit} text="Submit" />
+                              <Controls.Button
+                                onClick={handleSubmit}
+                                text="Submit"
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
+                    </div>
+                  </section>
+                  <Notification notify={notify} setNotify={setNotify} />
+                  <ConfirmDialog
+                    confirmDialog={confirmDialog}
+                    setConfirmDialog={setConfirmDialog}
+                  />
+                </div>
               </div>
             </section>
-          </Paper>
-          <Notification notify={notify} setNotify={setNotify} />
-          <ConfirmDialog
-            confirmDialog={confirmDialog}
-            setConfirmDialog={setConfirmDialog}
-          />
+          </div>
         </div>
       </div>
     </>

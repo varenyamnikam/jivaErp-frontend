@@ -495,14 +495,6 @@ export default function AcGlGroup() {
                           options={groupTypes}
                           error={errors.parentGroupName}
                         />
-                        <Controls.RadioGroup
-                          name="acGroupStatus"
-                          label="Status"
-                          value={values.acGroupStatus}
-                          onChange={handleInputChange}
-                          items={statusItems}
-                          error={errors.acGroupStatus}
-                        />
                         <UnusedAutosuggest
                           name="groupType"
                           label="Group Type"
@@ -511,7 +503,15 @@ export default function AcGlGroup() {
                           options={["Asset", "Laibality", "Income"]}
                           error={errors.groupType}
                         />
-                      </Grid>
+                      </Grid>{" "}
+                      <Controls.RadioGroup
+                        name="acGroupStatus"
+                        label="Status"
+                        value={values.acGroupStatus}
+                        onChange={handleInputChange}
+                        items={statusItems}
+                        error={errors.acGroupStatus}
+                      />
                       <div>
                         <Controls.Button type="submit" text="Submit" />
                         <Controls.Button

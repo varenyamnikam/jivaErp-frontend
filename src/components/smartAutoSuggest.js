@@ -64,7 +64,7 @@ const tfStyle = {
     // color: "purple",
     p: 0,
     // right: 10,
-    top: 5,
+    // top: 5,
 
     // This matches the specificity of the default styles at https://github.com/mui-org/material-ui/blob/v4.11.3/packages/material-ui-lab/src/Autocomplete/Autocomplete.js#L90
     '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child': {
@@ -169,7 +169,7 @@ export default function UnusedAutosuggest(props) {
           }
         }}
         options={options1}
-        renderInput={(params) => (
+        renderInput={(params, InputLabelProps) => (
           <TextField
             className={classes.root}
             {...params}
@@ -183,6 +183,10 @@ export default function UnusedAutosuggest(props) {
                 // placed under the icon at the end
                 // "&&&": { pr: "70px" },
               },
+            }}
+            InputLabelProps={{
+              shrink: true,
+              ...InputLabelProps,
             }}
             inputRef={(input) => {
               inputRef = input;

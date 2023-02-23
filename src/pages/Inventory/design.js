@@ -97,7 +97,7 @@ export default function GeneralForm(props) {
       return input.vouNo;
     }
   }
-  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  let newParty = JSON.parse(localStorage.getItem("newParty"));
   const openOnRender = newParty.transactnOpen;
   if (openOnRender) {
     newParty.transactnValue && setInput(newParty.transactnValue);

@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: "5px",
   },
   next: { backgroundColor: theme.palette.primary.light },
+  input: { display: "flex", alignItems: "center" },
 }));
 const useStylesContainer = makeStyles((theme) => ({
   root: {
@@ -350,7 +351,13 @@ export default function GeneralItemForm(props) {
             // error={errors.docCode}
           />
         </Grid>
-        <Grid item xs={12} sm={3} className={classes.input}>
+        <Grid
+          item
+          xs={12}
+          sm={3}
+          className={classes.input}
+          style={{ display: "flex", alignItems: "center" }}
+        >
           <StaticDatePickerLandscape
             name="vouDate"
             size="small"
@@ -370,7 +377,7 @@ export default function GeneralItemForm(props) {
             // error={errors.docCode}
           />
         </Grid>
-        <Grid item xs={12} sm={12} className={classes.input}>
+        <Grid item xs={12} sm={12}>
           <Divider
             variant="middle"
             color="blue"
@@ -419,7 +426,7 @@ export default function GeneralItemForm(props) {
                   error={errors.batchNo}
                 />
               </Grid>
-              <Grid item xs={12} sm={2} className={classes.input}>
+              <Grid item xs={12} sm={2} style={{}}>
                 <StaticDatePickerLandscape
                   name="expDate"
                   label="Expiry Date"
@@ -618,7 +625,7 @@ export default function GeneralItemForm(props) {
         </Grid>
       </Grid>
       <Grid container className={classesContainer.root} spacing={2}>
-        <Grid Item style={{}} xs={12} sm={12}>
+        <Grid Item style={{ marginBottom: "20px" }} xs={12} sm={12}>
           <TableContainer sx={{ minHeight: 500 }}>
             <TblContainer>
               <Table sx={{ minHeight: 500 }}>

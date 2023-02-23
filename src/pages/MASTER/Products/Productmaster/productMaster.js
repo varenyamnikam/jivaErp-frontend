@@ -40,6 +40,8 @@ import "../../../../components/public.css";
 import MuiSkeleton from "../../../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import GstForm from "./gstForm";
+import Filter from "../../../../components/filterButton";
+
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "name", label: "NAME" },
@@ -316,7 +318,8 @@ export default function ProductMaster(props) {
   }
   function handleFilter(e) {
     const value = e.target.value;
-    setFilter({ ...filter, allFields: value });
+    const name = e.target.name;
+    setFilter({ ...filter, [name]: value });
     search(value);
   }
   console.log(filter.allFields);
@@ -366,242 +369,234 @@ export default function ProductMaster(props) {
   }
   return (
     <>
-      <PageHeader
-        title="PRODUCTS"
-        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-      />
+      <div className="hold-transition sidebar-mini">
+        <div className="wrapper">
+          <div className="content-wrapper">
+            <PageHeader
+              title="Item Master"
+              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+            />
 
-      <div className="wrapper">
-        <div className="content-wrapper">
-          <br></br>
-          <Paper className={classes.pageContent}>
             <section className="content">
-              <Toolbar>
-                <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                  <Grid item xs={12} sm={8}>
-                    <Controls.Input
-                      label="Search Role Name"
-                      className={classes.searchInput}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search />
-                          </InputAdornment>
-                        ),
-                        endAdornment: getCancel(),
-                      }}
-                      value={filter.allFields}
-                      onChange={handleFilter}
-                    />
-                  </Grid>
-                  <Grid item sm={1} xs={4}>
-                    {filterIcon ? (
-                      <>
-                        <IconButton
-                          onClick={() => {
-                            setFilterPopup(true);
-                            setFilter(initialFilterValues);
-                          }}
+              <div className="card">
+                <div className="card-body">
+                  <section className="content">
+                    <Toolbar>
+                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                        <Grid item xs={12} sm={8}>
+                          <Controls.Input
+                            label="Search Role Name"
+                            name="allFields"
+                            className={classes.searchInput}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Search />
+                                </InputAdornment>
+                              ),
+                              endAdornment: getCancel(),
+                            }}
+                            value={filter.allFields}
+                            onChange={handleFilter}
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          sm={1}
+                          xs={4}
                           style={{
-                            borderRadius: 0,
-                            marginTop: "5px",
-                            marginLeft: "10px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
-                          <FilterAltOutlinedIcon color="success" />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <>
-                        <IconButton
-                          onClick={() => {
-                            setFilterFn({
-                              fn: (items) => {
-                                return items;
-                              },
-                            });
-                            setFilterIcon(true);
-                          }}
+                          <Filter
+                            filterIcon={filterIcon}
+                            setFilterPopup={setFilterPopup}
+                            setFilter={setFilter}
+                            setFilterFn={setFilterFn}
+                            setFilterIcon={setFilterIcon}
+                            initialFilterValues={initialFilterValues}
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          sm={3}
+                          xs={8}
                           style={{
-                            borderRadius: 0,
-                            marginTop: "5px",
-                            marginLeft: "10px",
+                            display: "flex",
+                            justifyContent: "flex-end",
                           }}
                         >
-                          <FilterAltOffOutlinedIcon color="error" />
-                        </IconButton>
-                      </>
-                    )}
-                  </Grid>
-                  <Grid
-                    item
-                    sm={3}
-                    xs={8}
-                    style={{ display: "flex", justifyContent: "flex-end" }}
+                          <Controls.Button
+                            text="Add New"
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={(e) => {
+                              setButtonPopup(true);
+                              setValues(initialValues);
+                            }}
+                            size="medium"
+                          />
+                        </Grid>
+                      </Grid>
+                    </Toolbar>
+                    <TableContainer>
+                      <TblContainer>
+                        <TblHead />
+                        {records[0].prodCode == "X X X X" ? (
+                          <MuiSkeleton />
+                        ) : (
+                          <TableBody>
+                            {recordsAfterPagingAndSorting().map((item) => (
+                              <TableRow key={item._id}>
+                                <TableCell>{item.prodCode}</TableCell>
+                                <TableCell>{item.prodName}</TableCell>
+                                <TableCell>{item.MRP}</TableCell>{" "}
+                                <TableCell>
+                                  <IconButton
+                                    className={classes.gst}
+                                    aria-label="Example"
+                                    onClick={() => {
+                                      setValues(item);
+                                      setPopup(true);
+                                    }}
+                                  >
+                                    G.S.T
+                                  </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                  <IconButton
+                                    className={classes[item.prodStatus]}
+                                    onClick={() => {}}
+                                  >
+                                    {item.prodStatus}
+                                  </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                  <Controls.ActionButton
+                                    color="primary"
+                                    onClick={() => {
+                                      setValues(item);
+                                      setButtonPopup(true);
+                                    }}
+                                  >
+                                    <EditOutlinedIcon fontSize="small" />
+                                  </Controls.ActionButton>
+                                  <Controls.ActionButton
+                                    color="secondary"
+                                    onClick={(e) => {
+                                      console.log(item);
+                                      setConfirmDialog({
+                                        isOpen: true,
+                                        title:
+                                          "Are you sure to delete this record?",
+                                        subTitle:
+                                          "You can't undo this operation",
+                                        onConfirm: (e) => {
+                                          onDelete(item);
+                                          e.preventDefault();
+                                          console.log("records:" + records);
+                                        },
+                                      });
+                                      e.preventDefault();
+                                    }}
+                                  >
+                                    <DeleteIconOutline fontSize="small" />
+                                  </Controls.ActionButton>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        )}
+                      </TblContainer>
+                    </TableContainer>{" "}
+                    <TblPagination />
+                  </section>
+                  <Popup
+                    title="Product form"
+                    openPopup={buttonPopup}
+                    setOpenPopup={setButtonPopup}
+                    size="md"
                   >
-                    <Controls.Button
-                      text="Add New"
-                      variant="outlined"
-                      startIcon={<AddIcon />}
-                      onClick={(e) => {
-                        setButtonPopup(true);
-                        setValues(initialValues);
-                      }}
+                    <Productform
+                      records={records}
+                      setRecords={setRecords}
+                      values={values}
+                      setValues={setValues}
+                      initialValues={initialValues}
+                      initialFilterValues={initialFilterValues}
+                      unitNames={unitNames}
+                      prodCompanyNames={prodCompanyNames}
+                      prodTypesNames={prodTypesNames}
+                      setNotify={setNotify}
                     />
-                  </Grid>
-                </Grid>
-              </Toolbar>
-              <TableContainer>
-                <TblContainer>
-                  <TblHead />
-                  {records[0].prodCode == "X X X X" ? (
-                    <MuiSkeleton />
-                  ) : (
-                    <TableBody>
-                      {recordsAfterPagingAndSorting().map((item) => (
-                        <TableRow key={item._id}>
-                          <TableCell>{item.prodCode}</TableCell>
-                          <TableCell>{item.prodName}</TableCell>
-                          <TableCell>{item.MRP}</TableCell>{" "}
-                          <TableCell>
-                            <IconButton
-                              className={classes.gst}
-                              aria-label="Example"
-                              onClick={() => {
-                                setValues(item);
-                                setPopup(true);
-                              }}
-                            >
-                              G.S.T
-                            </IconButton>
-                          </TableCell>
-                          <TableCell>
-                            <IconButton
-                              className={classes[item.prodStatus]}
-                              onClick={() => {}}
-                            >
-                              {item.prodStatus}
-                            </IconButton>
-                          </TableCell>
-                          <TableCell>
-                            <Controls.ActionButton
-                              color="primary"
-                              onClick={() => {
-                                setValues(item);
-                                setButtonPopup(true);
-                              }}
-                            >
-                              <EditOutlinedIcon fontSize="small" />
-                            </Controls.ActionButton>
-                            <Controls.ActionButton
-                              color="secondary"
-                              onClick={(e) => {
-                                console.log(item);
-                                setConfirmDialog({
-                                  isOpen: true,
-                                  title: "Are you sure to delete this record?",
-                                  subTitle: "You can't undo this operation",
-                                  onConfirm: (e) => {
-                                    onDelete(item);
-                                    e.preventDefault();
-                                    console.log("records:" + records);
-                                  },
-                                });
-                                e.preventDefault();
-                              }}
-                            >
-                              <DeleteIconOutline fontSize="small" />
-                            </Controls.ActionButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  )}
-                </TblContainer>
-              </TableContainer>{" "}
-              <TblPagination />
-            </section>
-          </Paper>
-          <Popup
-            title="Product form"
-            openPopup={buttonPopup}
-            setOpenPopup={setButtonPopup}
-            size="md"
-          >
-            <Productform
-              records={records}
-              setRecords={setRecords}
-              values={values}
-              setValues={setValues}
-              initialValues={initialValues}
-              initialFilterValues={initialFilterValues}
-              unitNames={unitNames}
-              prodCompanyNames={prodCompanyNames}
-              prodTypesNames={prodTypesNames}
-              setNotify={setNotify}
-            />
-          </Popup>
-          <Popup
-            title="Filter"
-            openPopup={filterPopup}
-            setOpenPopup={setFilterPopup}
-            // size="md"
-          >
-            <Form
-              onSubmit={(e) => {
-                e.preventDefault();
-                searchFilter();
-                setFilterPopup(false);
-                setFilterIcon(false);
-              }}
-            >
-              <ControlledAccordions
-                name="prodCode"
-                label="Product Code"
-                subLabel="Filter by Product Code"
-                value={filter}
-                setValue={setFilter}
-              />
-              <ControlledAccordions
-                name="prodName"
-                label="Product Name"
-                subLabel="Filter by Product Name"
-                value={filter}
-                setValue={setFilter}
-              />
-              <ControlledAccordions
-                name="MRP"
-                label="M.R.P"
-                subLabel="Filter by M.R.P"
-                value={filter}
-                setValue={setFilter}
-              />
+                  </Popup>
+                  <Popup
+                    title="Filter"
+                    openPopup={filterPopup}
+                    setOpenPopup={setFilterPopup}
+                    // size="md"
+                  >
+                    <Form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        searchFilter();
+                        setFilterPopup(false);
+                        setFilterIcon(false);
+                      }}
+                    >
+                      <Controls.Input
+                        name="prodCode"
+                        label="Product Code"
+                        value={filter.prodCode}
+                        setValue={setFilter}
+                        onChange={handleFilter}
+                      />
+                      <Controls.Input
+                        name="prodName"
+                        label="Product Name"
+                        value={filter.prodName}
+                        setValue={setFilter}
+                        onChange={handleFilter}
+                      />
+                      <Controls.Input
+                        name="MRP"
+                        label="M.R.P"
+                        value={filter.MRP}
+                        setValue={setFilter}
+                        onChange={handleFilter}
+                      />
 
-              <div style={{ marginTop: "25px" }}>
-                <Controls.Button type="submit" text="Submit" />
+                      <div style={{ marginTop: "25px" }}>
+                        <Controls.Button type="submit" text="Submit" />
+                      </div>
+                    </Form>
+                  </Popup>
+                  <Popup
+                    size="md"
+                    title="GST Form"
+                    openPopup={popup}
+                    setOpenPopup={setPopup}
+                  >
+                    <GstForm
+                      setNotify={setNotify}
+                      setPopup={setPopup}
+                      values={values}
+                      records={records}
+                      setRecords={setRecords}
+                    />
+                  </Popup>
+
+                  <Notification notify={notify} setNotify={setNotify} />
+                  <ConfirmDialog
+                    confirmDialog={confirmDialog}
+                    setConfirmDialog={setConfirmDialog}
+                  />
+                </div>
               </div>
-            </Form>
-          </Popup>
-          <Popup
-            size="md"
-            title="GST Form"
-            openPopup={popup}
-            setOpenPopup={setPopup}
-          >
-            <GstForm
-              setNotify={setNotify}
-              setPopup={setPopup}
-              values={values}
-              records={records}
-              setRecords={setRecords}
-            />
-          </Popup>
-
-          <Notification notify={notify} setNotify={setNotify} />
-          <ConfirmDialog
-            confirmDialog={confirmDialog}
-            setConfirmDialog={setConfirmDialog}
-          />
+            </section>
+          </div>
         </div>
       </div>
     </>

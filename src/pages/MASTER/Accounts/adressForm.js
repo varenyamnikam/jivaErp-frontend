@@ -17,6 +17,7 @@ import Talukas from "../../../components/talukaSelect";
 import DoneIcon from "@mui/icons-material/Done";
 import * as roleService from "../../../services/roleService";
 import { useNavigate } from "react-router-dom";
+import Divider from "@mui/material/Divider";
 
 const Firms = [
   "N.A.",
@@ -125,7 +126,7 @@ export default function Adressform(props) {
 
       localStorage.setItem("newParty", JSON.stringify(newParty));
 
-      history.push(newParty.path);
+      history(newParty.path);
     }
   }
   //
@@ -140,7 +141,6 @@ export default function Adressform(props) {
     if (!save[Index]) {
       return (
         <>
-          {" "}
           <Button
             variant="contained"
             // color="success"
@@ -164,121 +164,130 @@ export default function Adressform(props) {
   }
   return (
     <>
-      <Form onSubmit={handleSubmit}>
-        <Grid container>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="acCode"
-              label="Code"
-              value={acCode}
-              onChange={() => {}}
-              disabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="acName"
-              label="Name"
-              value={acName}
-              disabled={true}
-            />{" "}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="addressLine1"
-              label="Address Line 1"
-              value={input.addressLine1}
-              onChange={handleChange}
-              error={errors.addressLine1}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="addressLine2"
-              label="Address Line 2"
-              value={input.addressLine2}
-              onChange={handleChange}
-              error={errors.addressLine2}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="email"
-              label="Email"
-              value={input.email}
-              onChange={handleChange}
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="pincode"
-              label="Pincode"
-              value={getValue(input.pincode)}
-              onChange={handleChange}
-              error={errors.pincode}
-            />{" "}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="mobileno"
-              label="Mobile No"
-              value={getValue(input.mobileno)}
-              onChange={handleChange}
-            />{" "}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="contactNo"
-              label="Contact No"
-              value={getValue(input.contactNo)}
-              onChange={handleChange}
-            />{" "}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Countries
-              value={input}
-              setValue={setInput}
-              options={country}
-              error={errors.countryName}
-            />
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            <States
-              value={input}
-              setValue={setInput}
-              options={states}
-              countries={country}
-              country={input.countryName}
-              error={errors.stateName}
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="districtName"
-              label="District"
-              value={input.districtName}
-              onChange={handleChange}
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            <Controls.Input
-              name="talukaName"
-              label="Taluka"
-              value={input.talukaName}
-              onChange={handleChange}
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}></Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            style={{ display: "flex", justifyContent: "center" }}
-          >
-            <div style={{ marginTop: "20px" }}>{getButton()}</div>
-          </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Controls.Input
+            name="acCode"
+            label="Code"
+            value={acCode}
+            onChange={() => {}}
+            disabled={true}
+          />
         </Grid>
-      </Form>
+        <Grid item xs={12} sm={6}>
+          <Controls.Input
+            name="acName"
+            label="Name"
+            value={acName}
+            disabled={true}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Controls.Input
+            name="addressLine1"
+            label="Address Line 1"
+            value={input.addressLine1}
+            onChange={handleChange}
+            error={errors.addressLine1}
+            multiline
+            rows={3}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Controls.Input
+            name="addressLine2"
+            label="Address Line 2"
+            value={input.addressLine2}
+            onChange={handleChange}
+            error={errors.addressLine2}
+            multiline
+            rows={3}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12}>
+          <Divider
+            variant="middle"
+            color="blue"
+            sx={{ borderBottomWidth: 2 }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Controls.Input
+            name="email"
+            label="Email"
+            value={input.email}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Controls.Input
+            name="pincode"
+            label="Pincode"
+            value={getValue(input.pincode)}
+            onChange={handleChange}
+            error={errors.pincode}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="mobileno"
+            label="Mobile No"
+            value={getValue(input.mobileno)}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="contactNo"
+            label="Contact No"
+            value={getValue(input.contactNo)}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Countries
+            value={input}
+            setValue={setInput}
+            options={country}
+            error={errors.countryName}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <States
+            value={input}
+            setValue={setInput}
+            options={states}
+            countries={country}
+            country={input.countryName}
+            error={errors.stateName}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="districtName"
+            label="District"
+            value={input.districtName}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Controls.Input
+            name="talukaName"
+            label="Taluka"
+            value={input.talukaName}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={4}
+          style={{ display: "flex", justifyContent: "flex-end" }}
+        >
+          <div style={{ marginTop: "20px" }}>{getButton()}</div>
+        </Grid>
+      </Grid>
     </>
   );
 }
@@ -288,7 +297,7 @@ export default function Adressform(props) {
 // options={districts}
 // states={states}
 // state={input.stateName}
-// />{" "}
+// />
 // if (x) {
 // let x = true;
 // adresses.map((item, index) => {

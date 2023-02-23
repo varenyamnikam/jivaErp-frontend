@@ -6,9 +6,10 @@ import jQuery from "jquery";
 function checkAuth({ children }) {
   return AuthHandler.loggedIn() ? children : <Navigate to="/" />;
 }
-export var PrivateRouteNew = ({ page, ...rest }) => {
+export var PrivateRouteNew = ({ Page, ...rest }) => {
+  console.log(Page)
   return AuthHandler.loggedIn() ? (
-    <MainComponent page={page} />
+    <MainComponent page={Page} />
   ) : (
     <Navigate to="/" />
   );

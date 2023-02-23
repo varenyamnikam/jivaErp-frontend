@@ -7,10 +7,10 @@ import { InputAdornment } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root1: {
-    top: 5,
+    // top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      // color: "#D3D3D3",
+      color: "#D3D3D3",
     },
     "& .MuiFormLabel-root.Mui-focused": {
       color: "blue", // or black
@@ -24,10 +24,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   root2: {
-    top: 5,
+    // top: 5,
     "& .MuiFormLabel-root": {
       fontSize: 15,
-      // color: "#D3D3D3",
+      color: "#D3D3D3",
     },
     "& .MuiFormLabel-root.Mui-focused": {
       color: "blue", // or black

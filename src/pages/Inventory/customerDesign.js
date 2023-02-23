@@ -237,7 +237,7 @@ export default function CustomerForm(props) {
   const [value, setValue] = React.useState(null);
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} style={{display:"flex",alignContent:"flex-end"}}>
         <Grid item xs={12} sm={9} className={classes.input}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4} className={classes.input}>

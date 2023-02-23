@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-block",
     paddingleft: theme.spacing(4),
     color: "#3c44b1",
-    height: "40px",
+    height: "35px",
   },
 }));
 

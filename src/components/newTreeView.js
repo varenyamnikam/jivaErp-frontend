@@ -76,11 +76,13 @@ export default function ControlledTreeView(props) {
   const [selected, setSelected] = React.useState([]);
 
   const handleToggle = (event, nodeIds) => {
+    console.log(nodeIds);
     setExpanded(nodeIds);
   };
   console.log("hi", dataBase);
 
   const handleSelect = (event, nodeIds) => {
+    console.log(nodeIds);
     setSelected(nodeIds);
     dataBase.map((item) => {
       if (item.mktAreaCode == nodeIds && values.mktAreaCode !== nodeIds) {

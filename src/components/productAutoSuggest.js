@@ -69,7 +69,7 @@ const tfStyle = {
     // color: "purple",
     p: 0,
     // right: 10,
-    top: 5,
+    // top: 5,
 
     // This matches the specificity of the default styles at https://github.com/mui-org/material-ui/blob/v4.11.3/packages/material-ui-lab/src/Autocomplete/Autocomplete.js#L90
     '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child': {
@@ -159,7 +159,8 @@ export default function UnusedAutosuggest(props) {
           value.cgstP !== gstInfo.cgst &&
           value.sgstP !== gstInfo.sgst &&
           value.cessP !== gstInfo.cess) ||
-        !companyStateCode
+        !companyStateCode ||
+        !partyStateCode
       ) {
         setValue({
           ...value,
@@ -169,6 +170,8 @@ export default function UnusedAutosuggest(props) {
         });
       }
       if (
+        companyStateCode &&
+        partyStateCode &&
         !insideOfMaharashtra &&
         value.igstP !== igst &&
         value.cessP !== gstInfo.cess
@@ -286,7 +289,7 @@ export default function UnusedAutosuggest(props) {
               backgroundColor: "green",
               color: "#E9E4DC",
               height: "39px",
-              top: 5,
+              // top: 5,
               width: "100%",
             }}
           >
@@ -304,7 +307,7 @@ export default function UnusedAutosuggest(props) {
             style={{
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
-              top: 5,
+              // top: 5,
               height: "39px",
             }}
             onClick={() => {}}

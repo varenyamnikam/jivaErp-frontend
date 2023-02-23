@@ -29,7 +29,6 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import Popup from "../../components/Popup";
 import FinancialYearform from "./financialYearForm";
 import { Grid } from "@material-ui/core";
-import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import ControlledAccordions from "../../components/accordions";
 import ViewsDatePicker from "../../components/yearSelector";
 import { useForm, Form } from "../../components/useForm";
@@ -40,6 +39,8 @@ import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import Filter from "../../components/filterButton";
+import StaticDatePickerLandscape from "../../components/calendarLandscape";
+
 const headCells = [
   { id: "Code", label: "YearCode" },
   { id: "name", label: "Financial Year" },
@@ -204,6 +205,7 @@ export default function FinancialYearMaster(props) {
 
   // console.log(count);
   function searchFilter() {
+    console.log(filter);
     setFilterFn({
       fn: (items) => {
         let newRecords = items.filter((item) => {
@@ -302,7 +304,16 @@ export default function FinancialYearMaster(props) {
                   <section className="content">
                     <Toolbar>
                       <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                        <Grid item xs={12} sm={8}>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={8}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Controls.Input
                             label="Search Role Name"
                             className={classes.searchInput}
@@ -318,7 +329,16 @@ export default function FinancialYearMaster(props) {
                             onChange={handleFilter}
                           />
                         </Grid>
-                        <Grid item sm={1} xs={4}>
+                        <Grid
+                          item
+                          sm={1}
+                          xs={4}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <Filter
                             filterIcon={filterIcon}
                             setFilterPopup={setFilterPopup}
@@ -438,17 +458,17 @@ export default function FinancialYearMaster(props) {
                         setFilterIcon(false);
                       }}
                     >
-                      <ControlledAccordions
+                      <Controls.Input
                         name="yearCode"
                         label="Year Code"
-                        subLabel="Filter by Year Code"
-                        value={filter}
-                        setValue={setFilter}
+                        onChange={(e) => {
+                          setFilter({ ...filter, yearCode: e.target.values });
+                        }}
                       />
 
                       <Grid container style={{ marginTop: "10px" }}>
                         <Grid item xs={6} style={{ flexGrow: 1 }}>
-                          <ViewsDatePicker
+                          <StaticDatePickerLandscape
                             name="yearStartDate"
                             label="Start Year From-"
                             value={filter}
@@ -456,7 +476,7 @@ export default function FinancialYearMaster(props) {
                           />
                         </Grid>
                         <Grid item xs={6} style={{ flexGrow: 1 }}>
-                          <ViewsDatePicker
+                          <StaticDatePickerLandscape
                             name="yearEndDate"
                             label="To-"
                             value={filter}

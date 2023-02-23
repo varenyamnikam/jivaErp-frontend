@@ -5,8 +5,8 @@ import Sidemenu from "./sidemenu";
 import jQuery from "jquery";
 import StockMaster from "../pages/Stock/stockMaster";
 import Dashboard from "../pages/dashboard";
-class MainComponent extends React.Component {
-  render() {
+function MainComponent ({page}) {
+  console.log(page)
     return (
       <>
         <div>
@@ -49,12 +49,12 @@ class MainComponent extends React.Component {
           <div className="wrapper">
             <Headerpart />
             <Sidemenu />
-            {this.props.page}
+            {page}
             <aside className="control-sidebar control-sidebar-dark"></aside>
           </div>
         </div>
       </>
     );
-  }
+  
 }
 export default MainComponent;

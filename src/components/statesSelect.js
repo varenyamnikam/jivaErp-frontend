@@ -6,55 +6,22 @@ import { SliderValueLabelUnstyled } from "@mui/base";
 import { memo } from "react";
 import { makeStyles } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
-  root: {
-    "& .MuiFormLabel-root": {
-      fontSize: 15,
-      color: "#D3D3D3",
-      position: "absolute",
-      // p: 5,
-      // right: 40,
-      // bottom: 5,
-      height: "40px",
-    },
-    "& .MuiFormLabel-root.Mui-focused": {
-      color: "blue", // or black
-    },
-    // "& .MuiFormLabel-root": {
-    //   fontSize: 15,
-    //   color: "#D3D3D3",
-    // },
-    // "& .MuiFormLabel-root.Mui-focused": {
-    //   color: "blue", // or black
-    // },
-    "& .MuiInputLabel-shrink": {
-      color: "grey", // or black
-    },
-  },
+  root: {},
 }));
 
 const tfStyle = {
   "& .MuiButtonBase-root.MuiAutocomplete-clearIndicator": {
-    visibility: "visible",
     boxShadow: "none",
-    position: "absolute",
-    p: 0,
-    right: 40,
-    top: 5,
     //"calc(50% - 12px)"
   },
   "& .MuiButtonBase-root.MuiAutocomplete-popupIndicator": {
-    visibility: "visible",
     boxShadow: "none",
-    position: "absolute",
-    p: 0,
-    right: 10,
-    top: 5,
   },
   "& .MuiOutlinedInput-root": {
     // probably the width of your search IconButton or more if needed
     // color: "red",
-    paddingTop: "10px",
-    top: 5,
+    // paddingTop: "10px",
+    // top: 5,
   },
   // ".MuiInputBase-input": {
   //   height: "1.5rem",
@@ -91,14 +58,14 @@ function States(props) {
     props;
   const [inputValue, setInputValue] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState("");
-  if (value.stateCode) {
-    let found;
-    options.map((item) => {
-      if (value.stateCode == item.stateCode) found = item.stateName;
-    });
-    if (value.stateName !== found) setValue({ ...value, stateName: found });
-    console.log("findimg stateName");
-  }
+  // if (value.stateCode) {
+  //   let found;
+  //   options.map((item) => {
+  //     if (value.stateCode == item.stateCode) found = item.stateName;
+  //   });
+  //   if (value.stateName !== found) setValue({ ...value, stateName: found });
+  //   console.log("findimg stateName");
+  // }
   countries.map((c) => {
     if (c.countryName == country) {
       if (selectedCountry !== c.countryCode) setSelectedCountry(c.countryCode);
@@ -120,18 +87,16 @@ function States(props) {
       onChange={(event, newValue) => {
         if (newValue) {
           // setValue({ ...value, stateName: newValue.stateName });
-          if (value.districtName) {
-            setValue({
-              ...value,
-              stateCode: newValue.stateCode,
-              districtName: "",
-              districtCode: "",
-              talukaName: "",
-              talukaCode: "",
-            });
-          } else {
-            setValue({ ...value, stateCode: newValue.stateCode });
-          }
+          setValue({
+            ...value,
+            stateCode: newValue.stateCode,
+            stateName: newValue.stateName,
+            districtName: "",
+            districtCode: "",
+            talukaName: "",
+            talukaCode: "",
+          });
+
           console.log("onchange" + newValue);
         }
       }}
@@ -146,7 +111,7 @@ function States(props) {
       })}
       getOptionLabel={(option) => option.stateName}
       // sx={{ width: 300 }}
-      renderInput={(params) => (
+      renderInput={(params, InputLabelProps) => (
         <TextField
           className={classes.root}
           {...params}
@@ -159,6 +124,10 @@ function States(props) {
               // placed under the icon at the end
               // "&&&": { pr: "70px" },
             },
+          }}
+          InputLabelProps={{
+            shrink: true,
+            ...InputLabelProps,
           }}
           sx={tfStyle}
           inputRef={(input) => {

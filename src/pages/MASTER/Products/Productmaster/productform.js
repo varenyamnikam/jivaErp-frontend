@@ -203,147 +203,141 @@ export default function Productform(props) {
     }
   };
   return (
-    <Form
-      onSubmit={(e) => {
-        handleSubmit(e);
-      }}
-    >
-      <Grid container>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="prodCode"
-            label="Product Code"
-            value={input.prodCode}
-            disabled={true}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="prodName"
-            label="Product Name"
-            value={input.prodName}
-            error={errors.prodName}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12} style={{ flexGrow: 1 }}>
-          <Controls.Input
-            name="barCode"
-            label="Bar Code"
-            value={input.barCode}
-            error={errors.barCode}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12} style={{ paddingRight: "20px" }}>
-          <UnusedAutosuggest
-            name="itemType"
-            label="Item Type"
-            value={input}
-            setValue={setInput}
-            options={prodTypesNames}
-            error={errors.itemType}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <UnusedAutosuggest
-            name="prodCompany"
-            label="Company Name"
-            value={input}
-            setValue={setInput}
-            options={prodCompanyNames}
-            error={errors.prodCompany}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="prodDesc"
-            label="Description"
-            value={input.prodDesc}
-            onChange={handleChange}
-            error={errors.prodDesc}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12} style={{ flexGrow: 0.5 }}>
-          <UnusedAutosuggest
-            name="UOM"
-            label="U.O.M"
-            value={input}
-            setValue={setInput}
-            options={unitNames}
-            error={errors.UOM}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="MRP"
-            label="M.R.P"
-            value={input.MRP}
-            onChange={handleChange}
-            error={errors.MRP}
-          />
-        </Grid>{" "}
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="HSNNo"
-            label="HSN No."
-            value={input.HSNNo}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="reorderLevel"
-            label="Reorder Level"
-            value={input.reorderLevel}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="maintainStock"
-            label="Maintain Stock"
-            value={input.maintainStock}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.maintainStock}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="useBatchNo"
-            label="Use Batch No."
-            value={input.useBatchNo}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.useBatchNo}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="prodStatus"
-            label="Product Status"
-            value={input.prodStatus}
-            onChange={handleChange}
-            items={statusItems}
-            error={errors.prodStatus}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: "50px",
-          }}
-        >
-          <Controls.Button text="Reset" color="default" onClick={handleReset} />
-          <Controls.Button type="submit" text="Submit" />
-        </Grid>
+    <Grid container spacing={2}>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="prodCode"
+          label="Product Code"
+          value={input.prodCode}
+          disabled={true}
+          onChange={handleChange}
+        />
       </Grid>
-    </Form>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="prodName"
+          label="Product Name"
+          value={input.prodName}
+          error={errors.prodName}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12} style={{ flexGrow: 1 }}>
+        <Controls.Input
+          name="barCode"
+          label="Bar Code"
+          value={input.barCode}
+          error={errors.barCode}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12} style={{ paddingRight: "20px" }}>
+        <UnusedAutosuggest
+          name="itemType"
+          label="Item Type"
+          value={input}
+          setValue={setInput}
+          options={prodTypesNames}
+          error={errors.itemType}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <UnusedAutosuggest
+          name="prodCompany"
+          label="Item Group"
+          value={input}
+          setValue={setInput}
+          options={prodCompanyNames}
+          error={errors.prodCompany}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="prodDesc"
+          label="Description"
+          value={input.prodDesc}
+          onChange={handleChange}
+          error={errors.prodDesc}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12} style={{ flexGrow: 0.5 }}>
+        <UnusedAutosuggest
+          name="UOM"
+          label="U.O.M"
+          value={input}
+          setValue={setInput}
+          options={unitNames}
+          error={errors.UOM}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="MRP"
+          label="M.R.P"
+          value={input.MRP}
+          onChange={handleChange}
+          error={errors.MRP}
+        />
+      </Grid>{" "}
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="HSNNo"
+          label="HSN No."
+          value={input.HSNNo}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="reorderLevel"
+          label="Reorder Level"
+          value={input.reorderLevel}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="maintainStock"
+          label="Maintain Stock"
+          value={input.maintainStock}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.maintainStock}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="useBatchNo"
+          label="Use Batch No."
+          value={input.useBatchNo}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.useBatchNo}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="prodStatus"
+          label="Product Status"
+          value={input.prodStatus}
+          onChange={handleChange}
+          items={statusItems}
+          error={errors.prodStatus}
+        />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        sm={6}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingTop: "50px",
+        }}
+      >
+        <Controls.Button text="Reset" color="default" onClick={handleReset} />
+        <Controls.Button type="submit" text="Submit" onClick={handleSubmit} />
+      </Grid>
+    </Grid>
   );
 }

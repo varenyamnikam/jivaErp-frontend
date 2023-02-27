@@ -122,6 +122,7 @@ export default function UnusedAutosuggest(props) {
     height,
     getAccType,
     itemList,
+    autoAdress,
     ...other
   } = props;
   let history = useNavigate();
@@ -160,10 +161,16 @@ export default function UnusedAutosuggest(props) {
   if (value[name1]) {
     options2.map((item) => {
       if (value[name1] == item[name2] && value[code1] !== item[code2]) {
+        console.log({
+          ...value,
+          [code1]: item[code2],
+        });
         setValue({
           ...value,
           [code1]: item[code2],
         });
+        console.log("hi");
+        autoAdress(item[code2]);
       }
     });
   }
@@ -245,6 +252,7 @@ export default function UnusedAutosuggest(props) {
                     ...value,
                     [name1]: newValue,
                   });
+
                   console.log("onchange" + newValue);
                 }
               }
@@ -351,7 +359,7 @@ export default function UnusedAutosuggest(props) {
               let str = value.docCode;
               let path =
                 "/Inventory/" + str.substring(0, 1) + "." + str.substring(1, 2);
-
+              //for example convert DC -> D.C
               const newParty = {
                 transactnValue: value,
                 transactnList: itemList,

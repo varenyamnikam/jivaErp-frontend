@@ -12,6 +12,32 @@ import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
 import VerticalTabs from "./verticalTabs";
 import AuthHandler from "../Utils/AuthHandler";
+import { useNavigate } from "react-router-dom";
+
+const styles = (theme) => ({
+  "@global": {
+    "*::-webkit-scrollbar": {
+      width: "0.4em",
+      marginRight: "12px",
+      left: "12px !important",
+      position: "fixed",
+    },
+    "*::-webkit-scrollbar-track": {
+      "-webkit-box-shadow": "inset 0 0 6px rgba(0,0,0,0.00)",
+      marginRight: "12px",
+    },
+    "*::-webkit-scrollbar-thumb": {
+      backgroundColor: "rgb(194, 193, 193)",
+      borderRadius: "15px",
+      marginRight: "12px",
+      "&:hover": {
+        // add hover selector
+        backgroundColor: "rgb(142, 141, 141)",
+      },
+    },
+  },
+});
+
 const useStyles = makeStyles((theme) => ({
   dialogWrapper: {
     // padding: theme.spacing(2),
@@ -28,10 +54,13 @@ const useStyles = makeStyles((theme) => ({
   dialogContent: {
     // padding: "0px",
   },
+  ...styles(theme),
 }));
 export default function Popup(props) {
   const { title, children, openPopup, setOpenPopup, size, ...other } = props;
   const classes = useStyles();
+  let history = useNavigate();
+
   console.log(size, title);
   function getSize(ok) {
     if (size) {
@@ -44,13 +73,20 @@ export default function Popup(props) {
   function resetAddParty() {
     // reset if user closes dailogue ,while adding party thru transaction form
     let newParty = JSON.parse(localStorage.getItem("newParty"));
+    console.log(newParty);
     let openOnRender = newParty.partyOpen;
-    newParty = AuthHandler.getResetParty();
-    if (openOnRender)
+    // if (openOnRender)
+    //   localStorage.setItem("newParty", JSON.stringify(newParty));
+    if (openOnRender) {
+      let newParty = JSON.parse(localStorage.getItem("newParty"));
+      newParty.partyOpen = false;
       localStorage.setItem("newParty", JSON.stringify(newParty));
+      history(newParty.path);
+    }
   }
   return (
     <Dialog
+      fullWidth={true}
       open={openPopup}
       maxWidth={getSize()}
       classes={{ paper: classes.dialogWrapper }}

@@ -52,6 +52,7 @@
     "recharts": "^2.4.3",
     "sass": "^1.58.3",
     "styled-components": "^5.3.6",
+    "verbose": "^0.2.3",
     "web-vitals": "^3.1.1"
   },
   "scripts": {

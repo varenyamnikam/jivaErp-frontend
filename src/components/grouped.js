@@ -77,7 +77,7 @@ export default function Grouped(props) {
   const token = AuthHandler.getLoginToken();
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
-  console.log(values, records);
+  console.log(values, records, batchList);
   const classes = useStyles();
   const {
     TblContainer,
@@ -95,6 +95,7 @@ export default function Grouped(props) {
     { fn: (r) => r }
   );
   const saviour = useRef(Array(records.length).fill(createRef()));
+  console.log(records);
   function validate() {
     let x = true;
     for (var i = 0; i < records.length; i++) {
@@ -128,18 +129,19 @@ export default function Grouped(props) {
   }
   function integrate() {
     let x = true;
+    console.log(batchList);
     batchList.map((item) => {
       if (Number(item.sell) > 0) x = false;
     });
     return x;
   }
-  function getStock(y = false) {
+  function getStock(y = false, batchList = batchList) {
     const useBatch = JSON.parse(
       localStorage.getItem("adm_softwareSettings")
-    ).userBatchNo;
-
+    ).userBatchNo; //userBatchNo =yes/no
     const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}`;
     let data = records;
+    console.log(batchList, records);
     axios
       .get(Config.batch + query, {
         headers: {
@@ -153,24 +155,28 @@ export default function Grouped(props) {
         let data = res.data.stock;
         let arr = data.map((item) => ({ ...item, sell: "0" }));
         //setRecords(arr);
-        console.log(integrate(), arr);
+        console.log(integrate(), arr, data);
         if (integrate()) {
           arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
         } else {
+          console.log(batchList, records);
           let x = true;
           let total = 0;
+          console.log(arr);
           batchList.map((item) => {
             total += Number(item.sell);
             arr.map((a, i) => {
-              if (Number(item.batchNo) == Number(a.batchNo)) {
-                a.sell = item.sell;
+              console.log(item, a, item.batchNo == a.batchNo);
+              if (item.batchNo == a.batchNo) {
+                arr[i].sell = item.sell;
               }
             });
           });
           console.log(arr);
           arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
-          data = arr;
-          if (total !== values.qty) calcStock();
+          console.log(records, batchList, total, values.qty);
+          // data = arr;
+          if (Number(total) !== Number(values.qty)) calcStock();
         }
         if (y) {
           console.log(calcStock());
@@ -180,15 +186,19 @@ export default function Grouped(props) {
   }
   function handleChange(e, i) {
     const newArr = records;
-    const newObj = { ...records[i], sell: e.target.value };
-    newArr[i] = newObj;
+    // const newObj = { ...records[i], sell: e.target.value };
+    // newArr[i] = newObj;
+    newArr.map((item, index) => {
+      if (index == i) {
+        newArr[i].sell = e.target.value;
+      }
+    });
     console.log("hi", newArr);
-
-    setRecords([...newArr]);
+    setRecords(newArr);
     console.log(saviour);
   }
   function calcStock() {
-    console.log(records);
+    console.log(records, batchList);
     if (Number(values.qty) > 0 && Number(records[0].qty > 0)) {
       let final = Number(values.qty);
       let newArr = records;
@@ -244,8 +254,10 @@ export default function Grouped(props) {
     records.map((item) => {
       if (Number(item.sell) > 0 && Number(item.qty) !== 0) x = false;
     });
+    console.log(x, popup);
     if (!x && !popup) {
       if (batchList.length !== records.length) {
+        console.log("setBatchlist=>", records);
         setBatchlist(records);
       } else {
         let y = true;
@@ -254,7 +266,10 @@ export default function Grouped(props) {
             if (Number(b.sell) !== Number(r.sell)) y = false;
           });
         });
-        !y && setBatchlist(records);
+        if (!y) {
+          setBatchlist(records);
+          console.log("setBatchlist=>", records);
+        }
       }
     }
   }, [records]);
@@ -266,7 +281,7 @@ export default function Grouped(props) {
     });
     return count;
   }
-  console.log(records);
+  console.log(records, recordsAfterAndSorting());
   return (
     <>
       <Grid container>
@@ -303,9 +318,10 @@ export default function Grouped(props) {
             }}
             onClick={() => {
               if (values.prodCode) {
+                console.log(batchList, records);
                 setPopup(true);
-                getStock();
-                calcStock();
+                getStock(false, batchList);
+                // calcStock();
               }
             }}
           >
@@ -345,7 +361,7 @@ export default function Grouped(props) {
                               handleChange(e, i);
                               setFocus(i);
                             }}
-                            value={records[i].sell}
+                            value={item.sell}
                             ref={saviour[i]}
                           />
                         </TableCell>
@@ -387,6 +403,7 @@ export default function Grouped(props) {
                 color="primary"
                 onClick={() => {
                   if (validate()) {
+                    console.log(records);
                     setBatchlist(records);
                     setPopup(false);
                   }

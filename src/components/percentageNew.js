@@ -76,7 +76,11 @@ export default function Percent(props) {
     console.log(net);
     return net;
   }
-
+  const handleKeyPress = (event) => {
+    if (event.key === "-" || event.key === "+") {
+      event.preventDefault();
+    }
+  };
   function subStractFromAmt(sub, amt) {
     amt = amt - sub;
     return amt;
@@ -128,16 +132,21 @@ export default function Percent(props) {
           type={"number"}
           style={{ borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px" }}
           name={name2}
-          value={Number(value[name2]).toFixed(2)}
+          value={String(value[name2]).replace(/(\.\d{2})\d+$/, "$1")}
           onChange={(e) => {
             onChange(e);
             setPriority(name2);
           }}
+          onKeyPress={handleKeyPress}
           className={classes.root1}
           {...other}
           {...(error && { error: true, helperText: error })}
           // disabled={disabled}
           InputProps={{
+            inputProps: {
+              min: 0,
+              max: 99.99,
+            },
             endAdornment: (
               <PercentIcon
                 fontSize="small"
@@ -156,12 +165,18 @@ export default function Percent(props) {
           style={{
             borderRadius: "0px",
           }}
+          onKeyPress={handleKeyPress}
           label={label}
           name={name1}
-          value={Number(value[name1]).toFixed(2)}
+          value={String(value[name1]).replace(/(\.\d{2})\d+$/, "$1")}
           onChange={(e) => {
             onChange(e);
             setPriority(name1);
+          }}
+          InputProps={{
+            inputProps: {
+              min: 0,
+            },
           }}
           className={classes.root2}
           {...other}

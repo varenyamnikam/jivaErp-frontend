@@ -40,7 +40,7 @@ const headCells = [
   { id: "CESS", label: "CESS" },
 ];
 export default function GstForm(props) {
-  const { values, setRecords, records, setNotify, setPopup } = props;
+  const { values, setRecords, records, setNotify, setPopup, setValues } = props;
   const [input, setInput] = useState(initialInput);
   const [errors, setErrors] = useState({ cgst: "", sgst: "", cess: "" });
   const [gstTable, setGstTable] = useState(
@@ -106,9 +106,12 @@ export default function GstForm(props) {
         (item) => item.cgst || item.sgst || item.cess
       );
       const newValue = { ...values, gst: arr };
-      const newrecord = records.map((item) => {
+      let x = true;
+      let newrecord = records.map((item) => {
+        if (item.prodCode == values.prodCode) x = false;
         return item.prodCode == values.prodCode ? newValue : item;
       });
+      if (!x) newrecord.push(newValue);
       console.log(newrecord, arr, newValue);
       setGstTable(updatedTable);
       const msg = {
@@ -141,30 +144,37 @@ export default function GstForm(props) {
   };
   function updateGstInDb(input, newrecord, msg) {
     const token = AuthHandler.getLoginToken();
-    axios
-      .patch(
-        // Config.addUser,
-        Config.prodMaster + query,
-        { input },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((response) => {
-        setPopup(false);
-        console.log(newrecord);
-        setRecords(newrecord);
-        setNotify(msg);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
+    if (values.prodCode == "X X X X") {
+      console.log(input, newrecord);
+      setValues(input);
+      setRecords(newrecord);
+    } else {
+      axios
+        .patch(
+          // Config.addUser,
+          Config.prodMaster + query,
+          { input },
+          {
+            headers: {
+              authorization: "Bearer" + token,
+            },
+          }
+        )
+        .then((response) => {
+          setPopup(false);
+          console.log(newrecord);
+          setInput(input);
+          setRecords(newrecord);
+          setNotify(msg);
+        })
+        .catch((error) => {
+          setNotify({
+            isOpen: true,
+            message: "Unable to connect to servers",
+            type: "warning",
+          });
         });
-      });
+    }
   }
   console.log(input, gstTable, errors);
   return (

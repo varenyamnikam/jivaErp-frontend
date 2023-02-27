@@ -123,6 +123,8 @@ export default function ProductMaster(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const openOnRender = newParty.partyOpen;
 
   const [records, setRecords] = useState([initialValues]);
   const [unitNames, setUnitNames] = useState(["unable to get units"]);
@@ -136,7 +138,9 @@ export default function ProductMaster(props) {
   const [filterIcon, setFilterIcon] = useState(true);
   const [filter, setFilter] = useState(initialFilterValues);
   const [filterFn, setFilterFn] = useState(initialFilterFn);
-  const [buttonPopup, setButtonPopup] = useState(false);
+  const [buttonPopup, setButtonPopup] = useState(
+    openOnRender ? openOnRender : false
+  );
   const [values, setValues] = useState(initialValues);
   const [popup, setPopup] = useState(false);
   const [notify, setNotify] = useState({
@@ -522,14 +526,15 @@ export default function ProductMaster(props) {
                     <Productform
                       records={records}
                       setRecords={setRecords}
-                      values={values}
-                      setValues={setValues}
+                      input={values}
+                      setInput={setValues}
                       initialValues={initialValues}
                       initialFilterValues={initialFilterValues}
                       unitNames={unitNames}
                       prodCompanyNames={prodCompanyNames}
                       prodTypesNames={prodTypesNames}
                       setNotify={setNotify}
+                      setGstPopup={setPopup}
                     />
                   </Popup>
                   <Popup
@@ -583,6 +588,7 @@ export default function ProductMaster(props) {
                       setNotify={setNotify}
                       setPopup={setPopup}
                       values={values}
+                      setValues={setValues}
                       records={records}
                       setRecords={setRecords}
                     />

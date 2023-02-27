@@ -122,11 +122,11 @@ export default function Adressform(props) {
       setAdressData([...updatedData, ...updatedAdresses]);
       roleService.insertAcAdress(input);
       let newParty = JSON.parse(localStorage.getItem("newParty"));
-      newParty.partyOpen = false;
-
-      localStorage.setItem("newParty", JSON.stringify(newParty));
-
-      history(newParty.path);
+      if (newParty.partyOpen) {
+        newParty.partyOpen = false;
+        localStorage.setItem("newParty", JSON.stringify(newParty));
+        history(newParty.path);
+      }
     }
   }
   //

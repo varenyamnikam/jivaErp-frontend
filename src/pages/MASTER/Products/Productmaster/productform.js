@@ -29,7 +29,8 @@ import { Grid } from "@material-ui/core";
 import { useForm, Form } from "../../../../components/useForm";
 import BasicSelect from "../../../Usermaster/basicselect";
 import UnusedAutosuggest from "../../../../components/unusedautosuggest";
-
+import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -59,22 +60,23 @@ export default function Productform(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+  let history = useNavigate();
 
   const {
     records,
     setRecords,
-    values,
-    setValues,
+    input,
+    setInput,
     initialValues,
     initialFilterValues,
     setNotify,
     unitNames,
     prodCompanyNames,
     prodTypesNames,
+    setGstPopup,
   } = props;
-  const [input, setInput] = useState(values);
   const [errors, setErrors] = useState(initialFilterValues);
-  console.log(values, records);
+  console.log(input, records, input);
   console.log(errors);
   const validate = (fieldValues = input) => {
     let temp = { ...errors };
@@ -156,6 +158,13 @@ export default function Productform(props) {
               type: "success",
             });
             setRecords([...records, response.data.values]);
+            let newParty = JSON.parse(localStorage.getItem("newParty"));
+            if (newParty.partyOpen) {
+              let newParty = JSON.parse(localStorage.getItem("newParty"));
+              newParty.partyOpen = false;
+              localStorage.setItem("newParty", JSON.stringify(newParty));
+              history(newParty.path);
+            }
           })
           .catch((error) => {
             setNotify({
@@ -331,11 +340,19 @@ export default function Productform(props) {
         sm={6}
         style={{
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "space-between",
           paddingTop: "50px",
         }}
       >
         <Controls.Button text="Reset" color="default" onClick={handleReset} />
+        <Controls.Button
+          type="submit"
+          text="G.S.T"
+          variant="outlined"
+          onClick={() => {
+            if (validate()) setGstPopup(true);
+          }}
+        />
         <Controls.Button type="submit" text="Submit" onClick={handleSubmit} />
       </Grid>
     </Grid>

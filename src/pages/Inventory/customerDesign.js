@@ -55,7 +55,7 @@ export default function CustomerForm(props) {
     setButtonPopup,
     setNotify,
     accounts,
-    adress,
+    adressData,
     payTerms,
     products,
     voucherItems,
@@ -123,7 +123,7 @@ export default function CustomerForm(props) {
     console.log(temp);
     return Object.values(temp).every((x) => x == "");
   }
-  adress.filter((item) => item.acCode == input.partyCode);
+  let adress = adressData.filter((item) => item.acCode == input.partyCode);
   console.log(adress);
   const refOptions = reference
     .filter((item) => input.docCode !== item.docCode)
@@ -152,6 +152,8 @@ export default function CustomerForm(props) {
     .map((item) => {
       return item.acName;
     });
+  const partyData = accounts.filter((item) => item.preFix == getAccType());
+
   console.log(itemList);
   // if (input.vouNo.length > 8) {
   //   let arr = [];
@@ -170,11 +172,12 @@ export default function CustomerForm(props) {
     });
   console.log(input);
   const classes = useStyles();
-  const ad1 = adress
-    .filter(
-      (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
-    )
-    .map((item) => item.addressLine1);
+  // const ad2 = adress
+  //   .filter(
+  //     (item) => item.acCode == input.partyCode && Number(item.addressNo) == 2
+  //   )
+  //   .map((item) => item.addressLine2);
+
   let cntry = adress.find(
     (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
   );
@@ -184,13 +187,30 @@ export default function CustomerForm(props) {
   );
   let stName = state ? state.stateName : "";
 
-  if (input.partyCode && !input.billingAdress && !input.shippingAdress) {
-    setInput({
-      ...input,
-      billingAdress: ad1,
-      shippingAdress: ad1,
-    });
+  function autoAdress(code) {
+    console.log("hi");
+    const ad1 = adressData.find(
+      (item) => item.acCode == code && Number(item.addressNo) == 1
+    );
+    console.log(ad1, adressData, code);
+    const adress1 = ad1.addressLine1 ? ad1.addressLine1 : null;
+    if (
+      adress1 &&
+      input.billingAdress !== adress1 &&
+      input.shippingAdress !== adress1
+    ) {
+      console.log(input.billingAdress, input.shippingAdress, {
+        billingAdress: adress1,
+        shippingAdress: adress1,
+      });
+      setInput({
+        ...input,
+        billingAdress: adress1,
+        shippingAdress: adress1,
+      });
+    }
   }
+  // }
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value + "clicked haha");
@@ -237,7 +257,11 @@ export default function CustomerForm(props) {
   const [value, setValue] = React.useState(null);
   return (
     <>
-      <Grid container spacing={2} style={{display:"flex",alignContent:"flex-end"}}>
+      <Grid
+        container
+        spacing={2}
+        style={{ display: "flex", alignContent: "flex-end" }}
+      >
         <Grid item xs={12} sm={9} className={classes.input}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4} className={classes.input}>
@@ -318,11 +342,12 @@ export default function CustomerForm(props) {
                 value={input}
                 setValue={setInput}
                 options1={partyOptions}
-                options2={accounts}
+                options2={partyData}
                 getAccType={getAccType}
                 error={errors.partyCode}
                 itemList={itemList}
                 height={28}
+                autoAdress={autoAdress}
                 icon="user"
               />{" "}
             </Grid>{" "}
@@ -333,6 +358,7 @@ export default function CustomerForm(props) {
             name="remark"
             label="Remark"
             value={input.remark}
+            AnimatedSmartAutoSuggest
             onChange={handleChange}
             error={errors.remark}
             multiline
@@ -562,7 +588,6 @@ export default function CustomerForm(props) {
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "bottom",
-              marginTop: "20px",
             }}
             xs={12}
             sm={12}

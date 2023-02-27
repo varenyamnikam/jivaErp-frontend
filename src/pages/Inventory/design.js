@@ -116,7 +116,7 @@ export default function GeneralForm(props) {
             values={values}
             initialValues={initialValues}
             accounts={accounts}
-            adress={adress}
+            adressData={adress}
             payTerms={payTerms}
             products={products}
             setCommon={setCommon}
@@ -131,7 +131,7 @@ export default function GeneralForm(props) {
             getVouNo={getVouNo}
           />
         </TabPanel>{" "}
-        <TabPanel value="2">
+        <TabPanel value="2" style={{ paddingBottom: "10px" }}>
           <ItemForm
             itemList={itemList}
             setItemList={setItemList}

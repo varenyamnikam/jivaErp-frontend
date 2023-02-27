@@ -220,10 +220,7 @@ export default function GeneralItemForm(props) {
   if (Number(input.netAmount) !== Math.round(k)) {
     setInput({ ...input, netAmount: Math.round(k) });
   }
-  console.log(
-    Number(input.roundOff),
-    (k.toFixed(2) - Math.round(k)).toFixed(2)
-  );
+  console.log(batchList);
   if (
     Number(input.roundOff).toFixed(2) !==
     (k.toFixed(2) - Math.round(k)).toFixed(2)
@@ -395,6 +392,7 @@ export default function GeneralItemForm(props) {
             label="Products"
             value={item}
             setValue={setItem}
+            itemList={itemList}
             options1={prodOptions}
             options2={products}
             error={errors.prodCode}
@@ -606,9 +604,9 @@ export default function GeneralItemForm(props) {
             variant="outlined"
             startIcon={<AddIcon />}
             style={{
-              marginTop: "10px",
               display: "flex",
               justifyContent: "flex-end",
+              alignItems: "center",
             }}
             onClick={(e) => {
               if (Validate(item, errors, setErrors, settings, input)) {
@@ -634,13 +632,13 @@ export default function GeneralItemForm(props) {
                   {recordsAfterPagingAndSorting().map((item) => (
                     <TableRow key={item._id}>
                       <TableCell>{getProdName(item.prodCode)}</TableCell>
-                      <TableCell>{item.qty}</TableCell>
-                      <TableCell>{item.rate}</TableCell>
-                      <TableCell> {Number(item.qr)}</TableCell>
-                      <TableCell>
+                      <TableCell align="right">{item.qty}</TableCell>
+                      <TableCell align="right">{item.rate}</TableCell>
+                      <TableCell align="right"> {Number(item.qr)}</TableCell>
+                      <TableCell align="right">
                         {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
                       </TableCell>
-                      <TableCell>
+                      <TableCell align="right">
                         {" "}
                         {rnd(
                           Number(item.cgst) +
@@ -655,10 +653,10 @@ export default function GeneralItemForm(props) {
                         )}
                         %)
                       </TableCell>
-                      <TableCell>
+                      <TableCell align="right">
                         {rnd(item.cess)} ({rnd(item.cessP)}%)
                       </TableCell>{" "}
-                      <TableCell>{item.itemAmount}</TableCell>
+                      <TableCell align="right">{item.itemAmount}</TableCell>
                       <TableCell>
                         <Controls.ActionButton
                           color="primary"
@@ -667,6 +665,7 @@ export default function GeneralItemForm(props) {
                             setPopup(true);
                             if (useBatch == "Yes") {
                               setBatchlist(item.batchList);
+                              console.log("hii");
                             }
                           }}
                         >

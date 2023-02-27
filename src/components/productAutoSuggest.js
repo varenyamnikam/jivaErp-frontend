@@ -7,6 +7,11 @@ import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/InfoOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import Fade from "@mui/material/Fade";
+import { useNavigate } from "react-router-dom";
+import AuthHandler from "../Utils/AuthHandler";
+import axios from "axios";
+import Config from "../Utils/Config";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
@@ -102,10 +107,16 @@ export default function UnusedAutosuggest(props) {
     error = null,
     input,
     adress,
+    itemList,
     ...other
   } = props;
   const [inputValue, setInputValue] = React.useState("");
+  const [toolTip, setToolTip] = React.useState({
+    prodCode: "",
+    stock: "Check stock",
+  });
 
+  let history = useNavigate();
   console.log(options1, options2);
   const classes = useStyles();
 
@@ -152,13 +163,29 @@ export default function UnusedAutosuggest(props) {
       console.log(
         JSON.parse(localStorage.getItem("company")).stateCode,
         partyStateCode,
-        insideOfMaharashtra
+        insideOfMaharashtra,
+        value,
+        Number(value.cgstP),
+        Number(gstInfo.cgst),
+        Number(value.sgstP),
+        Number(gstInfo.sgst),
+        Number(value.cessP),
+        Number(gstInfo.cess),
+        Number(value.cgstP) !== Number(gstInfo.cgst),
+        Number(value.sgstP) !== Number(gstInfo.sgst),
+        Number(value.cessP) !== Number(gstInfo.cess),
+        "finally=>",
+        Number(value.cgstP) !== Number(gstInfo.cgst) &&
+          Number(value.sgstP) !== Number(gstInfo.sgst) &&
+          Number(value.cessP) !== Number(gstInfo.cess),
+        !companyStateCode,
+        !partyStateCode
       );
       if (
         (insideOfMaharashtra &&
-          value.cgstP !== gstInfo.cgst &&
-          value.sgstP !== gstInfo.sgst &&
-          value.cessP !== gstInfo.cess) ||
+          (Number(value.cgstP) !== Number(gstInfo.cgst) ||
+            Number(value.sgstP) !== Number(gstInfo.sgst) ||
+            Number(value.cessP) !== Number(gstInfo.cess))) ||
         !companyStateCode ||
         !partyStateCode
       ) {
@@ -184,6 +211,7 @@ export default function UnusedAutosuggest(props) {
       }
     }
   }
+
   function findCurrentGst(arr) {
     const prevDates = arr
       .filter((item) => new Date(item.startDate) < new Date())
@@ -202,6 +230,48 @@ export default function UnusedAutosuggest(props) {
       return latestGst;
     } else return null;
   }
+  function updateBalance() {
+    console.log(value.prodCode, toolTip.prodCode);
+    if (value.prodCode !== toolTip.prodCode) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userCode = user.userCode;
+      const userCompanyCode = user.userCompanyCode;
+      const useBatch = JSON.parse(
+        localStorage.getItem("adm_softwareSettings")
+      ).userBatchNo;
+      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${value.partyCode}`;
+      const token = AuthHandler.getLoginToken();
+      console.log(query);
+      axios
+        .post(
+          Config.stockReport,
+          {
+            userCompanyCode: userCompanyCode,
+            userCode: userCode,
+            yearCode: user.defaultYearCode,
+            branchCode: user.defaultBranchCode,
+            prodCode: value.prodCode,
+          },
+          {
+            headers: {
+              authorization: "Bearer" + token,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data.stock);
+          if (res.data)
+            setToolTip({
+              prodCode: value.prodCode,
+              stock: ` ${String(res.data.stock)}`,
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
   let inputRef;
   function setProductDetails(event, newValue, reason, prod) {
     inputRef.focus();
@@ -292,8 +362,16 @@ export default function UnusedAutosuggest(props) {
               // top: 5,
               width: "100%",
             }}
+            onClick={updateBalance}
           >
-            <Tooltip title="Check Stock" arrow>
+            <Tooltip
+              title={
+                value.prodCode == toolTip.prodCode
+                  ? toolTip.stock
+                  : "Check Stock"
+              }
+              arrow
+            >
               <InfoIcon width={30} color="white" />
             </Tooltip>
           </IconButton>
@@ -310,7 +388,21 @@ export default function UnusedAutosuggest(props) {
               // top: 5,
               height: "39px",
             }}
-            onClick={() => {}}
+            onClick={() => {
+              let str = input.docCode;
+              let path =
+                "/Inventory/" + str.substring(0, 1) + "." + str.substring(1, 2);
+              //for example convert DC -> D.C
+              const newParty = {
+                transactnValue: input,
+                transactnList: itemList,
+                path: path,
+                transactnOpen: true,
+                partyOpen: true,
+              };
+              localStorage.setItem("newParty", JSON.stringify(newParty));
+              history("/Inventory/ProductMaster");
+            }}
           >
             Product
           </Button>

@@ -23,8 +23,28 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import Pagination from "@mui/material/Pagination";
 import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
 const useStyles = makeStyles((theme) => ({
+  container: {
+    position: "relative",
+    // overflow: "hidden",
+    // "&:hover::-webkit-scrollbar-thumb": {
+    //   opacity: 0,
+    // },
+    // "&::-webkit-scrollbar": {
+    //   width: 10,
+    // },
+    // "&::-webkit-scrollbar-thumb": {
+    //   backgroundColor: theme.palette.grey[500],
+    //   borderRadius: 15,
+    //   opacity: 1,
+    //   transition: "opacity 0.3s",
+    // },
+    // "&::-webkit-scrollbar-thumb:hover": {
+    //   backgroundColor: theme.palette.grey[300],
+    // },
+  },
   table: {
-    marginTop: theme.spacing(1),
+    // marginTop: theme.spacing(1),
+
     "& thead th": {
       fontWeight: "600",
       color: theme.palette.primary.main,
@@ -163,8 +183,16 @@ export default function useTable(records, headCells, filterFn) {
   };
   /////////////////////////////////////////////////////////
   const TblContainer = (props) => (
-    <TableContainer sx={{ maxHeight: 440 }}>
-      <Table className={classes.table} size="small" stickyHeader>
+    <TableContainer
+      sx={{ maxHeight: 440, paddingRight: "1px" }}
+      className={classes.container}
+    >
+      <Table
+        className={classes.table}
+        size="small"
+        stickyHeader
+        sx={{ maxHeight: 440 }}
+      >
         {props.children}
       </Table>
     </TableContainer>

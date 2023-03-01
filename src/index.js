@@ -73,234 +73,234 @@ root.render(
         <Route
           exact
           path="/home"
-          element={<PrivateRouteNew Page={<Dashboard/>} />}
+          element={<PrivateRouteNew Page={<Dashboard />} />}
         ></Route>
         <Route
           path="/Admin/RoleMaster"
-          element={<PrivateRouteNew Page={<Rolemaster/>} />}
+          element={<PrivateRouteNew Page={<Rolemaster />} />}
         ></Route>
         <Route
           exact
           path="/Admin/UserMaster"
-          element={<PrivateRouteNew Page={<Usermaster/>} />}
+          element={<PrivateRouteNew Page={<Usermaster />} />}
         ></Route>
         <Route
           exact
           path="/Admin/Branch"
-          element={<PrivateRouteNew Page={<Branchmaster/>} />}
+          element={<PrivateRouteNew Page={<Branchmaster />} />}
         ></Route>
         <Route
           path="/Admin/FinancialYearMaster"
-          element={<PrivateRouteNew Page={<FinancialYearMaster/>} />}
+          element={<PrivateRouteNew Page={<FinancialYearMaster />} />}
         ></Route>
         <Route
           path="/Admin/SoftwareSetting"
-          element={<PrivateRouteNew Page={<Settings/>} />}
+          element={<PrivateRouteNew Page={<Settings />} />}
         />
         <Route
           exact
           path="/Master/Geography/Country"
-          element={<PrivateRouteNew Page={<Countrymaster/>} />}
+          element={<PrivateRouteNew Page={<Countrymaster />} />}
         ></Route>
         <Route
           exact
           path="/Master/Geography/State"
-          element={<PrivateRouteNew Page={<Statemaster/>} />}
+          element={<PrivateRouteNew Page={<Statemaster />} />}
         ></Route>{" "}
         <Route
           exact
           path="/Master/Geography/District"
-          element={<PrivateRouteNew Page={<Districtmaster/>} />}
+          element={<PrivateRouteNew Page={<Districtmaster />} />}
         ></Route>
         <Route
           exact
           path="/Master/Geography/Taluka"
-          element={<PrivateRouteNew Page={<Talukamaster/>} />}
+          element={<PrivateRouteNew Page={<Talukamaster />} />}
         ></Route>
         <Route
           exact
           path="/Master/Geography/MarketingArea"
-          element={<PrivateRouteNew Page={<MarketingArea/>} />}
+          element={<PrivateRouteNew Page={<MarketingArea />} />}
         ></Route>
         <Route
           exact
           path="/Master/Accounts/AccountGroupMaster"
-          element={<PrivateRouteNew Page={<AcGlGroup/>} />}
+          element={<PrivateRouteNew Page={<AcGlGroup />} />}
         ></Route>
         <Route
           exact
           path="/Master/Accounts/AccountTypesMaster"
-          element={<PrivateRouteNew Page={<AccountTypesMaster/>} />}
+          element={<PrivateRouteNew Page={<AccountTypesMaster />} />}
         ></Route>
         <Route
           exact
           path="/Master/Accounts/AccountMaster"
-          element={<PrivateRouteNew Page={<AccountMaster/>} />}
+          element={<PrivateRouteNew Page={<AccountMaster />} />}
         ></Route>
         <Route
           exact
           path="/Master/Accounts/Customers"
-          element={<PrivateRouteNew Page={<Customers/>} />}
+          element={<PrivateRouteNew Page={<Customers />} />}
         />
         <Route
           exact
           path="/Master/Accounts/Suppliers"
-          element={<PrivateRouteNew Page={<Suppliers/>} />}
+          element={<PrivateRouteNew Page={<Suppliers />} />}
         />
         <Route
           exact
           path="/Master/Accounts/Employees"
-          element={<PrivateRouteNew Page={<Employees/>} />}
+          element={<PrivateRouteNew Page={<Employees />} />}
         />
         <Route
           exact
           path="/Inventory/ProductMaster"
-          element={<PrivateRouteNew Page={<ProductMaster/>} />}
+          element={<PrivateRouteNew Page={<ProductMaster />} />}
         />
         <Route
           exact
           path="/Inventory/D.C"
-          element={<PrivateRouteNew Page={<DCMaster/>} />}
+          element={<PrivateRouteNew Page={<DCMaster />} />}
         />
         <Route
           exact
           path="/Inventory/Q.T"
-          element={<PrivateRouteNew Page={<QTMaster/>} />}
+          element={<PrivateRouteNew Page={<QTMaster />} />}
         />
         <Route
           exact
           path="/Inventory/S.I"
-          element={<PrivateRouteNew Page={<SIMaster/>} />}
+          element={<PrivateRouteNew Page={<SIMaster />} />}
         />
         <Route
           exact
           path="/Inventory/G.R"
-          element={<PrivateRouteNew Page={<GrMaster/>} />}
+          element={<PrivateRouteNew Page={<GrMaster />} />}
         />
         <Route
           exact
           path="/Inventory/P.I"
-          element={<PrivateRouteNew Page={<PIMaster/>} />}
+          element={<PrivateRouteNew Page={<PIMaster />} />}
         />
         <Route
           exact
           path="/Inventory/S.O"
-          element={<PrivateRouteNew Page={<SOMaster/>} />}
+          element={<PrivateRouteNew Page={<SOMaster />} />}
         />
         <Route
           exact
           path="/Inventory/S.R"
-          element={<PrivateRouteNew Page={<SRMaster/>} />}
+          element={<PrivateRouteNew Page={<SRMaster />} />}
         />
         <Route
           exact
           path="/Inventory/P.O"
-          element={<PrivateRouteNew Page={<POMaster/>} />}
+          element={<PrivateRouteNew Page={<POMaster />} />}
         />
         <Route
           exact
           path="/Inventory/P.V"
-          element={<PrivateRouteNew Page={<PVMaster/>} />}
+          element={<PrivateRouteNew Page={<PVMaster />} />}
         />
         <Route
           exact
           path="/Inventory/P.R"
-          element={<PrivateRouteNew Page={<PRMaster/>} />}
+          element={<PrivateRouteNew Page={<PRMaster />} />}
         />
         <Route
           exact
           path="/Inventory/C.N"
-          element={<PrivateRouteNew Page={<CNMaster/>} />}
+          element={<PrivateRouteNew Page={<CNMaster />} />}
         />
         <Route
           exact
           path="/Inventory/D.N"
-          element={<PrivateRouteNew Page={<DNMaster/>} />}
+          element={<PrivateRouteNew Page={<DNMaster />} />}
         />
         <Route
           exact
           path="/AcTransaction/BR"
-          element={<PrivateRouteNew Page={<BR/>} />}
+          element={<PrivateRouteNew Page={<BR />} />}
         />
         <Route
           exact
           path="/AcTransaction/BP"
-          element={<PrivateRouteNew Page={<BP/>} />}
+          element={<PrivateRouteNew Page={<BP />} />}
         />
         <Route
           exact
           path="/AcTransaction/CR"
-          element={<PrivateRouteNew Page={<CR/>} />}
+          element={<PrivateRouteNew Page={<CR />} />}
         />
         <Route
           exact
           path="/AcTransaction/CP"
-          element={<PrivateRouteNew Page={<CP/>} />}
+          element={<PrivateRouteNew Page={<CP />} />}
         />
         <Route
           exact
           path="/AcTransaction/JV"
-          element={<PrivateRouteNew Page={<JV/>} />}
+          element={<PrivateRouteNew Page={<JV />} />}
         />
         <Route
           exact
           path="/AcTransaction/CV"
-          element={<PrivateRouteNew Page={<CV/>} />}
+          element={<PrivateRouteNew Page={<CV />} />}
         />
         <Route
           exact
           path="/AcTransaction/OB"
-          element={<PrivateRouteNew Page={<OB/>} />}
+          element={<PrivateRouteNew Page={<OB />} />}
         />
         <Route
           exact
           path="/Inventory/PaymentTerm"
-          element={<PrivateRouteNew Page={<PayTermMaster/>} />}
+          element={<PrivateRouteNew Page={<PayTermMaster />} />}
         />
         <Route
           exact
           path="/Inventory/StockMaster"
-          element={<PrivateRouteNew Page={<StockMaster/>} />}
+          element={<PrivateRouteNew Page={<StockMaster />} />}
         />
         <Route
           exact
           path="/Inventory/StockReport"
-          element={<PrivateRouteNew Page={<StockReport/>} />}
+          element={<PrivateRouteNew Page={<StockReport />} />}
         />
         <Route
           exact
           path="/Inventory/StockReport"
-          element={<PrivateRouteNew Page={<StockReport/>} />}
+          element={<PrivateRouteNew Page={<StockReport />} />}
         />
         <Route
           exact
           path="/Report/POReport"
-          element={<PrivateRouteNew Page={<POReport/>} />}
+          element={<PrivateRouteNew Page={<POReport />} />}
         />
         <Route
           exact
           path="/Report/DCReport"
-          element={<PrivateRouteNew Page={<DCReport/>} />}
+          element={<PrivateRouteNew Page={<DCReport />} />}
         />
         <Route
           exact
           path="/Report/AcReport"
-          element={<PrivateRouteNew Page={<AcReport/>} />}
+          element={<PrivateRouteNew Page={<AcReport />} />}
         />
         <Route
           exact
           path="/Report/SIReport"
-          element={<PrivateRouteNew Page={<SIReport/>} />}
+          element={<PrivateRouteNew Page={<SIReport />} />}
         />
         <Route
           exact
           path="/Report/BankBook"
-          element={<PrivateRouteNew Page={<BankBook/>} />}
+          element={<PrivateRouteNew Page={<BankBook />} />}
         />
         <Route
           exact
           path="/Report/CashBook"
-          element={<PrivateRouteNew Page={<CashBook/>} />}
+          element={<PrivateRouteNew Page={<CashBook />} />}
         />
       </Switch>
     </Router>
@@ -314,11 +314,12 @@ root.render(
   setTimeout(function () {
     if (
       window.___browserSync___ === undefined &&
-      Number(localStorage.getItem("AdminLTE:Demo:MessageShowed")) < Date.now()
+      Number(localStorage.getItem("AdminLTE:Demo:MessageShowed")) <
+        new Date().getTime()
     ) {
       localStorage.setItem(
         "AdminLTE:Demo:MessageShowed",
-        Date.now() + 15 * 60 * 1000
+        new Date().getTime() + 15 * 60 * 1000
       );
       // eslint-disable-next-line no-alert
       alert(
@@ -887,13 +888,15 @@ root.render(
   });
 
   var active_navbar_color = null;
-  $(".main-header")[0].classList.forEach(function (className) {
-    if (
-      navbar_all_colors.indexOf(className) > -1 &&
-      active_navbar_color === null
-    ) {
-      active_navbar_color = className.replace("navbar-", "bg-");
-    }
+  $(document).ready(function () {
+    $(".main-header")[0].classList.forEach(function (className) {
+      if (
+        navbar_all_colors.indexOf(className) > -1 &&
+        active_navbar_color === null
+      ) {
+        active_navbar_color = className.replace("navbar-", "bg-");
+      }
+    });
   });
 
   $navbar_variants_colors
@@ -975,14 +978,16 @@ root.render(
   $container.append($sidebar_dark_variants);
 
   var active_sidebar_dark_color = null;
-  $(".main-sidebar")[0].classList.forEach(function (className) {
-    var color = className.replace("sidebar-dark-", "bg-");
-    if (
-      sidebar_colors.indexOf(color) > -1 &&
-      active_sidebar_dark_color === null
-    ) {
-      active_sidebar_dark_color = color;
-    }
+  $(document).ready(function () {
+    $(".main-sidebar")[0].classList.forEach(function (className) {
+      var color = className.replace("sidebar-dark-", "bg-");
+      if (
+        sidebar_colors.indexOf(color) > -1 &&
+        active_sidebar_dark_color === null
+      ) {
+        active_sidebar_dark_color = color;
+      }
+    });
   });
 
   $sidebar_dark_variants
@@ -1025,14 +1030,16 @@ root.render(
   $container.append($sidebar_light_variants);
 
   var active_sidebar_light_color = null;
-  $(".main-sidebar")[0].classList.forEach(function (className) {
-    var color = className.replace("sidebar-light-", "bg-");
-    if (
-      sidebar_colors.indexOf(color) > -1 &&
-      active_sidebar_light_color === null
-    ) {
-      active_sidebar_light_color = color;
-    }
+  $(document).ready(function () {
+    $(".main-sidebar")[0].classList.forEach(function (className) {
+      var color = className.replace("sidebar-light-", "bg-");
+      if (
+        sidebar_colors.indexOf(color) > -1 &&
+        active_sidebar_light_color === null
+      ) {
+        active_sidebar_light_color = color;
+      }
+    });
   });
 
   if (active_sidebar_light_color !== null) {
@@ -1100,10 +1107,12 @@ root.render(
   $container.append($brand_variants);
 
   var active_brand_color = null;
-  $(".brand-link")[0].classList.forEach(function (className) {
-    if (logo_skins.indexOf(className) > -1 && active_brand_color === null) {
-      active_brand_color = className.replace("navbar-", "bg-");
-    }
+  $(document).ready(function () {
+    $(".brand-link")[0].classList.forEach(function (className) {
+      if (logo_skins.indexOf(className) > -1 && active_brand_color === null) {
+        active_brand_color = className.replace("navbar-", "bg-");
+      }
+    });
   });
 
   if (active_brand_color) {

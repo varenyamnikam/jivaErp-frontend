@@ -151,6 +151,7 @@ export default function (props) {
           backgroundColor={getTheme()}
           style={{ color: "#7A5299" }}
           onClick={hi}
+          fontSize="small"
         />
 
         {/* component to be printed */}

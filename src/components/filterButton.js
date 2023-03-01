@@ -18,43 +18,56 @@ export default function Filter(props) {
 
   return (
     <>
-      {filterIcon ? (
-        <>
-          <IconButton
-            size="large"
-            onClick={() => {
-              setFilterPopup(true);
-              setFilter(initialFilterValues);
-            }}
-            style={{
-              borderRadius: 5,
-              padding: "7px",
-            }}
-          >
-            <FilterAltOutlinedIcon color="success" />
-          </IconButton>
-        </>
-      ) : (
-        <>
-          <IconButton
-            size="large"
-            onClick={() => {
-              setFilterIcon(true);
-              setFilter(initialFilterValues);
-              setFilterFn({
-                fn: (items) => items,
-              });
-              setRefresh(true);
-            }}
-            style={{
-              borderRadius: 5,
-              padding: "7px",
-            }}
-          >
-            <FilterAltOffOutlinedIcon color="error" />
-          </IconButton>
-        </>
-      )}
+      <IconButton
+        size="large"
+        onClick={() => {
+          setFilterPopup(true);
+          // setFilter(initialFilterValues);
+        }}
+        style={{
+          borderRadius: 5,
+          padding: "7px",
+        }}
+      >
+        <FilterAltOutlinedIcon color="success" />
+      </IconButton>
     </>
   );
 }
+// {filterIcon ? (
+//   <>
+//     <IconButton
+//       size="large"
+//       onClick={() => {
+//         setFilterPopup(true);
+//         setFilter(initialFilterValues);
+//       }}
+//       style={{
+//         borderRadius: 5,
+//         padding: "7px",
+//       }}
+//     >
+//       <FilterAltOutlinedIcon color="success" />
+//     </IconButton>
+//   </>
+// ) : (
+//   <>
+//     <IconButton
+//       size="large"
+//       onClick={() => {
+//         setFilterIcon(true);
+//         setFilter(initialFilterValues);
+//         setFilterFn({
+//           fn: (items) => items,
+//         });
+//         setRefresh(true);
+//       }}
+//       style={{
+//         borderRadius: 5,
+//         padding: "7px",
+//       }}
+//     >
+//       <FilterAltOffOutlinedIcon color="error" />
+//     </IconButton>
+//   </>
+// )}

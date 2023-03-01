@@ -366,7 +366,7 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                             onChange={handleFilter}
                           />
                         </Grid>{" "}
-                        <Grid
+                        {/* <Grid
                           item
                           sm={1}
                           xs={4}
@@ -386,17 +386,21 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                             setRefresh={setRefresh}
                             initialFilterFn={initialFilterFn}
                           />
-                        </Grid>
+                        </Grid> */}
                         <Grid
                           item
-                          sm={3}
+                          sm={4}
                           xs={12}
                           style={{
                             display: "flex",
                             justifyContent: "center",
                           }}
                         >
-                          <Grid container style={{ width: "100%" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                            }}
+                          >
                             <Excel
                               buttonText="Export Data to Excel"
                               TblContainer={TblContainer}
@@ -420,7 +424,7 @@ export default function AcMaster({ title = "Contra Voucher" }) {
                               selected={selected}
                               setSelected={setSelected}
                             />
-                          </Grid>{" "}
+                          </div>{" "}
                         </Grid>
                         <Grid
                           item

@@ -87,6 +87,7 @@ export default function UnusedAutosuggest(props) {
   const classes = useStyles();
   console.log(inputValue);
   let inputRef;
+
   return (
     <>
       <Autocomplete
@@ -105,6 +106,7 @@ export default function UnusedAutosuggest(props) {
         onChange={(event, newValue, reason) => {
           inputRef.focus();
           if (newValue) {
+            if (reason === "clear") document.activeElement.blur();
             if (reason === "reset") {
               console.log("reset*****************", reason);
               setInputValue("");

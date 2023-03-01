@@ -269,7 +269,7 @@ export default function StockMaster() {
   function getEntry(initialOpening, prod) {
     let itemStock = stock.filter((item) => item.prodCode == prod.prodCode);
     itemStock.sort((a, b) => {
-      return new Date(b.vouDate).getTime() - new Date(a.vouDate).getTime();
+      return new Date(a.vouDate).getTime() - new Date(b.vouDate).getTime();
     });
     console.log(itemStock);
     if (itemStock.length != 0) {
@@ -308,6 +308,7 @@ export default function StockMaster() {
           vouDate: getDate(item.vouDate),
         };
       });
+      arr.sort((a, b) => new Date(a.voudate) - new Date(b.voudate));
       console.log(arr);
       setLedger(arr);
       return arr;
@@ -498,7 +499,7 @@ export default function StockMaster() {
                     openPopup={filterPopup}
                     setOpenPopup={setFilterPopup}
                   >
-                    <Grid container>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <StaticDatePickerLandscape
                           size="small"

@@ -200,8 +200,7 @@ export default function UnusedAutosuggest(props) {
         companyStateCode &&
         partyStateCode &&
         !insideOfMaharashtra &&
-        value.igstP !== igst &&
-        value.cessP !== gstInfo.cess
+        (value.igstP !== igst || value.cessP !== gstInfo.cess)
       ) {
         setValue({
           ...value,
@@ -293,6 +292,12 @@ export default function UnusedAutosuggest(props) {
     }
     console.log("onchange" + newValue);
   }
+  const handleClear = () => {
+    // your function to be executed when clear is clicked
+    console.log({ ...value, [name1]: "", [code1]: "" });
+    setValue({ ...value, [name1]: "", [code1]: "" });
+  };
+
   return (
     <>
       <Grid container>
@@ -311,6 +316,8 @@ export default function UnusedAutosuggest(props) {
             style={{ width: "100%" }}
             value={value[name1]}
             onChange={(event, newValue, reason, value) => {
+              if (reason === "clear") handleClear(); // or you can open Dialog here
+
               setProductDetails(event, newValue, reason, value);
             }}
             inputValue={inputValue}

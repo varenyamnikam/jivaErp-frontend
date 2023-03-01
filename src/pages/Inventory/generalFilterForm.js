@@ -18,6 +18,7 @@ export default function FilterForm(props) {
     products,
     voucherItems,
     setRefresh,
+    initialFilterValues,
   } = props;
   const partyOptions = accounts
     .filter((item) => item.preFix == "C")
@@ -32,12 +33,12 @@ export default function FilterForm(props) {
 
         if (filter.vouNo) {
           console.log("vouNo", filter.vouNo);
-          newRecords = items.filter((item) => {
+          newRecords = newRecords.filter((item) => {
             if (item.vouNo == filter.vouNo) return item;
           });
         }
         if (filter.startDate && filter.endDate) {
-          newRecords = items.filter((item) => {
+          newRecords = newRecords.filter((item) => {
             if (
               new Date(item.vouDate).getTime() >=
                 new Date(filter.startDate).getTime() &&
@@ -68,15 +69,19 @@ export default function FilterForm(props) {
           console.log(newRecords);
         }
         if (filter.partyCode) {
-          newRecords = items.filter((item) => {
+          newRecords = newRecords.filter((item) => {
             if (item.partyCode == filter.partyCode) return item;
           });
+          console.log(newRecords, filter.partyCode);
         }
         if (filter.manualNo) {
-          newRecords = items.filter((item) => {
+          newRecords = newRecords.filter((item) => {
             if (item.manualNo == filter.manualNo) return item;
           });
         }
+        newRecords = newRecords.filter((item) => {
+          if (item.vouNo !== "") return item;
+        });
         console.log(newRecords);
 
         return newRecords;
@@ -154,25 +159,28 @@ export default function FilterForm(props) {
           options1={prodOptions}
           options2={products}
         />
+      </Grid>{" "}
+      <Grid item xs={3}>
+        <Controls.Button
+          text="Reset"
+          color="inherit"
+          onClick={(e) => {
+            e.preventDefault();
+            setFilter(initialFilterValues);
+          }}
+        />
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sm={6}
-        style={{ display: "flex", justifyContent: "flex-end" }}
-      >
-        <div style={{ marginTop: "25px" }}>
-          <Controls.Button
-            type="submit"
-            text="Apply"
-            onClick={(e) => {
-              e.preventDefault();
-              searchFilter();
-              setFilterPopup(false);
-              setFilterIcon(false);
-            }}
-          />
-        </div>{" "}
+      <Grid item xs={12} sm={3}>
+        <Controls.Button
+          type="submit"
+          text="Apply"
+          onClick={(e) => {
+            e.preventDefault();
+            searchFilter();
+            setFilterPopup(false);
+            setFilterIcon(false);
+          }}
+        />
       </Grid>
     </Grid>
   );

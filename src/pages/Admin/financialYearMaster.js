@@ -231,7 +231,7 @@ export default function FinancialYearMaster(props) {
 
         if (filter.yearCode) {
           console.log("yearCode", filter.yearCode);
-          newRecords = items.filter((item) => {
+          newRecords = newRecords.filter((item) => {
             if (item.yearCode == filter.yearCode) return item;
           });
           console.log(newRecords);
@@ -450,44 +450,61 @@ export default function FinancialYearMaster(props) {
                     setOpenPopup={setFilterPopup}
                     // size="md"
                   >
-                    <Form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        searchFilter();
-                        setFilterPopup(false);
-                        setFilterIcon(false);
-                      }}
-                    >
-                      <Controls.Input
-                        name="yearCode"
-                        label="Year Code"
-                        onChange={(e) => {
-                          setFilter({ ...filter, yearCode: e.target.values });
-                        }}
-                      />
-
-                      <Grid container style={{ marginTop: "10px" }}>
-                        <Grid item xs={6} style={{ flexGrow: 1 }}>
-                          <StaticDatePickerLandscape
-                            name="yearStartDate"
-                            label="Start Year From-"
-                            value={filter}
-                            setValue={setFilter}
-                          />
-                        </Grid>
-                        <Grid item xs={6} style={{ flexGrow: 1 }}>
-                          <StaticDatePickerLandscape
-                            name="yearEndDate"
-                            label="To-"
-                            value={filter}
-                            setValue={setFilter}
-                          />
-                        </Grid>
+                    {" "}
+                    <Grid container style={{ marginTop: "10px" }} spacing={2}>
+                      <Grid item xs={6} style={{ flexGrow: 1 }}>
+                        <Controls.Input
+                          name="yearCode"
+                          label="Year Code"
+                          value={filter.yearCode}
+                          onChange={(e) => {
+                            setFilter({
+                              ...filter,
+                              yearCode: e.target.value,
+                            });
+                          }}
+                        />
                       </Grid>
-                      <div style={{ marginTop: "25px" }}>
-                        <Controls.Button type="submit" text="Submit" />
-                      </div>
-                    </Form>
+                      <Grid item xs={6} style={{ flexGrow: 1 }}>
+                        <StaticDatePickerLandscape
+                          name="yearStartDate"
+                          label="Start Year From-"
+                          value={filter}
+                          setValue={setFilter}
+                        />
+                      </Grid>
+                      <Grid item xs={6} style={{ flexGrow: 1 }}>
+                        <StaticDatePickerLandscape
+                          name="yearEndDate"
+                          label="To-"
+                          value={filter}
+                          setValue={setFilter}
+                        />
+                      </Grid>
+
+                      <Grid item xs={3} style={{ flexGrow: 1 }}>
+                        <Controls.Button
+                          text="Reset"
+                          color="inherit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFilter(initialFilterValues);
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={3} style={{ flexGrow: 1 }}>
+                        <Controls.Button
+                          type="submit"
+                          text="Submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            searchFilter();
+                            setFilterPopup(false);
+                            setFilterIcon(false);
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
                   </Popup>
 
                   <Notification notify={notify} setNotify={setNotify} />

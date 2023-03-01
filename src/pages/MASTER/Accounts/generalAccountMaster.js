@@ -494,41 +494,17 @@ export default function Customers({ acTypeFor, initialValues }) {
                             justifyContent: "center",
                           }}
                         >
-                          {filterIcon ? (
-                            <>
-                              <IconButton
-                                onClick={() => {
-                                  setFilterPopup(true);
-                                  setFilter(initialFilterValues);
-                                }}
-                                style={{
-                                  borderRadius: 5,
-                                  padding: "7px",
-                                }}
-                              >
-                                <FilterAltOutlinedIcon color="success" />
-                              </IconButton>
-                            </>
-                          ) : (
-                            <>
-                              <IconButton
-                                onClick={() => {
-                                  setFilterFn({
-                                    fn: (items) => {
-                                      return items;
-                                    },
-                                  });
-                                  setFilterIcon(true);
-                                }}
-                                style={{
-                                  borderRadius: 5,
-                                  padding: "7px",
-                                }}
-                              >
-                                <FilterAltOffOutlinedIcon color="error" />
-                              </IconButton>
-                            </>
-                          )}
+                          <IconButton
+                            onClick={() => {
+                              setFilterPopup(true);
+                            }}
+                            style={{
+                              borderRadius: 5,
+                              padding: "7px",
+                            }}
+                          >
+                            <FilterAltOutlinedIcon color="success" />
+                          </IconButton>
                         </Grid>
                         <Grid
                           item
@@ -680,82 +656,82 @@ export default function Customers({ acTypeFor, initialValues }) {
                     setOpenPopup={setFilterPopup}
                     // size="md"
                   >
-                    <Form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        searchFilter();
-                        setFilterPopup(false);
-                        setFilterIcon(false);
-                      }}
-                    >
-                      <Grid container spacing={1} style={{ marginTop: "10px" }}>
-                        <Grid item xs={12} sm={6}>
-                          <Controls.Input
-                            name="acCode"
-                            label="Code"
-                            subLabel="Filter by  Code"
-                            value={filter.acCode}
-                            setValue={setFilter}
-                            onChange={handleFilter}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Controls.Input
-                            name="acName"
-                            label="Name"
-                            subLabel="Filter by  Name"
-                            value={filter.acName}
-                            setValue={setFilter}
-                            onChange={handleFilter}
-                          />
-                        </Grid>{" "}
-                        <Grid item sm={6} xs={12}>
-                          <UnusedAutosuggest
-                            name="acType"
-                            label="A C Type"
-                            value={filter.acType}
-                            setValue={setFilter}
-                            options={acTypeOptions}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Controls.Input
-                            name="acRegMob"
-                            label=" Mobile no."
-                            subLabel="Filter by Mobile no."
-                            value={filter.acRegMob}
-                            setValue={setFilter}
-                            onChange={handleFilter}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Controls.RadioGroup
-                            name="acStatus"
-                            label="Status"
-                            value={filter.acStatus}
-                            onChange={(e) => {
-                              setFilter({
-                                ...filter,
-                                acStatus: e.target.value,
-                              });
-                            }}
-                            items={statusItems}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          xs={12}
-                          sm={6}
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Controls.Button type="submit" text="Submit" />
-                        </Grid>
+                    <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                      <Grid item xs={12} sm={6}>
+                        <Controls.Input
+                          name="acCode"
+                          label="Code"
+                          subLabel="Filter by  Code"
+                          value={filter.acCode}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
                       </Grid>
-                    </Form>
+                      <Grid item xs={12} sm={6}>
+                        <Controls.Input
+                          name="acName"
+                          label="Name"
+                          subLabel="Filter by  Name"
+                          value={filter.acName}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
+                      </Grid>{" "}
+                      <Grid item sm={6} xs={12}>
+                        <UnusedAutosuggest
+                          name="acType"
+                          label="A C Type"
+                          value={filter}
+                          setValue={setFilter}
+                          options={acTypeOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Controls.Input
+                          name="acRegMob"
+                          label=" Mobile no."
+                          subLabel="Filter by Mobile no."
+                          value={filter.acRegMob}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Controls.RadioGroup
+                          name="acStatus"
+                          label="Status"
+                          value={filter.acStatus}
+                          onChange={(e) => {
+                            setFilter({
+                              ...filter,
+                              acStatus: e.target.value,
+                            });
+                          }}
+                          items={statusItems}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Controls.Button
+                          type="submit"
+                          text="Submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            searchFilter();
+                            setFilterPopup(false);
+                            setFilterIcon(false);
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
                   </Popup>
 
                   <Notification notify={notify} setNotify={setNotify} />

@@ -700,7 +700,7 @@ export default function DCReport({ docCode }) {
                     openPopup={filterPopup}
                     setOpenPopup={setFilterPopup}
                   >
-                    <Grid container>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <StaticDatePickerLandscape
                           size="small"
@@ -720,7 +720,11 @@ export default function DCReport({ docCode }) {
                           setValue={setFilter}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid
+                        item
+                        xs={12}
+                        style={{ justifyContent: "flex-end", display: "flex" }}
+                      >
                         <Controls.Button
                           text="Submit"
                           onClick={() => {

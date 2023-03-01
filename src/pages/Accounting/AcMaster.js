@@ -308,7 +308,7 @@ export default function AcMaster(props) {
                 <div className="card-body">
                   <section className="content">
                     <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                      <Grid container spacing={2}>
                         <Grid
                           item
                           xs={8}
@@ -346,7 +346,7 @@ export default function AcMaster(props) {
                             onChange={handleFilter}
                           />
                         </Grid>{" "}
-                        <Grid
+                        {/* <Grid
                           item
                           sm={1}
                           xs={4}
@@ -366,17 +366,21 @@ export default function AcMaster(props) {
                             setRefresh={setRefresh}
                             initialFilterFn={initialFilterFn}
                           />
-                        </Grid>
+                        </Grid> */}
                         <Grid
                           item
-                          sm={3}
+                          sm={4}
                           xs={12}
                           style={{
                             display: "flex",
                             justifyContent: "center",
                           }}
                         >
-                          <Grid container style={{ width: "100%" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                            }}
+                          >
                             <Excel
                               buttonText="Export Data to Excel"
                               TblContainer={TblContainer}
@@ -400,7 +404,7 @@ export default function AcMaster(props) {
                               selected={selected}
                               setSelected={setSelected}
                             />
-                          </Grid>{" "}
+                          </div>{" "}
                         </Grid>
                         <Grid
                           item

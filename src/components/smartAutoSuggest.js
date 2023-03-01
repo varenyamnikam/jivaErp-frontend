@@ -123,6 +123,10 @@ export default function UnusedAutosuggest(props) {
     });
   }
   let inputRef;
+  const handleClear = () => {
+    // your function to be executed when clear is clicked
+    setValue({ ...value, [name1]: "", [code1]: "" });
+  };
   return (
     <>
       <Autocomplete
@@ -140,6 +144,10 @@ export default function UnusedAutosuggest(props) {
         value={value[name1]}
         onChange={(event, newValue, reason) => {
           inputRef.focus();
+          if (reason === "clear") handleClear(); // or you can open Dialog here
+
+          //other codes go here like setting the value of input
+
           if (newValue) {
             if (reason === "reset") {
               console.log("reset*****************", reason);

@@ -457,64 +457,62 @@ export default function AccountMaster() {
                         </Grid>
                       </Grid>
                     </Toolbar>
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0].acCode == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow key={item._id}>
-                                <TableCell>{item.acCode}</TableCell>
-                                <TableCell>{item.acType}</TableCell>
-                                <TableCell>{item.acName}</TableCell>
-                                <TableCell>
-                                  <span className={item.acStatus}>
-                                    {item.acStatus}
-                                  </span>
-                                </TableCell>
-                                <TableCell>
-                                  {item.userCompanyCode !== "all" && (
-                                    <>
-                                      <Controls.ActionButton
-                                        color="primary"
-                                        onClick={() => {
-                                          setValues(item);
-                                          setButtonPopup(true);
-                                        }}
-                                      >
-                                        <EditOutlinedIcon fontSize="small" />
-                                      </Controls.ActionButton>
-                                      <Controls.ActionButton
-                                        color="secondary"
-                                        onClick={(e) => {
-                                          console.log(item);
-                                          setConfirmDialog({
-                                            isOpen: true,
-                                            title:
-                                              "Are you sure to delete this record?",
-                                            subTitle:
-                                              "You can't undo this operation",
-                                            onConfirm: (e) => {
-                                              onDelete(item);
-                                              e.preventDefault();
-                                            },
-                                          });
-                                          e.preventDefault();
-                                        }}
-                                      >
-                                        <DeleteIconOutline fontSize="small" />
-                                      </Controls.ActionButton>
-                                    </>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
+                    <TblContainer>
+                      <TblHead />
+                      {records[0].acCode == "X X X X" ? (
+                        <MuiSkeleton />
+                      ) : (
+                        <TableBody>
+                          {recordsAfterPagingAndSorting().map((item) => (
+                            <TableRow key={item._id}>
+                              <TableCell>{item.acCode}</TableCell>
+                              <TableCell>{item.acType}</TableCell>
+                              <TableCell>{item.acName}</TableCell>
+                              <TableCell>
+                                <span className={item.acStatus}>
+                                  {item.acStatus}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                {item.userCompanyCode !== "all" && (
+                                  <>
+                                    <Controls.ActionButton
+                                      color="primary"
+                                      onClick={() => {
+                                        setValues(item);
+                                        setButtonPopup(true);
+                                      }}
+                                    >
+                                      <EditOutlinedIcon fontSize="small" />
+                                    </Controls.ActionButton>
+                                    <Controls.ActionButton
+                                      color="secondary"
+                                      onClick={(e) => {
+                                        console.log(item);
+                                        setConfirmDialog({
+                                          isOpen: true,
+                                          title:
+                                            "Are you sure to delete this record?",
+                                          subTitle:
+                                            "You can't undo this operation",
+                                          onConfirm: (e) => {
+                                            onDelete(item);
+                                            e.preventDefault();
+                                          },
+                                        });
+                                        e.preventDefault();
+                                      }}
+                                    >
+                                      <DeleteIconOutline fontSize="small" />
+                                    </Controls.ActionButton>
+                                  </>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      )}
+                    </TblContainer>
                     <TblPagination />
                   </section>
                   <Popup

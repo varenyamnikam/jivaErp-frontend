@@ -243,6 +243,9 @@ export default function UnusedAutosuggest(props) {
             value={value[name1]}
             onChange={(event, newValue, reason) => {
               inputRef.focus();
+              if (reason === "clear")
+                setValue({ ...value, [name1]: "", [code1]: "" }); // or you can open Dialog here
+
               if (newValue) {
                 if (reason === "reset") {
                   console.log("reset*****************", reason);

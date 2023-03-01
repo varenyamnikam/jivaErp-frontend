@@ -118,6 +118,7 @@ export default function ReuseMaster(props) {
 
   const initialFilterValues = {
     ...initialValues,
+    prodCode: "",
     vouNo: "",
     allFields: "",
     startDate: getD(),

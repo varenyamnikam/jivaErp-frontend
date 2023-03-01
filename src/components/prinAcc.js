@@ -62,6 +62,7 @@ export default function (props) {
             <PrintIcon
               backgroundColor={getTheme()}
               style={{ color: "#7A5299" }}
+              fontSize="small"
             />
           )}
           content={() => componentRef.current}

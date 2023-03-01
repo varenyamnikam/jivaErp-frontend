@@ -17,19 +17,23 @@ import { useNavigate } from "react-router-dom";
 const styles = (theme) => ({
   "@global": {
     "*::-webkit-scrollbar": {
-      width: "0.4em",
-      marginRight: "12px",
-      left: "12px !important",
-      position: "fixed",
+      width: "6px",
+      // top: "5px",
+      // marginRight: "12px",
+      // left: "12px !important",
+      // position: "fixed",
     },
     "*::-webkit-scrollbar-track": {
+      // width: "10px",
+
       "-webkit-box-shadow": "inset 0 0 6px rgba(0,0,0,0.00)",
-      marginRight: "12px",
+      // marginRight: "12px",
     },
     "*::-webkit-scrollbar-thumb": {
       backgroundColor: "rgb(194, 193, 193)",
-      borderRadius: "15px",
-      marginRight: "12px",
+      borderRadius: "25px",
+      // marginRight: "12px",
+
       "&:hover": {
         // add hover selector
         backgroundColor: "rgb(142, 141, 141)",
@@ -53,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
   dialogContent: {
     // padding: "0px",
+    // paddingRight: "1px",
   },
   ...styles(theme),
 }));

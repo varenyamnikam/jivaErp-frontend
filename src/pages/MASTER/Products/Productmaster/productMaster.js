@@ -543,40 +543,53 @@ export default function ProductMaster(props) {
                     setOpenPopup={setFilterPopup}
                     // size="md"
                   >
-                    <Form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        searchFilter();
-                        setFilterPopup(false);
-                        setFilterIcon(false);
-                      }}
-                    >
-                      <Controls.Input
-                        name="prodCode"
-                        label="Product Code"
-                        value={filter.prodCode}
-                        setValue={setFilter}
-                        onChange={handleFilter}
-                      />
-                      <Controls.Input
-                        name="prodName"
-                        label="Product Name"
-                        value={filter.prodName}
-                        setValue={setFilter}
-                        onChange={handleFilter}
-                      />
-                      <Controls.Input
-                        name="MRP"
-                        label="M.R.P"
-                        value={filter.MRP}
-                        setValue={setFilter}
-                        onChange={handleFilter}
-                      />
-
-                      <div style={{ marginTop: "25px" }}>
-                        <Controls.Button type="submit" text="Submit" />
-                      </div>
-                    </Form>
+                    <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                      <Grid item xs={12} sm={6}>
+                        {" "}
+                        <Controls.Input
+                          name="prodCode"
+                          label="Product Code"
+                          value={filter.prodCode}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
+                      </Grid>{" "}
+                      <Grid item xs={12} sm={6}>
+                        <Controls.Input
+                          name="prodName"
+                          label="Product Name"
+                          value={filter.prodName}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
+                      </Grid>{" "}
+                      <Grid item xs={12} sm={6}>
+                        <Controls.Input
+                          name="MRP"
+                          label="M.R.P"
+                          value={filter.MRP}
+                          setValue={setFilter}
+                          onChange={handleFilter}
+                        />
+                      </Grid>{" "}
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        style={{ justifyContent: "flex-end", display: "flex" }}
+                      >
+                        <Controls.Button
+                          type="submit"
+                          text="Submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            searchFilter();
+                            setFilterPopup(false);
+                            setFilterIcon(false);
+                          }}
+                        />
+                      </Grid>{" "}
+                    </Grid>{" "}
                   </Popup>
                   <Popup
                     size="md"

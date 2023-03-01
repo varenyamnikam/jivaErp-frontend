@@ -5,14 +5,16 @@ import { Link, NavLink } from "react-router-dom";
 import SubMenu from "./SubMenu";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import MyAutocomplete from "./searchSideMenu";
 const Sidemenu = (props) => {
   const matches = useMediaQuery("(min-width:1000px)");
 
   // let SidebarData = AuthHandler.getMenuItem();
   let SidebarData = AuthHandler.getMenuItem();
-  // const User = AuthHandler.getUserCode();
+  const User = AuthHandler.getUser();
   // const SidebarData = Data.filter((item) => item.screenCode == "Master");
-  // console.log(SidebarData);
+  console.log(User);
+  let userName = User.userName ? User.userName : "User";
   function getAnchor() {
     console.log(matches);
     if (!matches) {
@@ -63,7 +65,7 @@ const Sidemenu = (props) => {
           alt="AdminLTE Logo"
           className="brand-image img-circle elevation-3"
         />
-        <span className="brand-text font-weight-light">AdminLTE 3</span>
+        <span className="brand-text font-weight-light">E.R.P</span>
       </a>
 
       <div className="sidebar">
@@ -77,21 +79,19 @@ const Sidemenu = (props) => {
           </div>
           <div className="info">
             <a href="#" className="d-block">
-              Alexander Pierce
+              {userName}
             </a>
           </div>
         </div>
 
         <div className="form-inline">
           <div className="input-group" data-widget="sidebar-search">
-            <input
-              className="form-control form-control-sidebar"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
+            <MyAutocomplete data={SidebarData} />
             <div className="input-group-append">
-              <button className="btn btn-sidebar">
+              <button
+                className="btn btn-sidebar"
+                style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}
+              >
                 <i className="fas fa-search fa-fw"></i>
               </button>
             </div>

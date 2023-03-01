@@ -42,7 +42,6 @@ export default function FinancialYearform(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
   const {
     records,
     setRecords,
@@ -53,7 +52,9 @@ export default function FinancialYearform(props) {
     setButtonPopup,
     setNotify,
   } = props;
-  const [errors, setErrors] = useState({...initialFilterValues,  yearStartDate: "",
+  const [errors, setErrors] = useState({
+    ...initialFilterValues,
+    yearStartDate: "",
     yearEndDate: "",
   });
   const [input, setInput] = useState(values);
@@ -85,7 +86,6 @@ export default function FinancialYearform(props) {
 
     if (fieldValues == input) return Object.values(temp).every((x) => x == "");
   };
-
   console.log(input);
   console.log(errors);
   console.log(typeof input.yearStartDate, input.yearStartDate);
@@ -192,7 +192,7 @@ export default function FinancialYearform(props) {
             error={errors.finYear}
           />
         </Grid>
-         <Grid item xs={12} sm={6} className={classes.input}>
+        <Grid item xs={12} sm={6} className={classes.input}>
           <StaticDatePickerLandscape
             name="yearStartDate"
             label="Start Year From-"
@@ -200,7 +200,7 @@ export default function FinancialYearform(props) {
             setValue={setInput}
             error={errors.yearStartDate}
           />
-        </Grid> 
+        </Grid>
         <Grid item xs={12} sm={6} className={classes.input}>
           <StaticDatePickerLandscape
             name="yearEndDate"

@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const tfStyle = {
   "& .MuiButtonBase-root.MuiAutocomplete-clearIndicator": {
-    visibility: "visible",
+    // visibility: "visible",
     boxShadow: "none",
     position: "absolute",
     p: 0,
@@ -52,7 +52,7 @@ const tfStyle = {
     //"calc(50% - 12px)"
   },
   "& .MuiButtonBase-root.MuiAutocomplete-popupIndicator": {
-    visibility: "visible",
+    // visibility: "visible",
     boxShadow: "none",
     position: "absolute",
     p: 0,
@@ -113,8 +113,8 @@ export default function MultipleSelectPlaceholder({
             backgroundColor: "#87CEEB",
             color: "white",
             border: "none",
-            paddingLeft: "10px",
-            paddingBottom: "15px",
+            paddingLeft: "18px",
+            paddingTop: "3px",
             paddingRight: "0px",
             borderRadius: "5px",
             borderTopLeftRadius: "0px",

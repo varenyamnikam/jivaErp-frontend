@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: "none",
     },
     "& .MuiOutlinedInput-root": {
-      paddingRight: "50px",
+      // paddingRight: "50px",
       height: "40px",
     },
   },
@@ -57,7 +57,7 @@ export default function StaticDatePickerLandscape(props) {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
           inputFormat="dd/MM/yyyy"
-          className={classes.datePicker}
+          className={classes.root}
           label={label}
           value={value[name]}
           onChange={(newValue) => {

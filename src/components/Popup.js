@@ -82,7 +82,7 @@ export default function Popup(props) {
     let openOnRender = newParty.partyOpen;
     // if (openOnRender)
     //   localStorage.setItem("newParty", JSON.stringify(newParty));
-    if (openOnRender) {
+    if (openOnRender && title !== "GST Form") {
       let newParty = JSON.parse(localStorage.getItem("newParty"));
       newParty.partyOpen = false;
       localStorage.setItem("newParty", JSON.stringify(newParty));

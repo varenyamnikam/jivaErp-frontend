@@ -176,9 +176,10 @@ export default function ReuseMaster(props) {
   console.log(values);
   console.log("filter=>", filter);
 
-  function getName(code) {
+  function getName(code, arr = common) {
     let name = "";
-    common.accounts.map((item) => {
+    console.log(code, arr);
+    arr.accounts.map((item) => {
       if (code == item.acCode) {
         name = item.acName;
       }
@@ -219,16 +220,6 @@ export default function ReuseMaster(props) {
         if (loading1) setLoading1(false);
         if (refresh) setRefresh(false);
 
-        const gr = response.data.inv_voucher
-          .filter((item) => item.docCode == docCode)
-          .map((item) => {
-            return {
-              ...item,
-              getDate: getDate(item.vouDate),
-              getName: getName(item.partyCode),
-            };
-          });
-
         function getAccounts(arr) {
           if (arr.length !== 0) {
             return arr;
@@ -258,19 +249,30 @@ export default function ReuseMaster(props) {
           }
         }
         const prodData = response.data.mst_prodMaster;
-        setCommon({
+        const collectiveData = {
           accounts: getAccounts(response.data.mst_accounts),
           voucherItems: getVouItems(response.data.inv_voucherItems),
           adress: getAdress(response.data.mst_acadress),
           payTerms: getPayterms(response.data.mst_paymentTerm),
           products: prodData.length == 0 ? initialProdValues : prodData,
-        });
+        };
+        setCommon(collectiveData);
         const po = response.data.inv_voucher.filter(
           (item) => item.docCode !== docCode
         );
         if (po.length !== 0) {
           setReference(po);
         }
+        const gr = response.data.inv_voucher
+          .filter((item) => item.docCode == docCode)
+          .map((item) => {
+            return {
+              ...item,
+              getDate: getDate(item.vouDate),
+              getName: getName(item.partyCode, collectiveData),
+            };
+          });
+
         if (gr.length !== 0) {
           setRecords(gr);
         } else {
@@ -428,8 +430,14 @@ export default function ReuseMaster(props) {
           }
         )
         .then((response) => {
+          let updatedEntry = response.data.values;
+          updatedEntry = {
+            ...updatedEntry,
+            getName: getName(updatedEntry.partyCode),
+            getDate: getDate(updatedEntry.vouDate),
+          };
           const updatedRecords = records.map((item) =>
-            item.vouNo == input.vouNo ? response.data.values : item
+            item.vouNo == input.vouNo ? updatedEntry : item
           );
           setRecords(updatedRecords);
           const newVouItems = common.voucherItems.filter(

@@ -148,6 +148,7 @@ export default function GstForm(props) {
       console.log(input, newrecord);
       setValues(input);
       setRecords(newrecord);
+      setPopup(false);
     } else {
       axios
         .patch(

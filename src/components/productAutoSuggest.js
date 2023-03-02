@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import AuthHandler from "../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../Utils/Config";
-
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
@@ -335,7 +334,7 @@ export default function UnusedAutosuggest(props) {
               }
             }}
             options={options1}
-            renderInput={(params) => (
+            renderInput={(params, InputLabelProps) => (
               <TextField
                 className={classes.root}
                 {...params}
@@ -349,6 +348,10 @@ export default function UnusedAutosuggest(props) {
                     // placed under the icon at the end
                     // "&&&": { pr: "70px" },
                   },
+                }}
+                InputLabelProps={{
+                  shrink: true,
+                  ...InputLabelProps,
                 }}
                 inputRef={(input) => {
                   inputRef = input;

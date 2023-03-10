@@ -129,6 +129,7 @@ export default function GeneralForm(props) {
             setInput={setInput}
             setTabValue={setTabValue}
             getVouNo={getVouNo}
+            setItem={setItem}
           />
         </TabPanel>{" "}
         <TabPanel value="2" style={{ paddingBottom: "10px" }}>

@@ -16,7 +16,8 @@ import DisabledInputs2 from "./userinputs2";
 import AuthHandler from "../../Utils/AuthHandler";
 import axios from "axios";
 import "./table.scss";
-
+import { user } from "react-icons-kit/fa/user";
+import { useNavigate } from "react-router-dom";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -68,6 +69,7 @@ export default function Userform(props) {
   } = props;
   console.log(branchNames);
   const classes = useStyles();
+  const page = useNavigate();
   const [errors, setErrors] = useState(initialFilterValues);
   console.log(values);
   const validate = (fieldValues = values) => {
@@ -97,6 +99,17 @@ export default function Userform(props) {
           ? ""
           : "mobile no. should be  10 digit";
     }
+
+    let found = records.find(
+      (item) =>
+        item.userName == fieldValues.userName &&
+        item.userCode !== fieldValues.userCode
+    );
+    if (fieldValues.userName)
+      temp.userName = found
+        ? `${found.userName} already exists at ${found.userCode}`
+        : "";
+
     console.log(temp);
     setErrors(temp);
 
@@ -199,6 +212,13 @@ export default function Userform(props) {
         });
         setRecords([...newrecord, values]);
         setButtonPopup(false);
+        if (
+          values.userCode == JSON.parse(localStorage.getItem("user")).userCode
+        ) {
+          alert("plz login again");
+          localStorage.clear();
+          page("/");
+        }
       }
     }
   };
@@ -294,6 +314,7 @@ export default function Userform(props) {
             value={values.userCode}
             disabled={true}
             onChange={handleChange}
+            autoComplete="new-password"
           />
         </Grid>
         <Grid item sm={6} xs={12}>
@@ -303,24 +324,27 @@ export default function Userform(props) {
             value={values.userName}
             error={errors.userName}
             onChange={handleChange}
+            autoComplete="new-password"
           />
         </Grid>
         <Grid item sm={6} xs={12}>
-          <Controls.Input
+          <Controls.Password
             name="Password"
             label=" Password"
             value={values.Password}
             error={errors.Password}
             onChange={handleChange}
+            autoComplete="new-password"
           />
         </Grid>
         <Grid item sm={6} xs={12}>
-          <Controls.Input
+          <Controls.Password
             name="RePassword"
             label=" Re-Password"
             value={values.RePassword}
             error={errors.RePassword}
             onChange={handleChange}
+            autoComplete="new-password"
           />
         </Grid>
         <Grid item sm={6} xs={12}>

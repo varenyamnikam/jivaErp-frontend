@@ -321,6 +321,7 @@ export default function ReuseMaster(props) {
     });
     const token = AuthHandler.getLoginToken();
     // setButtonPopup(false);
+    let finalItemList = itemList.filter(item);
     if (x) {
       axios
         .put(

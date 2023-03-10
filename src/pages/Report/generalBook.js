@@ -318,8 +318,8 @@ export default function BankBook({ docCode1, docCode2 }) {
                                       ? item.currentBalance == 0
                                         ? ""
                                         : item.currentBalance < 0
-                                        ? "Cr"
-                                        : "Dr"
+                                        ? "CR"
+                                        : "DR"
                                       : ""}
                                   </TableCell>
                                 ))}

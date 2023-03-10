@@ -43,6 +43,29 @@ export default function ReuseForm(props) {
       temp.stateName = fieldValues.stateName ? "" : "This field is required.";
     if ("stateCode" in fieldValues)
       temp.stateCode = fieldValues.stateCode ? "" : "This field is required.";
+
+    if ("countryName" in fieldValues) {
+      let x = "countryName";
+      let found = records.find((item) => item[x] == fieldValues[x]);
+      if (fieldValues[x])
+        temp[x] = found ? `${found[x]} already exists at ` : "";
+      let y = "countryCode";
+      let founde = records.find((item) => item[y] == fieldValues[y]);
+      if (fieldValues[y])
+        temp[y] = founde ? `${founde[y]} already exists  ` : "";
+    }
+    if ("stateName" in fieldValues) {
+      let x = "stateName";
+      let found = records.find((item) => item[x] == fieldValues[x]);
+      if (fieldValues[x]) temp[x] = found ? `${found[x]} already exists ` : "";
+      let y = "stateCode";
+      let founde = records.find((item) => item[y] == fieldValues[y]);
+      if (fieldValues[y])
+        temp[y] = founde ? `${founde[y]} already exists  ` : "";
+    }
+
+    console.log(temp);
+
     setErrors({
       ...temp,
     });

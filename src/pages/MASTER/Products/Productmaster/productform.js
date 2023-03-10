@@ -70,6 +70,7 @@ export default function Productform(props) {
     initialValues,
     initialFilterValues,
     setNotify,
+    setFormPopup,
     unitNames,
     prodCompanyNames,
     prodTypesNames,
@@ -99,6 +100,14 @@ export default function Productform(props) {
         temp.prodName = "This name already exists";
       }
     });
+    let x = "prodName";
+    let y = "prodCode";
+
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
 
     setErrors({
       ...temp,
@@ -165,6 +174,7 @@ export default function Productform(props) {
               localStorage.setItem("newParty", JSON.stringify(newParty));
               history(newParty.path);
             }
+            setFormPopup(false);
           })
           .catch((error) => {
             setNotify({
@@ -194,12 +204,13 @@ export default function Productform(props) {
             });
             console.log(newrecord);
             setRecords([...newrecord, input]);
-
+            console.log([...newrecord, input]);
             setNotify({
               isOpen: true,
               message: "item updated  successfully",
               type: "success",
             });
+            setFormPopup(false);
           })
           .catch((error) => {
             setNotify({

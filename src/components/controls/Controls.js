@@ -6,8 +6,9 @@ import DatePicker from "./DatePicker";
 import Button from "./Button";
 import ActionButton from "./ActionButton";
 import LoadingActionButton from "./LoadingActionButton";
-
+import Password from "./password";
 import Percent from "./percentage";
+import Switch from "./Switch";
 const Controls = {
   Input,
   RadioGroup,
@@ -18,6 +19,8 @@ const Controls = {
   ActionButton,
   Percent,
   LoadingActionButton,
+  Password,
+  Switch,
 };
 
 export default Controls;

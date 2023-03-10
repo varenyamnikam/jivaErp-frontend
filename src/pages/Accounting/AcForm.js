@@ -57,23 +57,13 @@ export default function AcForm(props) {
   const [popup, setPopup] = useState(false);
   const [otherValues, setOtherValues] = useState(initialValues);
 
-  let headcells =
-    bankValues.docCode == "JV"
-      ? [
-          { id: "A/c Name", label: "A/c Name" },
-          { id: "Debit", label: "Debit" },
-          { id: "Credit", label: "Credit" },
+  let headcells = [
+    { id: "A/c Name", label: "A/c Name" },
+    { id: "Debit", label: "Debit" },
+    { id: "Credit", label: "Credit" },
+    { id: "Edit", label: "Edit" },
+  ];
 
-          { id: "Edit", label: "Edit" },
-        ]
-      : [
-          { id: "Bank Name", label: "Bank Name" },
-          { id: "A/c Name", label: "A/c Name" },
-          { id: "Debit", label: "Debit" },
-          { id: "Credit", label: "Credit" },
-
-          { id: "Edit", label: "Edit" },
-        ];
   const [headCells, setHeadCells] = useState(headcells);
 
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
@@ -399,6 +389,13 @@ export default function AcForm(props) {
               />
             </Grid>
           )}
+          <Grid item xs={12} sm={12} style={{ margin: "4px" }}>
+            <Divider
+              variant="middle"
+              color="blue"
+              sx={{ borderBottomWidth: 2 }}
+            />
+          </Grid>
           <Grid item xs={12} sm={6}>
             <SmartAutoSuggest
               name1="acName"
@@ -412,6 +409,16 @@ export default function AcForm(props) {
               options2={others}
               error={otherErrors.acCode}
             />
+          </Grid>{" "}
+          <Grid item xs={12} sm={2}>
+            <Controls.Input
+              name="debit"
+              type="number"
+              label="Debit"
+              value={otherValues.debit}
+              onChange={handleOtherChange}
+              error={otherErrors.debit}
+            />
           </Grid>
           <Grid item xs={12} sm={2}>
             <Controls.Input
@@ -421,16 +428,6 @@ export default function AcForm(props) {
               value={otherValues.credit}
               onChange={handleOtherChange}
               error={otherErrors.credit}
-            />
-          </Grid>
-          <Grid item xs={12} sm={2}>
-            <Controls.Input
-              name="debit"
-              type="number"
-              label="Debit"
-              value={otherValues.debit}
-              onChange={handleOtherChange}
-              error={otherErrors.debit}
             />
           </Grid>
           <Grid
@@ -446,17 +443,10 @@ export default function AcForm(props) {
               text="Add"
               variant="outlined"
               startIcon={<AddIcon />}
-              style={{ marginTop: "10px" }}
+              size="medium"
               onClick={(e) => {
                 handleAdd();
               }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12}>
-            <Divider
-              variant="middle"
-              color="blue"
-              sx={{ borderBottomWidth: 2 }}
             />
           </Grid>
           <Grid item sm={12} xs={12}>
@@ -466,9 +456,6 @@ export default function AcForm(props) {
                 <TableBody>
                   {recordsAfterPagingAndSorting().map((item) => (
                     <TableRow key={item._id}>
-                      {bankValues.docCode !== "JV" && (
-                        <TableCell>{bankValues.acName}</TableCell>
-                      )}
                       <TableCell>{getName(item.acCode)}</TableCell>
                       <TableCell>{Number(item.debit)}</TableCell>
                       <TableCell>{Number(item.credit)}</TableCell>

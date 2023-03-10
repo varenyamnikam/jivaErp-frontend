@@ -85,14 +85,12 @@ const Profile = () => {
 
   return (
     <>
-      <div>
-        <div>
-          <Grid container>
-            <Grid Item xs={12} sm={4}>
+          
+            <Grid Item xs={12} sm={4} >
               <ImageUpload recentImage={getImage()} />
             </Grid>
             <Grid Item xs={12} sm={8} style={{ justifyContent: "left" }}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} >
                 <Grid item xs={12} sm={6}>
                   <Controls.Input
                     name="companyName"
@@ -254,15 +252,14 @@ const Profile = () => {
                 ></Grid>
                 <Grid
                   item
-                  sm={4}
+                  sm={12}
                   xs={6}
                   style={{
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "flex-end",
                   }}
                 >
                   <ButtonLoader
-                    style={{ width: "50%" }}
                     loading={loading}
                     setLoading={setLoading}
                     onClick={handleSubmit}
@@ -272,9 +269,6 @@ const Profile = () => {
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        </div>
-      </div>
     </>
   );
 };

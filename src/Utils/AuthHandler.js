@@ -27,6 +27,8 @@ class AuthHandler {
           reactLocalStorage.set("token", response.data.token);
           reactLocalStorage.set("userName", response.data.userName);
           localStorage.setItem("userCode", response.data.userCode);
+          localStorage.setItem("changeBranch", JSON.stringify({ open: false }));
+
           localStorage.setItem(
             "adm_userrights",
             JSON.stringify(response.data.adm_userrights)

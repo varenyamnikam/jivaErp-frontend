@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AuthHandler from "../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../Utils/Config";
@@ -38,7 +38,8 @@ import {
   getVouNo,
 } from "@material-ui/core";
 import Validate from "./validateItem";
-const headcells = [
+
+let initialHeadCells = [
   { id: "Product", label: "Product" },
   { id: "Quantity", label: "Quantity" },
   { id: "Rate", label: "Rate" },
@@ -49,6 +50,7 @@ const headcells = [
   { id: "Item Total", label: "Item Total" },
   { id: "Delete", label: "Delete" },
 ];
+
 const initialPause = { rate: true, itemAmount: true };
 const useStyles = makeStyles((theme) => ({
   inputRoot: {
@@ -86,8 +88,10 @@ export default function GeneralItemForm(props) {
   const initialSettings = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   );
+  const company = JSON.parse(localStorage.getItem("company"));
+
   const [errors, setErrors] = useState(validateValues);
-  const [headCells, setHeadCells] = useState(headcells);
+  const [headCells, setHeadCells] = useState(initialHeadCells);
   const [disabled1, setDisabled1] = useState(false);
   const [isPaused, setIsPaused] = useState(initialPause);
   const [settings, setSettings] = useState(initialSettings);
@@ -242,6 +246,39 @@ export default function GeneralItemForm(props) {
       [name]: value,
     });
   };
+  function isPurchase() {
+    if (
+      input.docCode == "PO" ||
+      input.docCode == "GR" ||
+      input.docCode == "PV" ||
+      input.docCode == "PR" ||
+      input.docCode == "CN" ||
+      input.docCode == "DN"
+    )
+      return true;
+    else return false;
+  }
+
+  console.log(isPurchase(), company.gstRegType == "Regular", company);
+  adjustFormHeadCells(company.gstRegType !== "Regular" && !isPurchase(), "GST");
+  adjustFormHeadCells(initialSettings.useCessitem == "NO", "CESS");
+
+  function adjustFormHeadCells(condition, _id) {
+    if (condition) {
+      let found = headCells.find((item) => item.id == _id);
+      if (found) {
+        let arr = headCells.filter((item) => item.id !== _id);
+        console.log(arr);
+        setHeadCells(arr);
+      }
+    } else {
+      let found = headCells.find((item) => item.id == _id);
+      if (!found) {
+        setHeadCells(initialHeadCells);
+      }
+    }
+  }
+
   const {
     TblContainer,
     TblHead,
@@ -319,7 +356,6 @@ export default function GeneralItemForm(props) {
   }
   console.log(item);
   const classesContainer = useStylesContainer();
-
   return (
     <>
       <Grid
@@ -508,45 +544,49 @@ export default function GeneralItemForm(props) {
             error={errors.discount}
           />
         </Grid>
-        <Grid item xs={12} sm={2} className={classes.input}>
-          <Percent
-            name1="cgst"
-            name2="cgstP"
-            disabled={true}
-            name3="dqr"
-            label="C-GST"
-            value={item}
-            setValue={setItem}
-            onChange={handleChange}
-            error={errors.cgst}
-          />
-        </Grid>
-        <Grid item xs={12} sm={2} className={classes.input}>
-          <Percent
-            name1="sgst"
-            name2="sgstP"
-            disabled={true}
-            name3="dqr"
-            label="S-GST"
-            value={item}
-            setValue={setItem}
-            onChange={handleChange}
-            error={errors.sgst}
-          />
-        </Grid>
-        <Grid item xs={12} sm={2} className={classes.input}>
-          <Percent
-            name1="igst"
-            name2="igstP"
-            disabled={true}
-            name3="dqr"
-            label="I-GST"
-            value={item}
-            setValue={setItem}
-            onChange={handleChange}
-            error={errors.igst}
-          />
-        </Grid>
+        {(isPurchase() || company.gstRegType == "Regular") && (
+          <>
+            <Grid item xs={12} sm={2} className={classes.input}>
+              <Percent
+                name1="cgst"
+                name2="cgstP"
+                disabled={true}
+                name3="dqr"
+                label="C-GST"
+                value={item}
+                setValue={setItem}
+                onChange={handleChange}
+                error={errors.cgst}
+              />
+            </Grid>
+            <Grid item xs={12} sm={2} className={classes.input}>
+              <Percent
+                name1="sgst"
+                name2="sgstP"
+                disabled={true}
+                name3="dqr"
+                label="S-GST"
+                value={item}
+                setValue={setItem}
+                onChange={handleChange}
+                error={errors.sgst}
+              />
+            </Grid>
+            <Grid item xs={12} sm={2} className={classes.input}>
+              <Percent
+                name1="igst"
+                name2="igstP"
+                disabled={true}
+                name3="dqr"
+                label="I-GST"
+                value={item}
+                setValue={setItem}
+                onChange={handleChange}
+                error={errors.igst}
+              />
+            </Grid>
+          </>
+        )}
         {settings.useCessitem == "Yes" && (
           <Grid item xs={12} sm={2} className={classes.input}>
             <Percent
@@ -638,24 +678,28 @@ export default function GeneralItemForm(props) {
                       <TableCell align="right">
                         {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
                       </TableCell>
-                      <TableCell align="right">
-                        {" "}
-                        {rnd(
-                          Number(item.cgst) +
-                            Number(item.sgst) +
-                            Number(item.igst)
-                        )}
-                        (
-                        {rnd(
-                          Number(item.cgstP) +
-                            Number(item.sgstP) +
-                            Number(item.igstP)
-                        )}
-                        %)
-                      </TableCell>
-                      <TableCell align="right">
-                        {rnd(item.cess)} ({rnd(item.cessP)}%)
-                      </TableCell>{" "}
+                      {(isPurchase() || company.gstRegType == "Regular") && (
+                        <TableCell align="right">
+                          {" "}
+                          {rnd(
+                            Number(item.cgst) +
+                              Number(item.sgst) +
+                              Number(item.igst)
+                          )}
+                          (
+                          {rnd(
+                            Number(item.cgstP) +
+                              Number(item.sgstP) +
+                              Number(item.igstP)
+                          )}
+                          %)
+                        </TableCell>
+                      )}
+                      {initialSettings.useCessitem == "Yes" && (
+                        <TableCell align="right">
+                          {rnd(item.cess)} ({rnd(item.cessP)}%)
+                        </TableCell>
+                      )}{" "}
                       <TableCell align="right">{item.itemAmount}</TableCell>
                       <TableCell>
                         <Controls.ActionButton
@@ -689,8 +733,10 @@ export default function GeneralItemForm(props) {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={7}>Total Amount</TableCell>
-                    <TableCell colSpan={3}>{Number(input.itemTotal)}</TableCell>
+                    <TableCell colSpan={headCells.length - 2}>
+                      Total Amount
+                    </TableCell>
+                    <TableCell colSpan={2}>{Number(input.itemTotal)}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

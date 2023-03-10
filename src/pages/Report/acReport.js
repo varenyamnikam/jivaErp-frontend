@@ -314,8 +314,8 @@ export default function StockMaster() {
                                       ? item.currentBalance == 0
                                         ? ""
                                         : item.currentBalance < 0
-                                        ? "Cr"
-                                        : "Dr"
+                                        ? "CR"
+                                        : "DR"
                                       : ""}
                                   </TableCell>
                                 ))}

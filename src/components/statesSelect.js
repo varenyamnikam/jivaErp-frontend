@@ -11,17 +11,27 @@ const useStyles = makeStyles((theme) => ({
 
 const tfStyle = {
   "& .MuiButtonBase-root.MuiAutocomplete-clearIndicator": {
+    visibility: "visible",
     boxShadow: "none",
+    position: "absolute",
+    p: 0,
+    right: 40,
+    top: 5,
     //"calc(50% - 12px)"
   },
   "& .MuiButtonBase-root.MuiAutocomplete-popupIndicator": {
+    visibility: "visible",
     boxShadow: "none",
+    position: "absolute",
+    p: 0,
+    right: 10,
+    top: 5,
   },
   "& .MuiOutlinedInput-root": {
     // probably the width of your search IconButton or more if needed
     // color: "red",
-    // paddingTop: "10px",
-    // top: 5,
+    paddingTop: "10px",
+    top: 5,
   },
   // ".MuiInputBase-input": {
   //   height: "1.5rem",
@@ -52,20 +62,19 @@ const tfStyle = {
     //   },
   },
 };
-
 function States(props) {
   const { value, setValue, options, disable, country, countries, error } =
     props;
   const [inputValue, setInputValue] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState("");
-  // if (value.stateCode) {
-  //   let found;
-  //   options.map((item) => {
-  //     if (value.stateCode == item.stateCode) found = item.stateName;
-  //   });
-  //   if (value.stateName !== found) setValue({ ...value, stateName: found });
-  //   console.log("findimg stateName");
-  // }
+  if (value.stateCode) {
+    let found;
+    options.map((item) => {
+      if (value.stateCode == item.stateCode) found = item.stateName;
+    });
+    if (value.stateName !== found) setValue({ ...value, stateName: found });
+    console.log("findimg stateName");
+  }
   countries.map((c) => {
     if (c.countryName == country) {
       if (selectedCountry !== c.countryCode) setSelectedCountry(c.countryCode);

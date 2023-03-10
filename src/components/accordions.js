@@ -59,6 +59,19 @@ export default function QuestionSection({
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+  const handleSwitchChange = (event) => {
+    console.log("hi");
+    // update in localstorage for permanant open
+    setKeepOpen(event.target.checked);
+    const prevSetting = JSON.parse(
+      localStorage.getItem("adm_softwareSettings")
+    );
+    const newSetting = {
+      ...prevSetting,
+      keepTransactionAccordionOpen: event.target.checked,
+    };
+    localStorage.setItem("adm_softwareSettings", JSON.stringify(newSetting));
+  };
 
   return (
     <div>
@@ -78,7 +91,11 @@ export default function QuestionSection({
           </div>
           <div style={{ display: "flex" }}>
             <Typography> {label}</Typography>
-            <Switch checked={keepOpen} setChecked={setKeepOpen} />
+            <Switch
+              checked={keepOpen}
+              setChecked={setKeepOpen}
+              onChange={handleSwitchChange}
+            />
           </div>
         </AccordionSummary>
         <AccordionDetails>{children}</AccordionDetails>

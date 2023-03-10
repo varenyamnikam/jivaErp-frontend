@@ -254,7 +254,7 @@ export default function ReuseMaster(props) {
           voucherItems: getVouItems(response.data.inv_voucherItems),
           adress: getAdress(response.data.mst_acadress),
           payTerms: getPayterms(response.data.mst_paymentTerm),
-          products: prodData.length == 0 ? initialProdValues : prodData,
+          products: prodData.length == 0 ? [initialProdValues] : prodData,
         };
         setCommon(collectiveData);
         const po = response.data.inv_voucher.filter(
@@ -325,15 +325,24 @@ export default function ReuseMaster(props) {
     setFilter({ ...filter, allFields: value });
     search(value);
   }
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
+  // function getDate(code) {
+  //   const date = new Date(code);
+  //   return (
+  //     String(date.getDate()) +
+  //     "/" +
+  //     String(date.getMonth() + 1) +
+  //     "/" +
+  //     String(date.getFullYear()).slice(-2)
+  //   );
+  // }
+  function getDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day.toString().padStart(2, "0")}/${month
+      .toString()
+      .padStart(2, "0")}/${year}`;
   }
 
   console.log(filter.allFields);
@@ -370,6 +379,18 @@ export default function ReuseMaster(props) {
     console.log(input, itemList, new Date(input.vouDate), x);
     const token = AuthHandler.getLoginToken();
     // setButtonPopup(false);
+    let finalItemList = itemList;
+    //removing batch from batchlist whose sell ==0
+    if (useBatch == "Yes")
+      itemList.map((item, i) => {
+        if ("batchList" in item) {
+          let finalBatchList = item.batchList.filter(
+            (b) => Number(b.sell) !== 0
+          );
+          finalItemList[i].batchList = finalBatchList;
+        }
+      });
+    console.log(finalItemList);
     if (x) {
       axios
         .put(
@@ -378,7 +399,7 @@ export default function ReuseMaster(props) {
           {
             obj: {
               input: input,
-              itemList: itemList,
+              itemList: finalItemList,
             },
           },
           {
@@ -420,7 +441,7 @@ export default function ReuseMaster(props) {
           {
             obj: {
               input: input,
-              itemList: itemList,
+              itemList: finalItemList,
             },
           },
           {
@@ -431,6 +452,7 @@ export default function ReuseMaster(props) {
         )
         .then((response) => {
           let updatedEntry = response.data.values;
+          console.log(updatedEntry);
           updatedEntry = {
             ...updatedEntry,
             getName: getName(updatedEntry.partyCode),

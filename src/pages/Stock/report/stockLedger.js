@@ -76,6 +76,9 @@ const initialLedgerValues = {
 };
 
 export default function StockLedger({ records }) {
+  const useBatch =
+    JSON.parse(localStorage.getItem("adm_softwareSettings")).userBatchNo ==
+    "Yes";
   const headCells = [
     { id: "Date", label: "Date", feild: "vouDate" },
     { id: "Voucher", label: "Voucher", feild: "vouNo" },
@@ -88,9 +91,7 @@ export default function StockLedger({ records }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
+
   let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
   const { getD } = DateCalc(user);
 
@@ -115,6 +116,7 @@ export default function StockLedger({ records }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log("records=>", records);
+
   return (
     <>
       <TableContainer>

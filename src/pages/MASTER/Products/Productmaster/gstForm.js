@@ -177,6 +177,15 @@ export default function GstForm(props) {
         });
     }
   }
+  function getDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear().toString().slice(-2);
+    return `${day.toString().padStart(2, "0")}/${month
+      .toString()
+      .padStart(2, "0")}/${year}`;
+  }
   console.log(input, gstTable, errors);
   return (
     <>
@@ -194,9 +203,7 @@ export default function GstForm(props) {
                     Number(item.sgst) !== 0 && (
                       <TableRow key={item._id}>
                         {" "}
-                        <TableCell>
-                          {new Date(item.startDate).toLocaleDateString()}
-                        </TableCell>
+                        <TableCell>{getDate(item.startDate)}</TableCell>
                         <TableCell>{item.cgst}</TableCell>
                         <TableCell>{item.sgst}</TableCell>
                         <TableCell

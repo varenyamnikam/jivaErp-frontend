@@ -10,192 +10,24 @@ import {
 } from "@material-ui/core";
 import Skeleton from "@mui/material/Skeleton";
 
-export default function MuiSkeleton(props) {
+export default function MuiSkeleton({ col = 6 }) {
   const skeleton = [, , , , , , , , , ,];
   console.log(skeleton.length);
-
+  let n = 8;
   return (
     <TableBody>
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>{" "}
-      <TableRow>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />{" "}
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="75%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-        <TableCell>
-          <Skeleton variant="rectangular" width="25%" height={50} />
-        </TableCell>
-      </TableRow>
+      {[...Array(n)].map((e, i) => (
+        <TableRow>
+          <TableCell colSpan={10}>
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={30}
+              animation="wave"
+            />{" "}
+          </TableCell>
+        </TableRow>
+      ))}
     </TableBody>
   );
 }

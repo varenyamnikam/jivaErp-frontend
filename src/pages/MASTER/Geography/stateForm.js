@@ -53,6 +53,15 @@ export default function StateForm(props) {
       temp.districtCode = fieldValues.districtCode
         ? ""
         : "This field is required.";
+    let x = "stateName";
+    let y = "stateCode";
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+    console.log(temp);
+
     setErrors({
       ...temp,
     });

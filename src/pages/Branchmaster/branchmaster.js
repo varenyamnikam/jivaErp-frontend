@@ -315,7 +315,7 @@ const Branchmaster = (props) => {
                 <div className="card-body">
                   <section className="content">
                     <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                      <Grid container spacing={2}>
                         <Grid item xs={12} sm={8}>
                           <Controls.Input
                             label="Search Role Name"

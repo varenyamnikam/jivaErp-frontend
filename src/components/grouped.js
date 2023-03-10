@@ -135,11 +135,12 @@ export default function Grouped(props) {
     });
     return x;
   }
-  function getStock(y = false, batchList = batchList) {
+  function getStock(y = false) {
     const useBatch = JSON.parse(
       localStorage.getItem("adm_softwareSettings")
     ).userBatchNo; //userBatchNo =yes/no
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}`;
+    const user = JSON.parse(localStorage.getItem("user"));
+    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}&branchCode=${user.defaultBranchCode}&yearCode=${user.defaultYearCode}`;
     let data = records;
     console.log(batchList, records);
     axios
@@ -298,6 +299,8 @@ export default function Grouped(props) {
             {...(error && { error: true, helperText: error })}
             onChange={(e) => {
               setValues({ ...values, qty: e.target.value });
+            }}
+            onBlur={() => {
               if (values.prodCode) {
                 getStock(true);
               }

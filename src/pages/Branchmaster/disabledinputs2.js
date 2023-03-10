@@ -11,7 +11,7 @@ export default function DisabledInputs2(props) {
   const { values, errors, handleChange } = props;
   const classes = useStyles();
   return (
-    <Grid container>
+    <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <Controls.Input
           name="pinCode"

@@ -29,7 +29,7 @@ import Input from "../../components/controls/Input";
 import { Grid } from "@material-ui/core";
 import { useForm, Form } from "../../components/useForm";
 import StaticDatePickerLandscape from "../../components/calendarLandscape";
-
+import { useNavigate } from "react-router-dom";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
 export default function FinancialYearform(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const page = useNavigate();
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
@@ -78,6 +79,13 @@ export default function FinancialYearform(props) {
         temp.yearCode = "This yearcode already exists";
       }
     });
+    let x = "finYear";
+    let y = "yearCode";
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
 
     console.log(temp);
     setErrors({
@@ -148,6 +156,14 @@ export default function FinancialYearform(props) {
               message: "Financial Year updated  successfully",
               type: "success",
             });
+            if (
+              input.yearCode ==
+              JSON.parse(localStorage.getItem("user")).defaultYearCode
+            ) {
+              alert("plz login again");
+
+              page("/");
+            }
           }
         })
         .catch((error) => {

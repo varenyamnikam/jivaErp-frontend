@@ -535,6 +535,7 @@ export default function ProductMaster(props) {
                       prodTypesNames={prodTypesNames}
                       setNotify={setNotify}
                       setGstPopup={setPopup}
+                      setFormPopup={setButtonPopup}
                     />
                   </Popup>
                   <Popup

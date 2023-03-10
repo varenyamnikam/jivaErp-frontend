@@ -1,22 +1,11 @@
 import React, { useState } from "react";
 import { Switch } from "@material-ui/core";
 
-function ToggleSwitch({ checked, setChecked, label = "Keep Open" }) {
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-    const prevSetting = JSON.parse(
-      localStorage.getItem("adm_softwareSettings")
-    );
-    const newSetting = {
-      ...prevSetting,
-      keepTransactionAccordionOpen: event.target.checked,
-    };
-    localStorage.setItem("adm_softwareSettings", JSON.stringify(newSetting));
-  };
+function ExportSwitch({ checked, setChecked, label = "Keep Open", onChange }) {
   return (
     <Switch
       checked={checked}
-      onChange={handleChange}
+      onChange={onChange}
       name="checked"
       color="primary"
       size="small"
@@ -25,4 +14,4 @@ function ToggleSwitch({ checked, setChecked, label = "Keep Open" }) {
   );
 }
 
-export default ToggleSwitch;
+export default ExportSwitch;

@@ -33,34 +33,11 @@ const template = [
 const groupTypes = ["ASSET", "LIABILITY", "INCOME", "EXPENSE"];
 
 const useStyles = makeStyles((theme) => ({
-  pageContent: {
-    margin: theme.spacing(5),
-    padding: theme.spacing(3),
-  },
-  searchInput: {
-    width: "100%",
-  },
-  newButton: {
-    position: "absolute",
-    right: "10px",
-  },
-  Active: {
-    padding: "5px",
-    borderRadius: "5px",
-    color: "green",
-    backgroundColor: "rgba(0, 128, 0, 0.151)",
-  },
-  Inactive: {
-    padding: "5px",
-    borderRadius: "5px",
-    color: "goldenrod",
-    backgroundColor: "rgba(189, 189, 3, 0.103)",
-  },
+  center: { paddingLeft: "10px", display: "flex", alignContent: "center" },
 }));
 
-export default function Settings({ input, setInput }) {
-  const [errors, setErrors] = useState({});
-
+export default function Settings({ input, setInput, errors }) {
+  const classes = useStyles();
   function handleInputChange(e) {
     const { value, name } = e.target;
     console.log("hi");
@@ -70,9 +47,10 @@ export default function Settings({ input, setInput }) {
 
   return (
     <>
-      <Grid container>
-        <Grid item sm={6} xs={12}>
+      <Grid container spacing={2}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="userBatchNo"
             label="use Batch No?"
@@ -82,8 +60,9 @@ export default function Settings({ input, setInput }) {
             error={errors.userBatchNo}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="useSerialNo"
             label="Use Serial No?"
@@ -93,8 +72,9 @@ export default function Settings({ input, setInput }) {
             error={errors.useSerialNo}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="itemDescription"
             label="Use Item Description?"
@@ -104,19 +84,9 @@ export default function Settings({ input, setInput }) {
             error={errors.itemDescription}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
-          <UnusedAutosuggest
-            style={{ width: "100%", paddingTop: "5px" }}
-            name="gstReg"
-            label="Gst Registration"
-            value={input}
-            setValue={setInput}
-            options={["UnRegistered", "Regular", "Composition"]}
-            error={errors.gstReg}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="useintraStateSale"
             label="Use Intra State Sale?"
@@ -126,8 +96,9 @@ export default function Settings({ input, setInput }) {
             error={errors.useintraStateSale}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="usePesticideSale"
             label="Use Pesticide Sale?"
@@ -137,8 +108,9 @@ export default function Settings({ input, setInput }) {
             error={errors.usePesticideSale}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="useCessitem"
             label="Use Cess Item"
@@ -148,7 +120,7 @@ export default function Settings({ input, setInput }) {
             error={errors.useCessitem}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <UnusedAutosuggest
             style={{ width: "100%" }}
             name="saleStockUpdateUsing"
@@ -159,8 +131,9 @@ export default function Settings({ input, setInput }) {
             error={errors.saleStockUpdateUsing}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="color"
             label="THEME"
@@ -170,7 +143,7 @@ export default function Settings({ input, setInput }) {
             error={errors.color}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <UnusedAutosuggest
             style={{ width: "100%" }}
             name="purcStockUpdateUsing"
@@ -181,8 +154,9 @@ export default function Settings({ input, setInput }) {
             error={errors.purcStockUpdateUsing}
           />
         </Grid>
-        <Grid item sm={6} xs={12}>
+        <Grid item className={classes.center} sm={6} xs={12}>
           <Controls.RadioGroup
+            position="left"
             size="small"
             name="useAcc"
             label="Account Print Format"

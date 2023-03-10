@@ -224,12 +224,16 @@ export default function StockMaster() {
     });
     const token = AuthHandler.getLoginToken();
     axios
-      .delete(Config.batch + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-        data: item,
-      })
+      .delete(
+        Config.batch + query,
+
+        {
+          headers: {
+            authorization: "Bearer" + token,
+          },
+          data: item,
+        }
+      )
       .catch((err) => {
         console.log(err);
       });

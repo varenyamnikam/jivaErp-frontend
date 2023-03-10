@@ -130,6 +130,15 @@ export default function AcGlGroup() {
     Object.keys(initialFilterValues).map((x) => {
       check(x);
     });
+    let x = "acGroupName";
+    let y = "acGroupCode";
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+    console.log(temp);
+
     setErrors({
       ...temp,
     });

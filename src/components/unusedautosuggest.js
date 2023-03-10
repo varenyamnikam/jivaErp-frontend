@@ -82,7 +82,15 @@ const tfStyle = {
 };
 
 export default function UnusedAutosuggest(props) {
-  const { value, setValue, options, error, name, label } = props;
+  const {
+    value,
+    setValue,
+    options,
+    error,
+    name,
+    label,
+    disabled = false,
+  } = props;
   const [inputValue, setInputValue] = React.useState("");
   const classes = useStyles();
   console.log(inputValue);
@@ -135,6 +143,7 @@ export default function UnusedAutosuggest(props) {
           }
         }}
         options={options}
+        disabled={disabled}
         renderInput={(params, InputLabelProps) => (
           <TextField
             className={classes.root}

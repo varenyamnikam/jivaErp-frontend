@@ -37,21 +37,21 @@ const tfStyle = {
   //   top: 5,
   // },
   "& .MuiButtonBase-root.MuiAutocomplete-clearIndicator": {
-    // visibility: "visible",
+    visibility: "visible",
     boxShadow: "none",
-    // position: "absolute",
-    // p: 0,
-    // right: 40,
-    // top: 5,
+    position: "absolute",
+    p: 0,
+    right: 40,
+    top: 5,
     //"calc(50% - 12px)"
   },
   "& .MuiButtonBase-root.MuiAutocomplete-popupIndicator": {
-    // visibility: "visible",
+    visibility: "visible",
     boxShadow: "none",
-    // position: "absolute",
-    // p: 0,
-    // right: 10,
-    // top: 5,
+    position: "absolute",
+    p: 0,
+    right: 10,
+    top: 5,
   },
   // "& .MuiOutlinedInput-root.MuiAutocomplete-endAdornment": {
   //   // probably the width of your search IconButton or more if needed
@@ -62,15 +62,15 @@ export default function Countries(props) {
   const { value, setValue, options, error } = props;
   const [inputValue, setInputValue] = React.useState("");
   const classes = useStyles();
-  // if (value.countryCode) {
-  //   let found;
-  //   options.map((item) => {
-  //     if (value.countryCode == item.countryCode) found = item.countryName;
-  //   });
-  //   if (value.countryName !== found) {
-  //     setValue({ ...value, countryName: found });
-  //   }
-  // }
+  if (value.countryCode) {
+    let found;
+    options.map((item) => {
+      if (value.countryCode == item.countryCode) found = item.countryName;
+    });
+    if (value.countryName !== found) {
+      setValue({ ...value, countryName: found });
+    }
+  }
   return (
     <Autocomplete
       disablePortal

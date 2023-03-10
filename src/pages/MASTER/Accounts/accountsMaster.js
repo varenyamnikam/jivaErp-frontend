@@ -149,6 +149,14 @@ export default function AccountMaster() {
     check("acStatus");
     check("acGroupName");
     check("acType");
+    let x = "acName";
+    let y = "acCode";
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+console.log(temp)
     setErrors({
       ...temp,
     });

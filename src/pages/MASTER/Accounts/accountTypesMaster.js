@@ -124,6 +124,15 @@ export default function AccountTypesMaster() {
     Object.keys(initialValues).map((x) => {
       check(x);
     });
+    let x = "acType";
+    let y = "acTypeFor";
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] == fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists for ${found[y]}` : "";
+    console.log(temp);
+
     setErrors({
       ...temp,
     });

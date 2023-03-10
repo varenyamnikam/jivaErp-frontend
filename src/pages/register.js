@@ -41,13 +41,13 @@ const initialFValues = {
   stateName: "",
   companyName: "",
   companyType: "",
-  district: "",
-  taluka: "",
+  districtName: "",
+  talukaName: "",
   adressLine1: "",
   adressLine2: "",
   phoneStdCode: "",
   contactNo: "",
-  pincode: "",
+  pinCode: "",
   ownerName: "",
   email: "",
   gstRegType: "",
@@ -60,7 +60,6 @@ const initialValues = {
   userBatchNo: "",
   useSerialNo: "",
   itemDescription: "",
-  gstReg: "",
   useintraStateSale: "",
   usePesticideSale: "",
   useCessitem: "",
@@ -69,7 +68,6 @@ const initialValues = {
   color: "blue",
   useAcc: "",
 };
-
 export default function RegisterForm() {
   const [values, setValues] = useState(initialFValues);
   const [input, setInput] = useState(initialValues);
@@ -80,12 +78,18 @@ export default function RegisterForm() {
     states: [{ stateName: "X" }],
     talukas: [{}],
   });
-  const validate = (fieldValues = values) => {
+  const validate = (fieldValues = values, settings = input) => {
     let temp = { ...errors };
     function check(key) {
       if (key in fieldValues)
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
+    function checkInput(key) {
+      console.log(settings);
+      if (key in settings)
+        temp[key] = settings[key] ? "" : "This field is required.";
+    }
+
     check("companyName");
     check("ownerName");
     check("regMobileNo");
@@ -93,9 +97,33 @@ export default function RegisterForm() {
     check("adressLine2");
     check("countryName");
     check("stateName");
-    check("pincode");
+    check("pinCode");
     check("gstRegType");
+    // check("useAcc");
+    // check("purcStockUpdateUsing");
+    // check("color");
+    // check("saleStockUpdateUsing");
+    // check("useCessitem");
+    // check("usePesticideSale");
+    // check("useintraStateSale");
+    // check("itemDescription");
+    // check("useSerialNo");
+    //check("userBatchNo");
+    Object.keys(settings).map((x) => {
+      console.log(x);
+      checkInput(x);
+    });
 
+    var expr = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+    if (
+      fieldValues.gstRegType !== "UnRegistered" &&
+      !expr.test(fieldValues.gstInNo)
+    ) {
+      temp.gstInNo = "incorrect format";
+    } else {
+      temp.gstInNo = "";
+    }
     setErrors({
       ...temp,
     });
@@ -204,180 +232,183 @@ export default function RegisterForm() {
             >
               <div className="col-md-12 col-lg-10">
                 <div className="wrap d-md-flex">
-                  <Form onSubmit={handleSubmit}>
-                    <Grid
-                      container
-                      spacing={2}
-                      style={{ marginTop: "20px", padding: "10px" }}
-                    >
-                      <img
-                        src={checklist}
-                        alt="Paris"
-                        width="100%"
-                        className="center"
-                      />
-                      <Grid item xs={12} sm={12} style={{}}>
-                        <h1>Please fill details to become a member</h1>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="companyName"
-                          label="Company Name"
-                          value={values.companyName}
-                          onChange={handleInputChange}
-                          error={errors.companyName}
-                          fullWidths
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="ownerName"
-                          label="Owner Name"
-                          value={values.ownerName}
-                          onChange={handleInputChange}
-                          fullWidth
-                          error={errors.ownerName}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="regMobileNo"
-                          label="Registered Mobile No."
-                          value={values.mobileNo}
-                          onChange={handleInputChange}
-                          error={errors.regMobileNo}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="adressLine1"
-                          label="Adress Line 1"
-                          value={values.adressLine1}
-                          onChange={handleInputChange}
-                          fullWidth
-                          error={errors.adressLine1}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="adressLine2"
-                          label="Adress Line 2"
-                          value={values.adressLine2}
-                          onChange={handleInputChange}
-                          fullWidth
-                          error={errors.adressLine2}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Countries
-                          value={values}
-                          setValue={setValues}
-                          options={location.country}
-                          error={errors.countryName}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <States
-                          value={values}
-                          setValue={setValues}
-                          options={location.states}
-                          countries={location.country}
-                          country={values.countryName}
-                          error={errors.stateName}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="district"
-                          label="District"
-                          value={values.district}
-                          onChange={handleInputChange}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="taluka"
-                          label="Taluka"
-                          value={values.taluka}
-                          onChange={handleInputChange}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="pincode"
-                          label="Pincode"
-                          value={values.pincode}
-                          onChange={handleInputChange}
-                          fullWidth
-                          error={errors.pincode}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <UnusedAutosuggest
-                          options={gstType}
-                          setValue={setValues}
-                          value={values}
-                          label="GST Registration Type"
-                          name="gstRegType"
-                          fullWidth
-                          error={errors.gstRegType}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="gstInNo"
-                          label="GSTin No"
-                          value={values.gstInNo}
-                          onChange={handleInputChange}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="contactNo"
-                          label="Phone No."
-                          value={values.contactNo}
-                          onChange={handleInputChange}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="email"
-                          label="Email"
-                          value={values.email}
-                          onChange={handleInputChange}
-                          fullWidth
-                        />
-                      </Grid>{" "}
-                      <Grid item xs={12} sm={12}>
-                        <Settings input={input} setInput={setInput} />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <ImageUpload recentImage="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        style={{ display: "flex", justifyContent: "flex-end" }}
-                      >
-                        <Controls.Button
-                          type="submit"
-                          text="Submit"
-                          onClick={handleSubmit}
-                        />
-                        <Controls.Button
-                          text="Reset"
-                          color="default"
-                          onClick={() => {}}
-                        />
-                      </Grid>
+                  <Grid
+                    container
+                    spacing={2}
+                    style={{ marginTop: "20px", padding: "10px" }}
+                  >
+                    <img
+                      src={checklist}
+                      alt="Paris"
+                      width="100%"
+                      className="center"
+                    />
+                    <Grid item xs={12} sm={12} style={{}}>
+                      <h1>Please fill details to become a member</h1>
                     </Grid>
-                  </Form>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="companyName"
+                        label="Company Name"
+                        value={values.companyName}
+                        onChange={handleInputChange}
+                        error={errors.companyName}
+                        fullWidths
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="ownerName"
+                        label="Owner Name"
+                        value={values.ownerName}
+                        onChange={handleInputChange}
+                        fullWidth
+                        error={errors.ownerName}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="regMobileNo"
+                        label="Registered Mobile No."
+                        value={values.mobileNo}
+                        onChange={handleInputChange}
+                        error={errors.regMobileNo}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="adressLine1"
+                        label="Adress Line 1"
+                        value={values.adressLine1}
+                        onChange={handleInputChange}
+                        fullWidth
+                        error={errors.adressLine1}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="adressLine2"
+                        label="Adress Line 2"
+                        value={values.adressLine2}
+                        onChange={handleInputChange}
+                        fullWidth
+                        error={errors.adressLine2}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Countries
+                        value={values}
+                        setValue={setValues}
+                        options={location.country}
+                        error={errors.countryName}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <States
+                        value={values}
+                        setValue={setValues}
+                        options={location.states}
+                        countries={location.country}
+                        country={values.countryName}
+                        error={errors.stateName}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="districtName"
+                        label="District"
+                        value={values.districtName}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="talukaName"
+                        label="Taluka"
+                        value={values.talukaName}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="pinCode"
+                        label="Pincode"
+                        value={values.pinCode}
+                        onChange={handleInputChange}
+                        fullWidth
+                        error={errors.pinCode}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <UnusedAutosuggest
+                        options={gstType}
+                        setValue={setValues}
+                        value={values}
+                        label="GST Registration Type"
+                        name="gstRegType"
+                        fullWidth
+                        error={errors.gstRegType}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="gstInNo"
+                        label="GSTin No"
+                        value={values.gstInNo}
+                        onChange={handleInputChange}
+                        fullWidth
+                        error={errors.gstInNo}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="contactNo"
+                        label="Phone No."
+                        value={values.contactNo}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Controls.Input
+                        name="email"
+                        label="Email"
+                        value={values.email}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>{" "}
+                    <Grid item xs={12} sm={12}>
+                      <Settings
+                        input={input}
+                        setInput={setInput}
+                        errors={errors}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <ImageUpload recentImage="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <Controls.Button
+                        type="submit"
+                        text="Submit"
+                        onClick={handleSubmit}
+                      />
+                      <Controls.Button
+                        text="Reset"
+                        color="default"
+                        onClick={() => {}}
+                      />
+                    </Grid>
+                  </Grid>
                 </div>{" "}
               </div>
             </div>

@@ -6,40 +6,20 @@ import Config from "../Utils/Config";
 import { reactLocalStorage } from "reactjs-localstorage";
 import Popup from "./Popup";
 import ChangeFinyear from "./changeFinYear";
-import StorefrontIcon from "@mui/icons-material/Storefront";
 import PersonIcon from "@mui/icons-material/Person";
 import jQuery from "jquery";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import { FcCalendar } from "react-icons/fc";
+import { useLocation } from "react-router-dom";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import { IconButton } from "@material-ui/core";
+import { FcShop } from "react-icons/fc";
+import { FcManager } from "react-icons/fc";
 const Headerpart = (props) => {
-  const recentImageDataUrl = localStorage.getItem("recent-image");
   const [buttonPopup, setButtonPopup] = React.useState(false);
   let history = useNavigate();
-
-  function getImage() {
-    if (recentImageDataUrl) {
-      return (
-        <img
-          height={40}
-          width={50}
-          src={recentImageDataUrl}
-          alt=""
-          id="img"
-          className="img"
-        />
-      );
-    } else
-      return (
-        <img
-          height={40}
-          width={50}
-          src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-          alt=""
-          id="img"
-          className="img"
-        />
-      );
-  }
+  let location = useLocation();
   let user;
   if (AuthHandler.getUser()) {
     user = AuthHandler.getUser();
@@ -47,160 +27,119 @@ const Headerpart = (props) => {
   console.log(user);
   const userCompanyName = reactLocalStorage.get("userCompanyName");
   console.log(userCompanyName);
+  // {userCompanyName} (Branch:
+  //   {user.defaultBranchName ? user.defaultBranchName : "Pune Branch"})
+  // Financial Year :
+  // {user.defaultFinYear ? user.defaultFinYear : "2021-22"}
   return (
     <>
       <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+          <li class="nav-item" style={{ color: "rgba(0,0,0,.5)" }}>
+            <a
+              class="nav-link"
+              data-widget="pushmenu"
+              href="#"
+              role="button"
+              style={{
+                paddingTop: "15px",
+                display: "flex",
+                alignContent: "flex-end",
+              }}
+            >
               <i class="fas fa-bars"></i>
             </a>
           </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link">
-              Home
-            </a>
-          </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">
-              Contact
-            </a>
+
+          <li class="nav-item" style={{ color: "rgba(0,0,0,.5)" }}>
+            <div className="nav-link">
+              <>
+                <FcShop
+                  style={{ marginBottom: "4px", height: "24px", width: "24px" }}
+                />{" "}
+                Branch:
+                {user.defaultBranchName
+                  ? user.defaultBranchName
+                  : "unknown Branch"}
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    location.pathname == "/Admin/UserMaster" &&
+                      window.location.reload();
+                    history("/Admin/UserMaster");
+                    localStorage.setItem(
+                      "changeBranch",
+                      JSON.stringify({ open: true })
+                    );
+                  }}
+                  style={{
+                    marginBottom: "3px",
+                    marginLeft: "5px",
+                    boxShadow: "none",
+                  }}
+                >
+                  <ChangeCircleIcon />
+                </IconButton>
+                <FcCalendar
+                  style={{
+                    marginBottom: "2px",
+                    marginLeft: "20px",
+                    height: "24px",
+                    width: "24px",
+                  }}
+                />{" "}
+                Financial Year :
+                {user.defaultFinYear ? user.defaultFinYear : "unknown year"}
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    location.pathname == "/Admin/UserMaster" &&
+                      window.location.reload();
+                    history("/Admin/UserMaster");
+                    localStorage.setItem(
+                      "changeBranch",
+                      JSON.stringify({ open: true })
+                    );
+                  }}
+                  style={{
+                    marginBottom: "3px",
+                    marginLeft: "5px",
+                    boxShadow: "none",
+                  }}
+                >
+                  <ChangeCircleIcon />
+                </IconButton>
+              </>
+            </div>
           </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              data-widget="navbar-search"
-              href="#"
-              role="button"
-            >
-              <i class="fas fa-search"></i>
-            </a>
-            <div class="navbar-search-block">
-              <form class="form-inline">
-                <div class="input-group input-group-sm">
-                  <input
-                    class="form-control form-control-navbar"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                  <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit">
-                      <i class="fas fa-search"></i>
-                    </button>
-                    <button
-                      class="btn btn-navbar"
-                      type="button"
-                      data-widget="navbar-search"
-                    >
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-              <i class="far fa-comments"></i>
-              <span class="badge badge-danger navbar-badge">3</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-              <a href="#" class="dropdown-item">
-                <div class="media">
-                  <img
-                    src="dist/img/user1-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 mr-3 img-circle"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      Brad Diesel
-                      <span class="float-right text-sm text-danger">
-                        <i class="fas fa-star"></i>
-                      </span>
-                    </h3>
-                    <p class="text-sm">Call me whenever you can...</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item">
-                <div class="media">
-                  <img
-                    src="dist/img/user8-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 img-circle mr-3"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      John Pierce
-                      <span class="float-right text-sm text-muted">
-                        <i class="fas fa-star"></i>
-                      </span>
-                    </h3>
-                    <p class="text-sm">I got your message bro</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item">
-                <div class="media">
-                  <img
-                    src="dist/img/user3-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 img-circle mr-3"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      Nora Silvester
-                      <span class="float-right text-sm text-warning">
-                        <i class="fas fa-star"></i>
-                      </span>
-                    </h3>
-                    <p class="text-sm">The subject goes here</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item dropdown-footer">
-                See All Messages
-              </a>
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link"
-              data-toggle="dropdown"
-              href="/"
+          <li
+            class="nav-item dropdown"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              padding: "6px",
+            }}
+          >
+            <IconButton
+              size="small"
               style={{
-                display: "flex",
-                alignItems: "flex-start",
-                paddingTop: "6px",
-                paddingRight: "10px",
+                boxShadow: "none",
+              }}
+              onClick={() => {
+                console.log("hi");
+                history("/");
               }}
             >
-              <i>
-                <LogoutIcon
-                  fontSize="small"
-                  onClick={() => {
-                    history("/");
-                  }}
-                />
-              </i>
-            </a>
+              <LogoutIcon
+                fontSize="small"
+                onClick={() => {
+                  history("/");
+                }}
+              />
+            </IconButton>
           </li>
           <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
@@ -221,6 +160,14 @@ const Headerpart = (props) => {
         </ul>
       </nav>
       <aside class="control-sidebar control-sidebar-dark"></aside>
+      <Popup
+        title={`Financial Year`}
+        openPopup={buttonPopup}
+        setOpenPopup={setButtonPopup}
+        size="md"
+      >
+        <ChangeFinyear setButtonPopup={setButtonPopup} />
+      </Popup>
     </>
   );
 

@@ -37,9 +37,31 @@ export default function GeneralForm(props) {
     handleSubmit,
   } = props;
   const [input, setInput] = useState(values);
+  const [errors, setErrors] = useState(initialFilterValues);
 
   const prodOptions = products.map((item) => item.prodName);
+  const validate = (fieldValues = input) => {
+    let temp = { ...errors };
+    delete temp.endDate;
+    delete temp.expDate;
+    delete temp.startDate;
+    delete temp.vouDate;
+    function check(key) {
+      if (key in fieldValues)
+        temp[key] = fieldValues[key] ? "" : "This field is required.";
+    }
+    check("refType");
 
+    settings.userBatchNo == "Yes" && check("batchNo");
+    check("prodCode");
+    check("prodName");
+    console.log(temp);
+    setErrors({
+      ...temp,
+    });
+
+    if (fieldValues == input) return Object.values(temp).every((x) => x == "");
+  };
   console.log(input, prodOptions);
   const classes = useStyles();
   const handleChange = (e) => {
@@ -106,6 +128,8 @@ export default function GeneralForm(props) {
             value={input}
             setValue={setInput}
             options={["AJ", "OP"]}
+            disabled={getVouNo() !== " NEW "}
+            error={errors.refType}
           />
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>
@@ -119,6 +143,7 @@ export default function GeneralForm(props) {
             setValue={setInput}
             options1={prodOptions}
             options2={products}
+            error={errors.prodCode}
           />
         </Grid>
         {settings.userBatchNo == "Yes" && (
@@ -129,6 +154,7 @@ export default function GeneralForm(props) {
                 label="Batch No"
                 value={input.batchNo}
                 onChange={handleChange}
+                error={errors.batchNo}
               />
             </Grid>
 
@@ -181,7 +207,7 @@ export default function GeneralForm(props) {
               type="submit"
               text="Submit"
               onClick={(e) => {
-                handleSubmit(input);
+                validate() && handleSubmit(input);
               }}
             />
           </div>

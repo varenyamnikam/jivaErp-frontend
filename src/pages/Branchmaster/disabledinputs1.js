@@ -13,7 +13,7 @@ export default function DisabledInputs1(props) {
           <Controls.Input
             name="branchCode"
             label="Branch Code"
-            value={values.branchCode}
+            value={values.branchCode == "X X X X" ? "N E W" : values.branchCode}
             error={errors.branchCode}
             onChange={handleChange}
             disabled={true}

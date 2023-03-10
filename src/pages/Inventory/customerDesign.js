@@ -73,6 +73,7 @@ export default function CustomerForm(props) {
     setInput,
     setTabValue,
     getVouNo,
+    setItem,
   } = props;
   const validateValues = {
     ...initialValues,
@@ -139,7 +140,9 @@ export default function CustomerForm(props) {
       values.docCode == "PO" ||
       values.docCode == "GR" ||
       values.docCode == "PV" ||
-      values.docCode == "PR"
+      values.docCode == "PR" ||
+      values.docCode == "CN" ||
+      values.docCode == "DN"
     )
       x = "S";
     else {
@@ -596,6 +599,13 @@ export default function CustomerForm(props) {
             <button
               class="buttonNext"
               onClick={() => {
+                setItem((prev) => ({
+                  ...prev,
+                  cgstP: "",
+                  sgstP: "",
+                  cessP: "",
+                  igstP: "",
+                }));
                 setTabValue("2");
               }}
             >

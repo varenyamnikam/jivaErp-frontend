@@ -67,6 +67,10 @@ const useStyles = makeStyles((theme) => ({
     color: "goldenrod",
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
+  center: {
+    display: "flex",
+    justifyContent: "center",
+  },
 }));
 const initialValues = {
   userCompanyCode: "X X X X",
@@ -91,7 +95,7 @@ export default function Settings() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [save, setSave] = useState(true);
-
+  const classes = useStyles();
   function handleInputChange(e) {
     const { value, name } = e.target;
     setValues({ ...values, [name]: value });
@@ -157,7 +161,7 @@ export default function Settings() {
             <section className="content">
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
-                  <Grid container>
+                  <Grid container style={{ pading: "20px" }}>
                     <Profile />
                   </Grid>
                 </Grid>
@@ -165,9 +169,10 @@ export default function Settings() {
                   <div className="card">
                     <div className="card-body">
                       <section className="content">
-                        <Grid container>
+                        <Grid container spacing={2}>
                           <Grid item sm={6} xs={12}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="userBatchNo"
                               label="use Batch No?"
@@ -177,8 +182,9 @@ export default function Settings() {
                               error={errors.userBatchNo}
                             />
                           </Grid>
-                          <Grid item sm={6} xs={12}>
+                          <Grid item sm={6} xs={12} className={classes.center}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="useSerialNo"
                               label="Use Serial No?"
@@ -190,6 +196,7 @@ export default function Settings() {
                           </Grid>
                           <Grid item sm={6} xs={12}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="itemDescription"
                               label="Use Item Description?"
@@ -199,23 +206,9 @@ export default function Settings() {
                               error={errors.itemDescription}
                             />
                           </Grid>
-                          <Grid item sm={6} xs={12}>
-                            <UnusedAutosuggest
-                              style={{ width: "100%", marginBottom: "20px" }}
-                              name="gstReg"
-                              label="Gst Registration"
-                              value={values}
-                              setValue={setValues}
-                              options={[
-                                "UnRegistered",
-                                "Regular",
-                                "Composition",
-                              ]}
-                              error={errors.gstReg}
-                            />
-                          </Grid>
-                          <Grid item sm={6} xs={12}>
+                          <Grid item sm={6} xs={12} className={classes.center}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="useintraStateSale"
                               label="Use Intra State Sale?"
@@ -227,6 +220,7 @@ export default function Settings() {
                           </Grid>
                           <Grid item sm={6} xs={12}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="usePesticideSale"
                               label="Use Pesticide Sale?"
@@ -236,8 +230,9 @@ export default function Settings() {
                               error={errors.usePesticideSale}
                             />
                           </Grid>
-                          <Grid item sm={6} xs={12}>
+                          <Grid item sm={6} xs={12} className={classes.center}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="useCessitem"
                               label="Use Cess Item"
@@ -258,8 +253,9 @@ export default function Settings() {
                               error={errors.saleStockUpdateUsing}
                             />
                           </Grid>
-                          <Grid item sm={6} xs={12}>
+                          <Grid item sm={6} xs={12} className={classes.center}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="color"
                               label="THEME"
@@ -280,8 +276,9 @@ export default function Settings() {
                               error={errors.purcStockUpdateUsing}
                             />
                           </Grid>
-                          <Grid item sm={6} xs={12}>
+                          <Grid item sm={6} xs={12} className={classes.center}>
                             <Controls.RadioGroup
+                              position="left"
                               size="small"
                               name="useAcc"
                               label="Account Print Format"
@@ -293,11 +290,11 @@ export default function Settings() {
                           </Grid>
                           <Grid
                             item
-                            sm={6}
+                            sm={12}
                             xs={12}
                             style={{
                               display: "flex",
-                              justifyContent: "center",
+                              justifyContent: "flex-end",
                               padding: "20px",
                             }}
                           >

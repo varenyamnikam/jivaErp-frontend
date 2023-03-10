@@ -154,14 +154,16 @@ export default function UnusedAutosuggest(props) {
       );
       partyStateCode = partyStateCode ? partyStateCode.stateCode : "0";
       const companyStateCode = Number(
-        JSON.parse(localStorage.getItem("company")).stateCode
+        JSON.parse(localStorage.getItem("user")).stateCode
       );
-      const insideOfMaharashtra = companyStateCode == partyStateCode;
+      const insideOfMaharashtra =
+        Number(companyStateCode) == Number(partyStateCode);
       const igst = String(Number(gstInfo.cgst) + Number(gstInfo.sgst));
 
       console.log(
-        JSON.parse(localStorage.getItem("company")).stateCode,
+        companyStateCode,
         partyStateCode,
+        !partyStateCode,
         insideOfMaharashtra,
         value,
         Number(value.cgstP),
@@ -181,12 +183,10 @@ export default function UnusedAutosuggest(props) {
         !partyStateCode
       );
       if (
-        (insideOfMaharashtra &&
-          (Number(value.cgstP) !== Number(gstInfo.cgst) ||
-            Number(value.sgstP) !== Number(gstInfo.sgst) ||
-            Number(value.cessP) !== Number(gstInfo.cess))) ||
-        !companyStateCode ||
-        !partyStateCode
+        (insideOfMaharashtra || Number(partyStateCode) == 0) &&
+        (Number(value.cgstP) !== Number(gstInfo.cgst) ||
+          Number(value.sgstP) !== Number(gstInfo.sgst) ||
+          Number(value.cessP) !== Number(gstInfo.cess))
       ) {
         setValue({
           ...value,
@@ -196,9 +196,8 @@ export default function UnusedAutosuggest(props) {
         });
       }
       if (
-        companyStateCode &&
-        partyStateCode &&
         !insideOfMaharashtra &&
+        Number(partyStateCode) !== 0 &&
         (value.igstP !== igst || value.cessP !== gstInfo.cess)
       ) {
         setValue({

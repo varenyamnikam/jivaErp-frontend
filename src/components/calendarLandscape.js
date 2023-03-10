@@ -3,8 +3,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
 import { makeStyles, IconButton } from "@material-ui/core";
+import { format } from "date-fns";
 import "./arrows.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +51,33 @@ export default function StaticDatePickerLandscape(props) {
   } = props;
 
   const classes = useStyles();
+  console.log(value[name]);
+  function isValidDate(date) {
+    if (typeof date === "string") {
+      // Check if the input is in "DD/MM/YYYY" format
+      const regex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+      if (regex.test(date)) {
+        // If the input is in "DD/MM/YYYY" format, try to parse it as a date
+        const timestamp = Date.parse(date);
+        return isNaN(timestamp) === false;
+      } else {
+        // If the input is not in "DD/MM/YYYY" format, return false
+        return false;
+      }
+    } else if (date instanceof Date) {
+      // Check if the date object is valid
+      return isNaN(date.getTime()) === false;
+    } else {
+      // If the input is neither a string nor a date object, return false
+      return false;
+    }
+  }
 
+  function getFromattedDate(date) {
+    let formattedDate = date;
+    if (isValidDate(date)) formattedDate = format(date, "dd/MM/yyyy");
+    return formattedDate;
+  }
   return (
     <div className="customDatePickerWidth">
       <LocalizationProvider dateAdapter={AdapterDateFns}>

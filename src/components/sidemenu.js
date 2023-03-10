@@ -6,8 +6,18 @@ import SubMenu from "./SubMenu";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MyAutocomplete from "./searchSideMenu";
+import { reactLocalStorage } from "reactjs-localstorage";
+import { FcManager } from "react-icons/fc";
+
 const Sidemenu = (props) => {
   const matches = useMediaQuery("(min-width:1000px)");
+  const recentImageDataUrl = localStorage.getItem("recent-image");
+
+  function getImage() {
+    return recentImageDataUrl
+      ? recentImageDataUrl
+      : "../dist/img/AdminLTELogo.png";
+  }
 
   // let SidebarData = AuthHandler.getMenuItem();
   let SidebarData = AuthHandler.getMenuItem();
@@ -57,18 +67,20 @@ const Sidemenu = (props) => {
       );
     }
   }
+  const userCompanyName = reactLocalStorage.get("userCompanyName");
+
   return (
     <aside className="main-sidebar sidebar-dark-primary elevation-4">
-      <a href="index3.html" className="brand-link">
+      <Link to="/home" className="brand-link">
         <img
-          src="../dist/img/AdminLTELogo.png"
+          src={getImage()}
           alt="AdminLTE Logo"
           className="brand-image img-circle elevation-3"
         />
-        <span className="brand-text font-weight-light">E.R.P</span>
-      </a>
+        <span className="brand-text font-weight-light">{userCompanyName}</span>
+      </Link>
 
-      <div className="sidebar">
+      <div className="sidebar" style={{ overflow: "scroll" }}>
         <div className="user-panel mt-3 pb-3 mb-3 d-flex">
           <div className="image">
             <img
@@ -78,9 +90,9 @@ const Sidemenu = (props) => {
             />
           </div>
           <div className="info">
-            <a href="#" className="d-block">
+            <Link to="/Admin/UserMaster" className="d-block">
               {userName}
-            </a>
+            </Link>
           </div>
         </div>
 

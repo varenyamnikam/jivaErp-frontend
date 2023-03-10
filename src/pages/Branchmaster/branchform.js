@@ -21,6 +21,8 @@ import Talukas from "../../components/talukaSelect";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useNavigate } from "react-router-dom";
+
 const hello = makeStyles((theme) => ({
   Weddings: {
     padding: "8px",
@@ -58,6 +60,7 @@ const initialLocation = {
 export default function Branchform(props) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const page = useNavigate();
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
@@ -92,9 +95,26 @@ export default function Branchform(props) {
       if (key in fieldValues)
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
+    var expr = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    console.log(expr.test(fieldValues.GSTno));
+
     Object.keys(temp).map((x) => {
       check(x);
     });
+    if (!expr.test(fieldValues.GSTno)) {
+      temp.GSTno = "incorrect format";
+    } else {
+      temp.GSTno = "";
+    }
+    let x = "branchName";
+    let y = "branchCode";
+
+    let found = records.find(
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    );
+    if (fieldValues[x])
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+    console.log(temp);
     setErrors({
       ...temp,
     });
@@ -208,6 +228,14 @@ export default function Branchform(props) {
         });
         console.log(newrecord);
         setRecords([...newrecord, input]);
+        if (
+          input.branchCode ==
+          JSON.parse(localStorage.getItem("user")).defaultBranchCode
+        ) {
+          alert("plz login again");
+
+          page("/");
+        }
         // scroll.scrollToBottom();
       }
     }
@@ -260,91 +288,91 @@ export default function Branchform(props) {
   // }
 
   return (
-    <Form
-      onSubmit={(e) => {
-        handleSubmit(e);
-      }}
-    >
-      <Grid container>
-        <DisabledInputs1
-          values={input}
-          errors={errors}
-          handleChange={handleChange}
+    <Grid container spacing={2}>
+      <DisabledInputs1
+        values={input}
+        errors={errors}
+        handleChange={handleChange}
+      />
+      <Grid item xs={12} sm={6}>
+        <UnusedAutosuggest
+          options={branchTypes}
+          setValue={setInput}
+          value={input}
+          name="branchType"
+          label="branchType"
+          error={errors.branchType}
         />
-        <Grid item xs={12} sm={6}>
-          <UnusedAutosuggest
-            options={branchTypes}
-            setValue={setInput}
-            value={input}
-            name="branchType"
-            label="branchType"
-            error={errors.branchType}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <UnusedAutosuggest
-            options={acBranchOptions}
-            setValue={setInput}
-            value={input}
-            name="acBranchName"
-            label="A.C Branch"
-            error={errors.acBranchName}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Countries
-            value={input}
-            setValue={setInput}
-            options={country}
-            error={errors.countryName}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <States
-            value={input}
-            setValue={setInput}
-            options={states}
-            countries={country}
-            country={input.countryName}
-            disable={stateDisable}
-            error={errors.stateName}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Controls.Input
-            value={input.districtName}
-            name="districtName"
-            label="District"
-            error={errors.districtName}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Controls.Input
-            value={input.talukaName}
-            name="talukaName"
-            label="Taluka"
-            error={errors.talukaName}
-            onChange={handleChange}
-          />
-        </Grid>
-        <DisabledInputs2
-          values={input}
-          errors={errors}
-          handleChange={handleChange}
-        />
-        <Grid item xs={12} sm={6}></Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          style={{ display: "flex", justifyContent: "center" }}
-        >
-          <Controls.Button text="Reset" color="default" onClick={handleReset} />
-          <Controls.Button type="submit" text="Submit" />
-        </Grid>
       </Grid>
-    </Form>
+      <Grid item xs={12} sm={6}>
+        <UnusedAutosuggest
+          options={acBranchOptions}
+          setValue={setInput}
+          value={input}
+          name="acBranchName"
+          label="A.C Branch"
+          error={errors.acBranchName}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Countries
+          value={input}
+          setValue={setInput}
+          options={country}
+          error={errors.countryName}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <States
+          value={input}
+          setValue={setInput}
+          options={states}
+          countries={country}
+          country={input.countryName}
+          disable={stateDisable}
+          error={errors.stateName}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controls.Input
+          value={input.districtName}
+          name="districtName"
+          label="District"
+          error={errors.districtName}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Controls.Input
+          value={input.talukaName}
+          name="talukaName"
+          label="Taluka"
+          error={errors.talukaName}
+          onChange={handleChange}
+        />
+      </Grid>
+      <DisabledInputs2
+        values={input}
+        errors={errors}
+        handleChange={handleChange}
+      />
+      <Grid item xs={12} sm={6}></Grid>
+      <Grid
+        item
+        xs={12}
+        sm={6}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        <Controls.Button text="Reset" color="default" onClick={handleReset} />
+        <Controls.Button
+          type="submit"
+          text="Submit"
+          onClick={(e) => {
+            handleSubmit(e);
+          }}
+        />
+      </Grid>
+    </Grid>
   );
 }
 // <ControllableStates

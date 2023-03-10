@@ -46,6 +46,25 @@ export default function CountryForm(props) {
       temp.countryCode = fieldValues.countryCode
         ? ""
         : "This field is required.";
+    // let x = "countryName";
+    // let y = "countryCode";
+    // let found = records.find(
+    //   (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
+    // );
+    // if (fieldValues[x])
+    //   temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+    console.log(temp);
+    if ("countryName" in fieldValues) {
+      let x = "countryName";
+      let found = records.find((item) => item[x] == fieldValues[x]);
+      if (fieldValues[x])
+        temp[x] = found ? `${found[x]} already exists at ` : "";
+      let y = "countryCode";
+      let founde = records.find((item) => item[y] == fieldValues[y]);
+      if (fieldValues[y])
+        temp[y] = founde ? `${founde[y]} already exists  ` : "";
+    }
+
     setErrors({
       ...temp,
     });

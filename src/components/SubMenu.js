@@ -34,7 +34,7 @@ const DropdownLink = styled(Link)`
 `;
 function getRights(node) {
   let adm_userrights = JSON.parse(localStorage.getItem("adm_userrights"));
-  // let adm_userrights = [];
+  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   let x = true;
   if (adm_userrights) {
     adm_userrights.map((right) => {
@@ -48,6 +48,17 @@ function getRights(node) {
       }
     });
   }
+  if (
+    settings.saleStockUpdateUsing == "Invoice" &&
+    node.screenName == "Dispatch Register"
+  )
+    x = false;
+  if (
+    settings.purcStockUpdateUsing == "Invoice" &&
+    node.screenName == "Material Inward Register"
+  )
+    x = false;
+
   return x;
 }
 const SubMenu = ({ data = [] }) => {
@@ -68,13 +79,13 @@ const SubMenu = ({ data = [] }) => {
 
 const TreeNode = ({ node }) => {
   const [childVisible, setChildVisiblity] = useState(false);
-  function getIcon(data) {
-    if (data.screenName == "ADMIN") {
-      return <Icon size={12} icon={getIcon(node)} />;
-    } else {
-      return <i class="fa-solid fa-user-tie"></i>;
-    }
-  }
+  // function getIcon(data) {
+  //   if (data.screenName == "ADMIN") {
+  //     return <Icon size={12} icon={getIcon(node)} />;
+  //   } else {
+  //     return <i class="fa-solid fa-user-tie"></i>;
+  //   }
+  // }
 
   const hasChild = node.subNav ? true : false;
   return (

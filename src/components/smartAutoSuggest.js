@@ -83,7 +83,7 @@ const tfStyle = {
   },
 };
 
-export default function UnusedAutosuggest(props) {
+export default function SmartAutosuggest(props) {
   const {
     value,
     setValue,

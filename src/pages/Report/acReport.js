@@ -83,13 +83,13 @@ const initialAccount = {
   acName: "",
 };
 
-export default function StockMaster() {
+export default function AcReport() {
   const headCells = [
     { id: "Vou No", label: "Vou No", feild: "vouNo" },
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
-    { id: "Credit", label: "Credit", feild: "credit" },
     { id: "Debit", label: "Debit", feild: "debit" },
+    { id: "Credit", label: "Credit", feild: "credit" },
     {
       id: "Balance",
       label: "Balance",

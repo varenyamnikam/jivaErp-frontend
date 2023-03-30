@@ -121,8 +121,7 @@ const Usermaster = (props) => {
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   console.log(filter);
-  const isOpen = JSON.parse(localStorage.getItem("changeBranch")).open;
-  const [buttonPopup, setButtonPopup] = useState(isOpen);
+  const [buttonPopup, setButtonPopup] = useState(false);
   const [popup, setPopup] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [branchNames, setBranchNames] = useState([]);
@@ -178,16 +177,6 @@ const Usermaster = (props) => {
           }
           if (response.data.adm_userrights)
             setUserRights(response.data.adm_userrights);
-          if (isOpen) {
-            let currentUsr = response.data.adm_usermaster.find(
-              (item) => item.userCode == userCode
-            );
-            currentUsr && setValues(currentUsr);
-            localStorage.setItem(
-              "changeBranch",
-              JSON.stringify({ open: false })
-            );
-          }
         })
         .catch(function (error) {
           setNotify({
@@ -195,16 +184,6 @@ const Usermaster = (props) => {
             message: "Unable to connect to servers",
             type: "warning",
           });
-        })
-        .finally(() => {
-          if (isOpen) {
-            let currentUsr = records.find((item) => item.userCode == userCode);
-            currentUsr && setValues(currentUsr);
-            localStorage.setItem(
-              "changeBranch",
-              JSON.stringify({ open: false })
-            );
-          }
         });
     }
   }, []);

@@ -90,6 +90,8 @@ export default function UnusedAutosuggest(props) {
     name,
     label,
     disabled = false,
+    callback = () => {},
+    ...rest
   } = props;
   const [inputValue, setInputValue] = React.useState("");
   const classes = useStyles();
@@ -109,7 +111,7 @@ export default function UnusedAutosuggest(props) {
         onClose={() => {
           inputRef.focus();
         }}
-        style={{ width: "100%" }}
+        {...rest}
         value={value[name]}
         onChange={(event, newValue, reason) => {
           inputRef.focus();
@@ -126,6 +128,7 @@ export default function UnusedAutosuggest(props) {
               console.log("onchange" + newValue);
             }
           }
+          callback(newValue);
           console.log("onchange" + newValue);
         }}
         inputValue={inputValue}

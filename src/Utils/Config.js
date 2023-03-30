@@ -7,112 +7,139 @@ const PORT = process.env.PORT;
 class Config {
   static user = JSON.parse(localStorage.getItem("user"));
   static query = AuthHandler.getQuery();
-  // static loginUrl = "http://localhost:3001/api/login";
-  // static register = "http://localhost:3001/api/register";
-  // static homeUrl = "http://localhost:3001/api/home";
-  // static userUrl = "http://localhost:3001/api/adm_userrole";
-  // static userRightsUrl = "http://localhost:3001/api/adm_userrights";
-  // static showRights = "http://localhost:3001/api/post_userrights";
-  // static deleteUserRoleUrl = "http://localhost:3001/api/delete_adm_userrole";
-  // static logoutPageUrl = "/";
-  // static resetUrl = "http://localhost:3001/api/delete_adm_userrights";
-  // static usermasterUrl = "http://localhost:3001/api/adm_usermaster";
-  // static addUser = "http://localhost:3001/api/post_adduser";
-  // static deleteUser = "http://localhost:3001/api/post_deleteuser";
-  // static updateUser = "http://localhost:3001/api/post_updateuser";
-  // static location = "http://localhost:3001/api/post_location";
-  // static Branch = "http://localhost:3001/api/adm_branch";
-  // static deleteBranch = "http://localhost:3001/api/post_deletebranch";
-  // static updateBranch = "http://localhost:3001/api/post_updatebranch";
-  // static addlocation = "http://localhost:3001/api/post_addlocation";
-  // static marketareaemployee = "http://localhost:3001/api/post_marketarea";
-  // static getacGlGroup = "http://localhost:3001/api/post_acGlGroup";
-  // static getacGl = "http://localhost:3001/api/post_acGl";
-  // static addacglgroup = "http://localhost:3001/api/post_addAcGlGroup";
-  // static getaccounts = "http://localhost:3001/api/post_accounts";
-  // static getmktArea = "http://localhost:3001/api/post_mktArea";
-  // static getacadress = "http://localhost:3001/api/post_acadress";
-  // static addacadress = "http://localhost:3001/api/post_addacadress";
-  // static getAcTypes = "http://localhost:3001/api/post_acTypes";
-  // static getDeptTypes = "http://localhost:3001/api/post_deptTypes";
-  // static random = "http://localhost:3001/api/random";
-  // static unit = "http://localhost:3001/api/mst_unit";
-  // static prodCompany = "http://localhost:3001/api/mst_prodCompany";
-  // static prodType = "http://localhost:3001/api/mst_prodTypes";
-  // static prodMaster = "http://localhost:3001/api/mst_prodMaster";
-  // static finYear = "http://localhost:3001/api/adm_finYear";
-  // static accounts = "http://localhost:3001/api/mst_accounts";
-  // static acglgroup = "http://localhost:3001/api/mst_acglgroup";
-  // static acgl = "http://localhost:3001/api/mst_acgl";
-  // static acadress = "http://localhost:3001/api/mst_acadress";
-  // static paymentTerms = "http://localhost:3001/api/mst_paymentTerms";
-  // static dc = "http://localhost:3001/api/inv_dc";
-  // static soft = "http://localhost:3001/api/soft";
-  // static ledger = "http://localhost:3001/api/inv_ledger";
-  // static both = "http://localhost:3001/api/inv_both";
-  // static register = "http://localhost:3001/api/register";
-  // static batch = "http://localhost:3001/api/batch";
-  // static accounting = "http://localhost:3001/api/accounting";
-  // static stockReport = "http://localhost:3001/api/stockReport";
-  // static acReport = "http://localhost:3001/api/acReport";
-  // static bankReport = "http://localhost:3001/api/bankReport";
-  // static mktArea = "http://localhost:3001/api/mst_mktArea";
-  // static none = "http://localhost:3001/api/inv_none";
-
-  static loginUrl = "http://147.182.252.2:3001/api/login";
-  static registerUrl = "http://147.182.252.2:3001/api/register";
-  static homeUrl = "http://147.182.252.2:3001/api/home";
-  static userUrl = "http://147.182.252.2:3001/api/adm_userrole";
-  // static postuserroleUrl = "http://147.182.252.2:3001/api/post_userrole" ;
-  static userRightsUrl = "http://147.182.252.2:3001/api/adm_userrights";
-  static showRights = "http://147.182.252.2:3001/api/post_userrights";
+  static loginUrl = "https://good-lime-walrus-hose.cyclic.app/api/login";
+  static register = "https://good-lime-walrus-hose.cyclic.app/api/register";
+  static homeUrl = "https://good-lime-walrus-hose.cyclic.app/api/home";
+  static userUrl = "https://good-lime-walrus-hose.cyclic.app/api/adm_userrole";
+  static userRightsUrl =
+    "https://good-lime-walrus-hose.cyclic.app/api/adm_userrights";
+  static showRights =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_userrights";
   static deleteUserRoleUrl =
-    "http://147.182.252.2:3001/api/delete_adm_userrole";
-  static logoutPageUrl = "/login";
-  static resetUrl = "http://147.182.252.2:3001/api/delete_adm_userrights";
-  static usermasterUrl = "http://147.182.252.2:3001/api/adm_usermaster";
-  static addUser = "http://147.182.252.2:3001/api/post_adduser";
-  static deleteUser = "http://147.182.252.2:3001/api/post_deleteuser";
-  static updateUser = "http://147.182.252.2:3001/api/post_updateuser";
-  static location = "http://147.182.252.2:3001/api/post_location";
-  static Branch = "http://147.182.252.2:3001/api/adm_branch";
-  static deleteBranch = "http://147.182.252.2:3001/api/post_deletebranch";
-  static updateBranch = "http://147.182.252.2:3001/api/post_updatebranch";
-  static addlocation = "http://147.182.252.2:3001/api/post_addlocation";
-  static marketareaemployee = "http://147.182.252.2:3001/api/post_marketarea";
-  static getacGlGroup = "http://147.182.252.2:3001/api/post_acGlGroup";
-  static getacGl = "http://147.182.252.2:3001/api/post_acGl";
-  static addacglgroup = "http://147.182.252.2:3001/api/post_addAcGlGroup";
-  static getaccounts = "http://147.182.252.2:3001/api/post_accounts";
-  static getmktArea = "http://147.182.252.2:3001/api/post_mktArea";
-  static getacadress = "http://147.182.252.2:3001/api/post_acadress";
-  static addacadress = "http://147.182.252.2:3001/api/post_addacadress";
-  static getAcTypes = "http://147.182.252.2:3001/api/post_acTypes";
-  static getDeptTypes = "http://147.182.252.2:3001/api/post_deptTypes";
-  static random = "http://147.182.252.2:3001/api/random";
-  static unit = "http://147.182.252.2:3001/api/mst_unit";
-  static prodCompany = "http://147.182.252.2:3001/api/mst_prodCompany";
-  static prodType = "http://147.182.252.2:3001/api/mst_prodTypes";
-  static prodMaster = "http://147.182.252.2:3001/api/mst_prodMaster";
-  static finYear = "http://147.182.252.2:3001/api/adm_finYear";
-  static accounts = "http://147.182.252.2:3001/api/mst_accounts";
-  static acglgroup = "http://147.182.252.2:3001/api/mst_acglgroup";
-  static acgl = "http://147.182.252.2:3001/api/mst_acgl";
-  static acadress = "http://147.182.252.2:3001/api/mst_acadress";
-  static paymentTerms = "http://147.182.252.2:3001/api/mst_paymentTerms";
-  static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
-  static register = "http://147.182.252.2:3001/api/register";
-  static dc = "http://147.182.252.2:3001/api/inv_dc";
-  static ledger = "http://147.182.252.2:3001/api/inv_ledger";
-  static both = "http://147.182.252.2:3001/api/inv_both";
-  static soft = "http://147.182.252.2:3001/api/soft";
-  static batch = "http://147.182.252.2:3001/api/batch";
-  static accounting = "http://147.182.252.2:3001/api/accounting";
-  static stockReport = "http://147.182.252.2:3001/api/stockReport";
-  static acReport = "http://147.182.252.2:3001/api/acReport";
-  static bankReport = "http://147.182.252.2:3001/api/bankReport";
-  static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
-  static none = "http://147.182.252.2:3001/api/inv_none";
+    "https://good-lime-walrus-hose.cyclic.app/api/delete_adm_userrole";
+  static logoutPageUrl = "/";
+  static resetUrl =
+    "https://good-lime-walrus-hose.cyclic.app/api/delete_adm_userrights";
+  static usermasterUrl =
+    "https://good-lime-walrus-hose.cyclic.app/api/adm_usermaster";
+  static addUser = "https://good-lime-walrus-hose.cyclic.app/api/post_adduser";
+  static deleteUser =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_deleteuser";
+  static updateUser =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_updateuser";
+  static location =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_location";
+  static Branch = "https://good-lime-walrus-hose.cyclic.app/api/adm_branch";
+  static deleteBranch =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_deletebranch";
+  static updateBranch =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_updatebranch";
+  static addlocation =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_addlocation";
+  static marketareaemployee =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_marketarea";
+  static getacGlGroup =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_acGlGroup";
+  static getacGl = "https://good-lime-walrus-hose.cyclic.app/api/post_acGl";
+  static addacglgroup =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_addAcGlGroup";
+  static getaccounts =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_accounts";
+  static getmktArea =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_mktArea";
+  static getacadress =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_acadress";
+  static addacadress =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_addacadress";
+  static getAcTypes =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_acTypes";
+  static getDeptTypes =
+    "https://good-lime-walrus-hose.cyclic.app/api/post_deptTypes";
+  static random = "https://good-lime-walrus-hose.cyclic.app/api/random";
+  static unit = "https://good-lime-walrus-hose.cyclic.app/api/mst_unit";
+  static prodCompany =
+    "https://good-lime-walrus-hose.cyclic.app/api/mst_prodCompany";
+  static prodType =
+    "https://good-lime-walrus-hose.cyclic.app/api/mst_prodTypes";
+  static prodMaster =
+    "https://good-lime-walrus-hose.cyclic.app/api/mst_prodMaster";
+  static finYear = "https://good-lime-walrus-hose.cyclic.app/api/adm_finYear";
+  static accounts = "https://good-lime-walrus-hose.cyclic.app/api/mst_accounts";
+  static acglgroup =
+    "https://good-lime-walrus-hose.cyclic.app/api/mst_acglgroup";
+  static acgl = "https://good-lime-walrus-hose.cyclic.app/api/mst_acgl";
+  static acadress = "https://good-lime-walrus-hose.cyclic.app/api/mst_acadress";
+  static paymentTerms =
+    "https://good-lime-walrus-hose.cyclic.app/api/mst_paymentTerms";
+  static dc = "https://good-lime-walrus-hose.cyclic.app/api/inv_dc";
+  static soft = "https://good-lime-walrus-hose.cyclic.app/api/soft";
+  static ledger = "https://good-lime-walrus-hose.cyclic.app/api/inv_ledger";
+  static both = "https://good-lime-walrus-hose.cyclic.app/api/inv_both";
+  static register = "https://good-lime-walrus-hose.cyclic.app/api/register";
+  static batch = "https://good-lime-walrus-hose.cyclic.app/api/batch";
+  static accounting = "https://good-lime-walrus-hose.cyclic.app/api/accounting";
+  static stockReport =
+    "https://good-lime-walrus-hose.cyclic.app/api/stockReport";
+  static acReport = "https://good-lime-walrus-hose.cyclic.app/api/acReport";
+  static bankReport = "https://good-lime-walrus-hose.cyclic.app/api/bankReport";
+  static mktArea = "https://good-lime-walrus-hose.cyclic.app/api/mst_mktArea";
+  static none = "https://good-lime-walrus-hose.cyclic.app/api/inv_none";
+  static trialBalance =
+    "https://good-lime-walrus-hose.cyclic.app/api/trialBalance";
+  // static loginUrl = "http://147.182.252.2:3001/api/login";
+  // static registerUrl = "http://147.182.252.2:3001/api/register";
+  // static homeUrl = "http://147.182.252.2:3001/api/home";
+  // static userUrl = "http://147.182.252.2:3001/api/adm_userrole";
+  // // static postuserroleUrl = "http://147.182.252.2:3001/api/post_userrole" ;
+  // static userRightsUrl = "http://147.182.252.2:3001/api/adm_userrights";
+  // static showRights = "http://147.182.252.2:3001/api/post_userrights";
+  // static deleteUserRoleUrl =
+  //   "http://147.182.252.2:3001/api/delete_adm_userrole";
+  // static logoutPageUrl = "/login";
+  // static resetUrl = "http://147.182.252.2:3001/api/delete_adm_userrights";
+  // static usermasterUrl = "http://147.182.252.2:3001/api/adm_usermaster";
+  // static addUser = "http://147.182.252.2:3001/api/post_adduser";
+  // static deleteUser = "http://147.182.252.2:3001/api/post_deleteuser";
+  // static updateUser = "http://147.182.252.2:3001/api/post_updateuser";
+  // static location = "http://147.182.252.2:3001/api/post_location";
+  // static Branch = "http://147.182.252.2:3001/api/adm_branch";
+  // static deleteBranch = "http://147.182.252.2:3001/api/post_deletebranch";
+  // static updateBranch = "http://147.182.252.2:3001/api/post_updatebranch";
+  // static addlocation = "http://147.182.252.2:3001/api/post_addlocation";
+  // static marketareaemployee = "http://147.182.252.2:3001/api/post_marketarea";
+  // static getacGlGroup = "http://147.182.252.2:3001/api/post_acGlGroup";
+  // static getacGl = "http://147.182.252.2:3001/api/post_acGl";
+  // static addacglgroup = "http://147.182.252.2:3001/api/post_addAcGlGroup";
+  // static getaccounts = "http://147.182.252.2:3001/api/post_accounts";
+  // static getmktArea = "http://147.182.252.2:3001/api/post_mktArea";
+  // static getacadress = "http://147.182.252.2:3001/api/post_acadress";
+  // static addacadress = "http://147.182.252.2:3001/api/post_addacadress";
+  // static getAcTypes = "http://147.182.252.2:3001/api/post_acTypes";
+  // static getDeptTypes = "http://147.182.252.2:3001/api/post_deptTypes";
+  // static random = "http://147.182.252.2:3001/api/random";
+  // static unit = "http://147.182.252.2:3001/api/mst_unit";
+  // static prodCompany = "http://147.182.252.2:3001/api/mst_prodCompany";
+  // static prodType = "http://147.182.252.2:3001/api/mst_prodTypes";
+  // static prodMaster = "http://147.182.252.2:3001/api/mst_prodMaster";
+  // static finYear = "http://147.182.252.2:3001/api/adm_finYear";
+  // static accounts = "http://147.182.252.2:3001/api/mst_accounts";
+  // static acglgroup = "http://147.182.252.2:3001/api/mst_acglgroup";
+  // static acgl = "http://147.182.252.2:3001/api/mst_acgl";
+  // static acadress = "http://147.182.252.2:3001/api/mst_acadress";
+  // static paymentTerms = "http://147.182.252.2:3001/api/mst_paymentTerms";
+  // static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
+  // static register = "http://147.182.252.2:3001/api/register";
+  // static dc = "http://147.182.252.2:3001/api/inv_dc";
+  // static ledger = "http://147.182.252.2:3001/api/inv_ledger";
+  // static both = "http://147.182.252.2:3001/api/inv_both";
+  // static soft = "http://147.182.252.2:3001/api/soft";
+  // static batch = "http://147.182.252.2:3001/api/batch";
+  // static accounting = "http://147.182.252.2:3001/api/accounting";
+  // static stockReport = "http://147.182.252.2:3001/api/stockReport";
+  // static acReport = "http://147.182.252.2:3001/api/acReport";
+  // static bankReport = "http://147.182.252.2:3001/api/bankReport";
+  // static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
+  // static none = "http://147.182.252.2:3001/api/inv_none";
 
   static sidebarItem = [
     { index: "0", title: "Home", url: "/home", icons: "home" },

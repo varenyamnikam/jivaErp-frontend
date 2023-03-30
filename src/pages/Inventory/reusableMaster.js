@@ -198,11 +198,18 @@ export default function ReuseMaster(props) {
   console.log(Config[route]);
   if (loading1 || refresh) {
     let qry = initialValues.docCode;
+    if (initialValues.docCode == "PV") {
+      qry = JSON.stringify({ $in: ["GR", "PO", "PV"] });
+    }
+
     if (initialValues.docCode == "GR") {
       qry = JSON.stringify({ $in: ["GR", "PO"] });
     }
     if (initialValues.docCode == "SI") {
-      qry = JSON.stringify({ $in: ["SI", "DC", "QT"] });
+      qry = JSON.stringify({ $in: ["SI", "DC", "QT", "SO"] });
+    }
+    if (initialValues.docCode == "DC") {
+      qry = JSON.stringify({ $in: ["DC", "QT", "SO"] });
     }
 
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}`;

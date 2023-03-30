@@ -56,11 +56,19 @@ import OB from "./pages/Accounting/OB/ObMaster";
 import StockReport from "./pages/Stock/report/stockReport";
 import POReport from "./pages/Report/POReport";
 import DCReport from "./pages/Report/DCReport";
+import GRNReport from "./pages/Report/GRReport";
+import SOReport from "./pages/Report/SOReport";
 import SIReport from "./pages/Report/SIReport";
+import SRReport from "./pages/Report/SRReport";
+import PVReport from "./pages/Report/PVReport";
+import PRReport from "./pages/Report/PRReport";
 import AcReport from "./pages/Report/acReport";
+import JvReport from "./pages/Report/jvReport";
 import BankBook from "./pages/Report/bankBook";
 import CashBook from "./pages/Report/cashBook";
+
 import Sidemenu from "./components/sidemenu";
+import TrialBalance from "./pages/Report/trialBalance";
 import jQuery from "jquery";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -259,53 +267,86 @@ root.render(
         />
         <Route
           exact
-          path="/Inventory/StockMaster"
+          path="/InventoryTransaction/OpeningStock"
           element={<PrivateRouteNew Page={<StockMaster />} />}
         />
         <Route
           exact
-          path="/Inventory/StockReport"
+          path="/InventoryReport/StockReport"
           element={<PrivateRouteNew Page={<StockReport />} />}
         />
         <Route
           exact
-          path="/Inventory/StockReport"
-          element={<PrivateRouteNew Page={<StockReport />} />}
-        />
-        <Route
-          exact
-          path="/Report/POReport"
+          path="/PurchaseReport/POReport"
           element={<PrivateRouteNew Page={<POReport />} />}
         />
         <Route
           exact
-          path="/Report/DCReport"
+          path="/PurchaseReport/GRNReport"
+          element={<PrivateRouteNew Page={<GRNReport />} />}
+        />
+        <Route
+          exact
+          path="/PurchaseReport/PVReport"
+          element={<PrivateRouteNew Page={<PVReport />} />}
+        />
+        <Route
+          exact
+          path="/PurchaseReport/PRReport"
+          element={<PrivateRouteNew Page={<PRReport />} />}
+        />
+        <Route
+          exact
+          path="/SaleReport/DispatchRegister"
           element={<PrivateRouteNew Page={<DCReport />} />}
+        />{" "}
+        <Route
+          exact
+          path="/SaleReport/SaleOrderReport"
+          element={<PrivateRouteNew Page={<SOReport />} />}
         />
         <Route
           exact
-          path="/Report/AcReport"
-          element={<PrivateRouteNew Page={<AcReport />} />}
-        />
-        <Route
-          exact
-          path="/Report/SIReport"
+          path="/SaleReport/SaleRegister"
           element={<PrivateRouteNew Page={<SIReport />} />}
         />
         <Route
           exact
-          path="/Report/BankBook"
+          path="/SaleReport/SaleReturnRegister"
+          element={<PrivateRouteNew Page={<SRReport />} />}
+        />
+        <Route
+          exact
+          path="/AccountingReport/AcReport"
+          element={<PrivateRouteNew Page={<AcReport />} />}
+        />
+        <Route
+          exact
+          path="/AccountingReport/JVRegister"
+          element={<PrivateRouteNew Page={<JvReport />} />}
+        />
+        <Route
+          exact
+          path="/AcReport/TrialBalance"
+          element={<PrivateRouteNew Page={<TrialBalance />} />}
+        />
+        <Route
+          exact
+          path="/AccountingReport/BankBook"
           element={<PrivateRouteNew Page={<BankBook />} />}
         />
         <Route
           exact
-          path="/Report/CashBook"
+          path="/AccountingReport/CashBook"
           element={<PrivateRouteNew Page={<CashBook />} />}
         />
       </Switch>
     </Router>
   </>
 );
+// SRReport from "./pages/Report/SRReport";
+// import PVReport from "./pages/Report/PVReport";
+// import PRReport
 // reportWebVitals();
 // <Branchmaster />
 (function ($) {

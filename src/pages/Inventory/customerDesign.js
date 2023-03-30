@@ -26,6 +26,7 @@ import Accordion from "../../components/accordions";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ButtonAutosuggest from "../../components/buttonAutosuggest";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -125,9 +126,9 @@ export default function CustomerForm(props) {
     return Object.values(temp).every((x) => x == "");
   }
   let adress = adressData.filter((item) => item.acCode == input.partyCode);
-  console.log(adress);
+  console.log(adress, reference);
   const refOptions = reference
-    .filter((item) => input.docCode !== item.docCode)
+    .filter((item) => input.refType == item.docCode)
     .map((item) => item.vouNo);
   const payOptions = payTerms.map((item) => item.paymentTerms);
   const addressOptions = adress
@@ -221,6 +222,11 @@ export default function CustomerForm(props) {
       ...input,
       [name]: value,
     });
+    if (name == "refNo" && value) {
+      const ref = reference.find((item) => item.vouNo == value);
+      console.log("hi");
+      setInput({ ...input, partyCode: ref.partyCode });
+    }
   };
   const handleReset = (e) => {
     console.log(e.target);
@@ -257,7 +263,21 @@ export default function CustomerForm(props) {
     },
   };
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  const [value, setValue] = React.useState(null);
+  function getOptionsForRef() {
+    if (initialValues.docCode == "PV") {
+      return ["GR", "PO"];
+    }
+
+    if (initialValues.docCode == "GR") {
+      return ["PO"];
+    }
+    if (initialValues.docCode == "SI") {
+      return ["DC", "QT"];
+    }
+    if (initialValues.docCode == "DC") {
+      return ["QT", "SO"];
+    } else return [""];
+  }
   return (
     <>
       <Grid
@@ -277,17 +297,6 @@ export default function CustomerForm(props) {
                 disabled={true}
               />
             </Grid>
-            {"manualNo" in settings && (
-              <Grid item xs={12} sm={3} className={classes.input}>
-                <Controls.Input
-                  name="manualNo"
-                  label="Manual No"
-                  value={input.manualNo}
-                  onChange={handleChange}
-                  error={errors.manualNo}
-                />
-              </Grid>
-            )}
             <Grid item xs={12} sm={4} className={classes.input}>
               <Controls.Input
                 style={{ width: "100%" }}
@@ -298,7 +307,7 @@ export default function CustomerForm(props) {
                 disabled={true}
                 // error={errors.docCode}
               />
-            </Grid>
+            </Grid>{" "}
             <Grid item xs={12} sm={4} className={classes.input}>
               <StaticDatePickerLandscape
                 name="vouDate"
@@ -307,23 +316,54 @@ export default function CustomerForm(props) {
                 value={input}
                 setValue={setInput}
               />
-            </Grid>
+            </Grid>{" "}
             {"manualNo" in settings && (
+              <Grid item xs={12} sm="auto" className={classes.input}>
+                <Controls.Input
+                  name="manualNo"
+                  label="Manual No"
+                  value={input.manualNo}
+                  onChange={handleChange}
+                  error={errors.manualNo}
+                />
+              </Grid>
+            )}
+            {getOptionsForRef()[0] && (
               <>
-                <Grid item xs={12} sm={3} className={classes.input}>
+                <Grid item xs={12} sm={4} className={classes.input}>
                   <UnusedAutosuggest
                     style={{ width: "100%" }}
                     name="refType"
                     label="RefType"
                     value={input}
                     setValue={setInput}
-                    options={["DC", "QT"]}
+                    options={getOptionsForRef()}
                     error={errors.refType}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4} className={classes.input}>
-                  <UnusedAutosuggest
-                    style={{ width: "100%" }}
+                <Grid item xs={12} sm={8} className={classes.input}>
+                  <ButtonAutosuggest
+                    style={{ width: "100%", borderRadius: "0px" }}
+                    onClick={() => {
+                      const refInput = reference.find(
+                        (item) => item.vouNo == input.refNo
+                      );
+                      const refItemList = common.voucherItems.filter(
+                        (item) => item.vouNo == input.refNo
+                      );
+
+                      console.log("refInput", refInput);
+                      refInput &&
+                        setInput({
+                          ...refInput,
+                          vouNo: input.refNo,
+                          vouDate: input.vouDate,
+                          docCode: input.docCode,
+                          refNo: input.refNo,
+                          refType: input.refType,
+                        });
+                      refItemList.length !== 0 && setItemList(refItemList);
+                    }}
                     name="refNo"
                     label="Ref No"
                     value={input}
@@ -365,7 +405,7 @@ export default function CustomerForm(props) {
             onChange={handleChange}
             error={errors.remark}
             multiline
-            rows={4}
+            rows={getOptionsForRef()[0] ? 6 : 3}
           />
         </Grid>
         <Grid item xs={12} sm={8} className={classes.input}>

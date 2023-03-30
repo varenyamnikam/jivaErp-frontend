@@ -64,13 +64,7 @@ const Headerpart = (props) => {
                 <IconButton
                   size="small"
                   onClick={() => {
-                    location.pathname == "/Admin/UserMaster" &&
-                      window.location.reload();
-                    history("/Admin/UserMaster");
-                    localStorage.setItem(
-                      "changeBranch",
-                      JSON.stringify({ open: true })
-                    );
+                    setButtonPopup(true);
                   }}
                   style={{
                     marginBottom: "3px",
@@ -93,13 +87,7 @@ const Headerpart = (props) => {
                 <IconButton
                   size="small"
                   onClick={() => {
-                    location.pathname == "/Admin/UserMaster" &&
-                      window.location.reload();
-                    history("/Admin/UserMaster");
-                    localStorage.setItem(
-                      "changeBranch",
-                      JSON.stringify({ open: true })
-                    );
+                    setButtonPopup(true);
                   }}
                   style={{
                     marginBottom: "3px",
@@ -994,14 +982,16 @@ const Headerpart = (props) => {
 };
 
 export default Headerpart;
-// <Popup
-// title={`Financial Year`}
-// openPopup={buttonPopup}
-// setOpenPopup={setButtonPopup}
-// size="md"
-// >
-// <ChangeFinyear setButtonPopup={setButtonPopup} />
-// </Popup>
+{
+  /* <Popup
+title={`Financial Year`}
+openPopup={buttonPopup}
+setOpenPopup={setButtonPopup}
+size="md"
+>
+<ChangeFinyear setButtonPopup={setButtonPopup} />
+</Popup> */
+}
 // <aside class="control-sidebar control-sidebar-dark">
 // <h1 style={{ color: "white" }}>hi</h1>
 // </aside>

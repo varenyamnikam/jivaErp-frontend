@@ -25,48 +25,6 @@ const Sidemenu = (props) => {
   // const SidebarData = Data.filter((item) => item.screenCode == "Master");
   console.log(User);
   let userName = User.userName ? User.userName : "User";
-  function getAnchor() {
-    console.log(matches);
-    if (!matches) {
-      return (
-        <>
-          <a
-            className="nav-link"
-            data-widget="pushmenu"
-            href="#"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              padding: "0px",
-              paddingTop: "10px",
-              color: "white",
-            }}
-          >
-            <CloseIcon />
-          </a>
-          <Link
-            to="/home"
-            className="brand-link"
-            style={{ marginLeft: "10px", paddingTop: "0px" }}
-          >
-            <Icon size={24} icon={home} style={{ marginRight: "7px" }} />
-            <span className="brand-text font-weight-light">
-              &nbsp;&nbsp;OAJ Seed ERP
-            </span>
-          </Link>
-        </>
-      );
-    } else {
-      return (
-        <Link to="/home" className="brand-link" style={{ marginLeft: "10px" }}>
-          <Icon size={24} icon={home} style={{ marginRight: "7px" }} />
-          <span className="brand-text font-weight-light">
-            &nbsp;&nbsp;OAJ Seed ERP
-          </span>
-        </Link>
-      );
-    }
-  }
   const userCompanyName = reactLocalStorage.get("userCompanyName");
 
   return (

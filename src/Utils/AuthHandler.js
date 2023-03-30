@@ -3,6 +3,7 @@ import Config from "./Config";
 import { Redirect } from "react-router-dom";
 import { reactLocalStorage } from "reactjs-localstorage";
 import PropTypes from "prop-types";
+import { user } from "react-icons-kit/fa/user";
 const newParty = {
   transactnValue: null,
   transactnList: null,
@@ -14,11 +15,15 @@ const newParty = {
 class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
     axios
-      .post(Config.loginUrl, {
-        usrCode: usrCode,
-        usrPassword: usrPassword,
-        usrCompanyCode: usrCompanyCode,
-      })
+      .post(
+        Config.loginUrl,
+        { withCredentials: false },
+        {
+          usrCode: usrCode,
+          usrPassword: usrPassword,
+          usrCompanyCode: usrCompanyCode,
+        }
+      )
       .then(function (response) {
         // if (response.status === 200) {
         if (response.data.auth) {
@@ -27,7 +32,6 @@ class AuthHandler {
           reactLocalStorage.set("token", response.data.token);
           reactLocalStorage.set("userName", response.data.userName);
           localStorage.setItem("userCode", response.data.userCode);
-          localStorage.setItem("changeBranch", JSON.stringify({ open: false }));
 
           localStorage.setItem(
             "adm_userrights",
@@ -39,7 +43,18 @@ class AuthHandler {
             "adm_softwareSettings",
             JSON.stringify(response.data.adm_softwareSettings)
           );
-          reactLocalStorage.set("user", JSON.stringify(response.data.user));
+          const usr = response.data.user;
+          const obj = {
+            ...usr,
+            currentBranchCode: usr.defaultBranchCode,
+            currentBranchName: usr.defaultBranchName,
+            currentFinYear: usr.defaultFinYear,
+            currentYearCode: usr.defaultYearCode,
+            currentYearEnd: usr.defaultYearEnd,
+            currentYearStart: usr.defaultYearStart,
+          };
+          console.log(obj);
+          localStorage.setItem("user", JSON.stringify(obj));
           localStorage.setItem(
             "userCompanyCode",
             response.data.userCompanyCode

@@ -226,6 +226,7 @@ export default function StockMaster() {
         setLoading(false);
         let data = response.data.records;
         let stk = response.data.stock;
+        console.log(data, stk);
         mountStockData(data, stk);
       })
       .catch((error) => {

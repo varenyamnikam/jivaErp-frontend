@@ -191,7 +191,7 @@ export default function useTable(records, headCells, filterFn) {
         className={classes.table}
         size="small"
         stickyHeader
-        sx={{ maxHeight: 440 }}
+        sx={{ maxHeight: 439 }}
       >
         {props.children}
       </Table>

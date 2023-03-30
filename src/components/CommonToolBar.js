@@ -40,6 +40,7 @@ export default function CmnToolBar({
   initialHeadCells,
   selected,
   setSelected,
+  additionalComponent = () => <></>,
 }) {
   return (
     <>
@@ -48,7 +49,7 @@ export default function CmnToolBar({
         <Grid container style={{ display: "flex", flexGrow: 1 }}>
           <Grid
             item
-            xs={8}
+            xs={12}
             sm={6}
             style={{ display: "flex", alignItems: "center" }}
           >
@@ -106,7 +107,7 @@ export default function CmnToolBar({
           <Grid
             item
             sm={3}
-            xs={12}
+            xs={8}
             style={{
               display: "flex",
               justifyContent: "center",
@@ -138,6 +139,7 @@ export default function CmnToolBar({
               />
             </Grid>{" "}
           </Grid>
+          {additionalComponent()}
         </Grid>
       </Toolbar>{" "}
     </>

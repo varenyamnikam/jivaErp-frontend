@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Switch } from "@material-ui/core";
 
-function ExportSwitch({ checked, setChecked, label = "Keep Open", onChange }) {
+function ExportSwitch({ checked, label = "Keep Open", onChange }) {
   return (
     <Switch
       checked={checked}

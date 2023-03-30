@@ -67,16 +67,18 @@ export default function ChangeFinyear({ setButtonPopup }) {
         },
       })
       .then((response) => {
+        console.log(response);
         if (response.data.adm_finYear.length !== 0)
           setRecords(response.data.adm_finYear);
         else {
-          setRecords([initialValues]);
+          console.log("no data");
         }
         if (response.data.adm_branch.length !== 0)
           setBranch(response.data.adm_branch);
         else {
-          setBranch([initialBranchValues]);
+          console.log("no data");
         }
+        setLoading(false);
       })
       .catch((error) => {
         setNotify({
@@ -85,9 +87,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
           type: "warning",
         });
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => {});
   }
   function findDate(code) {
     let date = null;
@@ -97,6 +97,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
     console.log(code, date);
     return date;
   }
+  console.log(branch, records);
   let options = records.map((item) => item.finYear);
   let options1 = branch.map((item) => item.branchName);
 
@@ -108,27 +109,27 @@ export default function ChangeFinyear({ setButtonPopup }) {
 
     localStorage.setItem("user", JSON.stringify(values));
     setButtonPopup(false);
-    axios
-      .patch(
-        Config.usermasterUrl + query,
-        { values },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then(function (response) {})
-      .catch(function (error) {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      })
-      .finally(() => {
-        setButtonPopup(false);
-      });
+    // axios
+    //   .patch(
+    //     Config.usermasterUrl + query,
+    //     { values },
+    //     {
+    //       headers: {
+    //         authorization: "Bearer" + token,
+    //       },
+    //     }
+    //   )
+    //   .then(function (response) {})
+    //   .catch(function (error) {
+    //     setNotify({
+    //       isOpen: true,
+    //       message: "Unable to connect to servers",
+    //       type: "warning",
+    //     });
+    //   })
+    //   .finally(() => {
+    //     setButtonPopup(false);
+    //   });
   }
   console.log(values);
   return (
@@ -157,8 +158,8 @@ export default function ChangeFinyear({ setButtonPopup }) {
         >
           <SmartAutoSuggest
             style={{ width: "100%" }}
-            name1="defaultFinYear"
-            code1="defaultYearCode"
+            name1="currentFinYear"
+            code1="currentYearCode"
             label="Financial Year"
             name2="finYear"
             code2="yearCode"
@@ -180,8 +181,8 @@ export default function ChangeFinyear({ setButtonPopup }) {
         >
           <SmartAutoSuggest
             style={{ width: "100%" }}
-            name1="defaultBranchName"
-            code1="defaultBranchCode"
+            name1="currentBranchName"
+            code1="currentBranchCode"
             label="Financial Year"
             name2="branchName"
             code2="branchCode"
@@ -201,15 +202,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
             alignItems: "center",
           }}
         >
-          <Link
-            to={Config.logoutPageUrl}
-            style={{ backgroundColor: "white" }}
-            onClick={() => {
-              localStorage.clear();
-            }}
-          >
-            <Controls.Button onClick={handleSubmit} text="Submit" />
-          </Link>
+          <Controls.Button onClick={handleSubmit} text="Submit" />
         </Grid>
       </Grid>
       <Notification notify={notify} setNotify={setNotify} />

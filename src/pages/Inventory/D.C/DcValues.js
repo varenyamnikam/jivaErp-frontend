@@ -142,6 +142,7 @@ export default function DcValues() {
   };
 
   const docOptions = ["DC", "QT", "GR", "SI"];
+  const initialVouValues = initialValues;
   return {
     initialValues,
     initialVouItem,
@@ -150,5 +151,6 @@ export default function DcValues() {
     initialPayValues,
     initialProdValues,
     initialCommonValues,
+    initialVouValues,
   };
 }

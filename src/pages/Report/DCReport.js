@@ -1,5 +1,5 @@
 import GeneralReport from "./generalReport";
 
-export default function SIReport() {
+export default function DCReport() {
   return <GeneralReport docCode="DC" />;
 }

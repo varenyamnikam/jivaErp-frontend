@@ -253,7 +253,7 @@ export default function JvReport() {
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title="A.C Report"
+              title="J.V Report"
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -300,7 +300,10 @@ export default function JvReport() {
                                       borderRight: "1px solid rgba(0,0,0,0.2)",
                                     }}
                                   >
-                                    {item[headcell.feild]}
+                                    {headcell.id == "Debit" ||
+                                    headcell.id == "Credit"
+                                      ? Math.abs(Number(item[headcell.feild]))
+                                      : item[headcell.feild]}
                                   </TableCell>
                                 ))}
                               </TableRow>

@@ -15,15 +15,11 @@ const newParty = {
 class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
     axios
-      .post(
-        Config.loginUrl,
-        { withCredentials: false },
-        {
-          usrCode: usrCode,
-          usrPassword: usrPassword,
-          usrCompanyCode: usrCompanyCode,
-        }
-      )
+      .post(Config.loginUrl, {
+        usrCode: usrCode,
+        usrPassword: usrPassword,
+        usrCompanyCode: usrCompanyCode,
+      })
       .then(function (response) {
         // if (response.status === 200) {
         if (response.data.auth) {

@@ -39,7 +39,7 @@ import Outer from "../../components/outer";
 import DcValues from "../Inventory/D.C/DcValues";
 import TbLedger from "./tbForm";
 import ExportSwitch from "../../components/controls/Switch";
-
+import UnusedAutosuggest from "../../components/unusedautosuggest";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -80,7 +80,7 @@ const initialValues = {
   acGroupStatus: "",
   childArr: [],
   displayData: {},
-  groupType: "Asset",
+  groupType: "",
   parentGroupCode: "",
   status: "",
   userCompanyCode: "all",
@@ -89,6 +89,7 @@ const initialAccount = {
   acCode: "",
   acName: "",
 };
+const groupTypeOptions = ["Asset", "Laibality", "Income"];
 
 export default function TrialBalance() {
   const headCells = [
@@ -104,7 +105,6 @@ export default function TrialBalance() {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
   const { getD } = DateCalc(user);
   const { initialVouValues } = DcValues();
   const initialFilterValues = {
@@ -161,11 +161,17 @@ export default function TrialBalance() {
   } = useTable(records, headcells, filterFn);
   console.log(Config.batch);
   if ((records[0] && records[0].acGroupCode == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
+    const filterByGrpType = filter.groupType
+      ? [filter.groupType]
+      : groupTypeOptions;
+
+    let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&groupTypes=${filterByGrpType}`;
     const token = AuthHandler.getLoginToken();
-    console.log(query);
     axios
       .get(Config.trialBalance + query, {
+        params: {
+          groupTypes: filterByGrpType,
+        },
         headers: {
           authorization: "Bearer" + token,
         },
@@ -176,7 +182,9 @@ export default function TrialBalance() {
         //data is array of obj having two fields ->{childArr:[...],
         //displayData:{...}} rest of feilds are useLess
         console.log(data, acc);
-        data.length !== 0 && setRecords(data);
+        data.length !== 0
+          ? setRecords(data)
+          : setRecords([{ ...initialValues, acGroupCode: "" }]);
         refresh && setRefresh(false);
       })
       .catch((error) => {
@@ -284,30 +292,6 @@ export default function TrialBalance() {
                 {item[headcell.feild]}
               </TableCell>
             ) : Number(item[headcell.feild]) < 0 ? (
-              //if -ve then diffrnt column if +ve then diffrnt column
-              <>
-                <TableCell
-                  key={headcell.id}
-                  style={{
-                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                  }}
-                >
-                  {typeof item[headcell.feild] == "number"
-                    ? Math.abs(item[headcell.feild].toFixed(2))
-                    : item[headcell.feild]}
-                </TableCell>
-                <TableCell
-                  key={headcell.id}
-                  style={{
-                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  0{headcell.feild == "closingBalance"}
-                </TableCell>
-              </>
-            ) : (
               <>
                 <TableCell
                   key={headcell.id}
@@ -329,6 +313,30 @@ export default function TrialBalance() {
                     ? Math.abs(item[headcell.feild].toFixed(2))
                     : item[headcell.feild]}
                   {headcell.feild == "closingBalance"}
+                </TableCell>
+              </>
+            ) : (
+              //if -ve then diffrnt column if +ve then diffrnt column
+              <>
+                <TableCell
+                  key={headcell.id}
+                  style={{
+                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                  }}
+                >
+                  {typeof item[headcell.feild] == "number"
+                    ? Math.abs(item[headcell.feild].toFixed(2))
+                    : item[headcell.feild]}
+                </TableCell>
+                <TableCell
+                  key={headcell.id}
+                  style={{
+                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  0{headcell.feild == "closingBalance"}
                 </TableCell>
               </>
             )
@@ -453,13 +461,7 @@ export default function TrialBalance() {
 
                           {[...Array(3)].map((e, i) => (
                             <>
-                              <TableCell
-                                style={{
-                                  borderRight: "1px solid rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                Credit
-                              </TableCell>
+                              {" "}
                               <TableCell
                                 style={{
                                   borderRight: "1px solid rgba(0,0,0,0.2)",
@@ -467,12 +469,19 @@ export default function TrialBalance() {
                               >
                                 Debit
                               </TableCell>
+                              <TableCell
+                                style={{
+                                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                Credit
+                              </TableCell>
                             </>
                           ))}
                         </TableRow>
                       </TableHead>
 
-                      {records[0] == "X X X X" ? (
+                      {records[0] == "X X X X" || refresh ? (
                         <MuiSkeleton />
                       ) : (
                         <TableBody>
@@ -518,21 +527,17 @@ export default function TrialBalance() {
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} className={classes.input}>
-                        <SmartAutoSuggest
+                        <UnusedAutosuggest
                           style={{
                             width: "100%",
                             display: "flex",
                             justifyContent: "flex-end",
                           }}
-                          name1="acName"
-                          code1="acCode"
-                          name2="acName"
-                          code2="acCode"
-                          label="Account"
+                          name="groupType"
+                          label="Group Type"
                           value={filter}
                           setValue={setFilter}
-                          options1={accountOptions}
-                          options2={accounts}
+                          options={["Asset", "Laibality", "Income"]}
                         />
                       </Grid>
 

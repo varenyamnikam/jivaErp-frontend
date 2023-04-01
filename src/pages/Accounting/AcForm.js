@@ -175,7 +175,8 @@ export default function AcForm(props) {
         }
       });
       let Fil = itemList.filter((item) => item.vouNo !== "X X X X");
-      if (bankValues !== "JV") {
+      if (bankValues.docCode !== "JV") {
+        console.log(Fil);
         Fil = Fil.map((item, i) => {
           return { ...item, srNo: i + 2, vouNo: bankValues.vouNo };
         });
@@ -183,10 +184,12 @@ export default function AcForm(props) {
         let obj = finalCalc(bankValues);
         Fil.push(obj);
       } else {
+        console.log(Fil);
         Fil = Fil.map((item, i) => {
           return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
         });
       }
+      console.log(Fil);
       const userCode = localStorage.getItem("userCode");
       const userCompanyCode = localStorage.getItem("userCompanyCode");
       const user = JSON.parse(localStorage.getItem("user"));
@@ -211,10 +214,10 @@ export default function AcForm(props) {
             console.log(response.data.itemList);
             let max = response.data.max;
             let Fil = response.data.itemList;
-            Fil = Fil.filter((item) => item.srNo !== 1);
+            // Fil = Fil.filter((item) => item.srNo !== 1);
             console.log(Fil, { ...bankValues, vouNo: max });
 
-            setRecords([...records, ...Fil, { ...bankValues, vouNo: max }]);
+            setRecords([...records, ...Fil]);
             setNotify({
               isOpen: true,
               message: "Voucher created  successfully",
@@ -245,9 +248,9 @@ export default function AcForm(props) {
             let newArr = records.filter(
               (item) => item.vouNo !== bankValues.vouNo
             );
-            console.log(Fil);
-            Fil = Fil.filter((item) => item.srNo !== 1);
-            setRecords([...newArr, ...Fil, { ...bankValues }]);
+            console.log(records, newArr, [...Fil, bankValues]);
+            // Fil = Fil.filter((item) => item.srNo !== 1);
+            setRecords([...newArr, ...Fil]);
             setNotify({
               isOpen: true,
               message: "Voucher created  successfully",
@@ -272,6 +275,7 @@ export default function AcForm(props) {
     return obj;
   }
   useEffect(() => {
+    console.log(itemList);
     let obj = calc(itemList);
     let credit = obj.credit;
     let debit = obj.debit;

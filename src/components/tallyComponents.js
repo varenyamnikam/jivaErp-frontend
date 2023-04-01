@@ -193,9 +193,11 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   }
   function getItems(values) {
     let arr = [];
-    arr = records.filter(
-      (item) => item.vouNo == values.vouNo && Number(item.srNo) !== 1
-    );
+    // arr = records.filter(
+    //   (item) => item.vouNo == values.vouNo && Number(item.srNo) !== 1
+    // );
+    arr = records.filter((item) => item.vouNo == values.vouNo);
+
     return arr;
   }
   function calc(list) {

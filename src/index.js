@@ -66,7 +66,7 @@ import AcReport from "./pages/Report/acReport";
 import JvReport from "./pages/Report/jvReport";
 import BankBook from "./pages/Report/bankBook";
 import CashBook from "./pages/Report/cashBook";
-
+import ExpiryReport from "./pages/Stock/report/expiryReport";
 import Sidemenu from "./components/sidemenu";
 import TrialBalance from "./pages/Report/trialBalance";
 import jQuery from "jquery";
@@ -267,6 +267,16 @@ root.render(
         />
         <Route
           exact
+          path="/Inventory/StockMaster"
+          element={<PrivateRouteNew Page={<StockMaster />} />}
+        />
+        <Route
+          exact
+          path="/Inventory/StockReport"
+          element={<PrivateRouteNew Page={<StockReport />} />}
+        />{" "}
+        <Route
+          exact
           path="/InventoryTransaction/OpeningStock"
           element={<PrivateRouteNew Page={<StockMaster />} />}
         />
@@ -274,6 +284,11 @@ root.render(
           exact
           path="/InventoryReport/StockReport"
           element={<PrivateRouteNew Page={<StockReport />} />}
+        />
+        <Route
+          exact
+          path="/InventoryReport/ExpiryReport"
+          element={<PrivateRouteNew Page={<ExpiryReport />} />}
         />
         <Route
           exact

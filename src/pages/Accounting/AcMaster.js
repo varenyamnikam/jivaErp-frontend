@@ -286,10 +286,14 @@ export default function AcMaster(props) {
   }
   function edit(e, ite) {
     e.preventDefault();
+    // const arr = records.filter(
+    //   (item) =>
+    //     item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo !== "X X X X"
+    // );
     const arr = records.filter(
-      (item) =>
-        item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo !== "X X X X"
+      (item) => item.vouNo == ite.vouNo && item.vouNo !== "X X X X"
     );
+
     setItemList(arr);
     setValues(ite);
     setButtonPopup(true);
@@ -489,7 +493,7 @@ export default function AcMaster(props) {
                                           "You can't undo this operation",
                                         onConfirm: (e) => {
                                           onDelete(item);
-                                          console.log("records:" + records);
+                                          console.log("records:", records);
                                         },
                                       });
                                     }}

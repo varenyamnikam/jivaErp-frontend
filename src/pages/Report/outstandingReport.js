@@ -60,15 +60,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
 const initialValues = {
   srNo: "",
   acCode: "0",
@@ -78,22 +69,23 @@ const initialValues = {
   openingBalance: "",
   closingBalance: "",
 };
-const initialAccount = {
-  acCode: "",
-  acName: "",
-};
 
-export default function AcReport() {
+export default function OutstandingReport() {
   const headCells = [
-    { id: "Vou No", label: "Vou No", feild: "vouNo" },
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
+    {
+      id: "Opening",
+      label: "Opening",
+      feild: "openingBalance",
+    },
+
     { id: "Debit", label: "Debit", feild: "debit" },
     { id: "Credit", label: "Credit", feild: "credit" },
     {
-      id: "Balance",
-      label: "Balance",
-      feild: "currentBalance",
+      id: "Closing",
+      label: "Closing",
+      feild: "closingBalance",
     },
   ];
   const user = JSON.parse(localStorage.getItem("user"));
@@ -131,10 +123,9 @@ export default function AcReport() {
   const [print, setPrint] = useState(false);
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
-  const [loading1, setLoading1] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
-  const [accounts, setAccounts] = useState([initialAccount]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -154,50 +145,27 @@ export default function AcReport() {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  if ((records[0] && records[0].srNo == "") || refresh) {
+  if (loading) {
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
     axios
-      .get(Config.acReport + query, {
-        headers: {
-          authorization: "Bearer" + token,
+      .put(
+        Config.acReport + query,
+        {
+          body: "body",
         },
-      })
+        {
+          headers: {
+            authorization: "Bearer" + token,
+          },
+        }
+      )
       .then((res) => {
-        let data = res.data.transactions;
-        let acc = res.data.mst_accounts;
-        let openingBalance = res.data.openingBalance;
-        console.log(res.data);
-        let arr = [];
-        let credit = 0;
-        let debit = 0;
-        if (filter.acCode != "0")
-          arr[0] = {
-            srNo: 1,
-            acCode: "",
-            acName: "OPENING",
-            credit: "",
-            debit: "",
-            currentBalance: openingBalance,
-            vouNo: "",
-          };
-        data.map((item, i) => {
-          credit += Number(item.credit);
-          debit += Number(item.debit);
-          arr[i + 1] = {
-            ...item,
-            acName: getAcName(item.acCode),
-            currentBalance: openingBalance + debit - credit,
-            credit: Number(item.credit),
-            debit: Number(item.debit),
-            srNo: i + 2,
-          };
-        });
-        if (acc.length != 0) setAccounts(acc);
-        console.log(arr);
-        setRecords(arr);
-        if (refresh) setRefresh(false);
+        const data = res.data.acReport;
+        console.log(data);
+        if (data.length !== 0) setRecords(data);
+        if (loading) setLoading(false);
       })
       .catch((error) => {
         setNotify({
@@ -210,7 +178,6 @@ export default function AcReport() {
       .finally(() => {});
   }
 
-  console.log(accounts);
   function handleFilter(e) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
@@ -235,21 +202,13 @@ export default function AcReport() {
       },
     });
   }
-  function getAcName(code) {
-    let name = "";
-    accounts.map((item) => {
-      if (item.acCode == code) name = item.acName;
-    });
-    return name;
-  }
-  const accountOptions = accounts.map((item) => item.acName);
   return (
     <>
       <div className="hold-transition sidebar-mini">
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title="A.C Report"
+              title="Outstanding Report"
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -265,7 +224,7 @@ export default function AcReport() {
                       setFilterFn={setFilterFn}
                       setFilterIcon={setFilterIcon}
                       initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
+                      setRefresh={setLoading}
                       initialFilterFn={initialFilterFn}
                       buttonText="Export Data to Excel"
                       TblContainer={TblContainer}
@@ -299,10 +258,11 @@ export default function AcReport() {
                                     {typeof item[headcell.feild] == "number"
                                       ? Math.abs(item[headcell.feild])
                                       : item[headcell.feild]}
-                                    {headcell.feild == "currentBalance"
-                                      ? item.currentBalance == 0
+                                    {headcell.feild !== "acCode" &&
+                                    headcell.feild !== "acName"
+                                      ? item[headcell.feild] == 0
                                         ? ""
-                                        : item.currentBalance < 0
+                                        : item[headcell.feild] < 0
                                         ? "CR"
                                         : "DR"
                                       : ""}
@@ -342,30 +302,12 @@ export default function AcReport() {
                           setValue={setFilter}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12} className={classes.input}>
-                        <SmartAutoSuggest
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                          name1="acName"
-                          code1="acCode"
-                          name2="acName"
-                          code2="acCode"
-                          label="Account"
-                          value={filter}
-                          setValue={setFilter}
-                          options1={accountOptions}
-                          options2={accounts}
-                        />
-                      </Grid>
 
                       <Grid item xs={6}>
                         <Controls.Button
                           text="Submit"
                           onClick={() => {
-                            setRefresh(true);
+                            setLoading(true);
                             setFilterPopup(false);
                             setFilterIcon(false);
                           }}

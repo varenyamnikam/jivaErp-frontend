@@ -28,6 +28,10 @@ import UnusedAutosuggest from "../../components/specialAutoSuggest";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Profile from "../../components/profile";
 import ButtonLoader from "../../components/loading";
+import AcLedgerSettings from "../../components/acLedgerSettings";
+import DefaultAcc from "../../components/hardCoded/defaultAcc";
+const { purchaseAcc, saleAcc, purchaseObj, saleObj } = DefaultAcc();
+
 const statusItems = [
   { id: "Yes", title: "Yes" },
   { id: "NO", title: "NO" },
@@ -85,6 +89,8 @@ const initialValues = {
   purcStockUpdateUsing: "",
   color: "blue",
   useAcc: "",
+  purchaseLedger: purchaseObj,
+  saleLedger: saleObj,
 };
 
 export default function Settings() {
@@ -92,6 +98,9 @@ export default function Settings() {
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const [values, setValues] = useState(initialValues);
+  const [purchaseValues, setPurchaseValues] = useState(purchaseObj);
+  const [saleValues, setSaleValues] = useState(saleObj);
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [save, setSave] = useState(true);
@@ -113,8 +122,17 @@ export default function Settings() {
       })
       .then((response) => {
         console.log(response.data);
-        if (response.data.result) {
-          setValues(response.data.result);
+        const settingsData = response.data.result;
+
+        if (settingsData) {
+          console.log("hi", settingsData);
+          setValues({
+            purchaseLedger: settingsData.purchaseLedger,
+            saleLedger: settingsData.saleLedger,
+            ...settingsData,
+          });
+          setPurchaseValues(settingsData.purchaseLedger);
+          setSaleValues(settingsData.saleLedger);
         } else {
           setValues({ ...values, userCompanyCode: "" });
         }
@@ -124,14 +142,15 @@ export default function Settings() {
       });
   }
   console.log(values);
-  function handleSubmit() {
+  function handleSubmit(updatedSettings = values) {
     setLoading(true);
     setSave(false);
+    console.log(updatedSettings);
     const token = AuthHandler.getLoginToken();
     axios
       .patch(
         Config.soft + query,
-        { values },
+        { updatedSettings },
         {
           headers: {
             authorization: "Bearer" + token,
@@ -140,8 +159,11 @@ export default function Settings() {
       )
       .then((response) => {
         setLoading(false);
-        setValues(values);
-        localStorage.setItem("adm_softwareSettings", JSON.stringify(values));
+        setValues(updatedSettings);
+        localStorage.setItem(
+          "adm_softwareSettings",
+          JSON.stringify(updatedSettings)
+        );
       });
   }
   useEffect(() => {
@@ -302,10 +324,25 @@ export default function Settings() {
                               style={{ width: "100%" }}
                               loading={loading}
                               setLoading={setLoading}
-                              onClick={handleSubmit}
+                              onClick={() => {
+                                handleSubmit();
+                              }}
                               save={save}
                               setSave={setSave}
                             />
+                          </Grid>
+                          <Grid item xs={12} sm={12}>
+                            <Grid container style={{ pading: "20px" }}>
+                              <AcLedgerSettings
+                                values={values}
+                                setValues={setValues}
+                                handleSubmit={handleSubmit}
+                                purchaseValues={purchaseValues}
+                                setPurchaseValues={setPurchaseValues}
+                                saleValues={saleValues}
+                                setSaleValues={setSaleValues}
+                              />
+                            </Grid>
                           </Grid>
                         </Grid>
                       </section>

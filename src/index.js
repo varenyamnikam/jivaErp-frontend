@@ -11,7 +11,7 @@ import LogoutComponent from "./pages/LogoutComponent";
 import MainComponent from "./components/MainComponent";
 import Dashboard from "./pages/dashboard";
 import Rolemaster from "./pages/Rolemaster/rolemaster";
-import Usermaster from "./pages/Usermaster/usermaster";
+import Usermaster from "./pages/Admin/Usermaster/usermaster";
 import Branchmaster from "./pages/Branchmaster/branchmaster";
 import { PrivateRouteNew } from "./Utils/PrivateRouteNew";
 import Countrymaster from "./pages/MASTER/Geography/countryMaster";
@@ -29,7 +29,7 @@ import SignIn from "./pages/newLogin";
 import RegisterForm from "./pages/register";
 import Home from "./pages/home/Home";
 import ProductMaster from "./pages/MASTER/Products/Productmaster/productMaster";
-import FinancialYearMaster from "./pages/Admin/financialYearMaster";
+import FinancialYearMaster from "./pages/FinancialYear/Admin/financialYearMaster";
 import AccountTypesMaster from "./pages/MASTER/Accounts/accountTypesMaster";
 import DCMaster from "./pages/Inventory/D.C/dcMaster";
 import PayTermMaster from "./pages/Inventory/paymentTermMaster";
@@ -69,6 +69,8 @@ import CashBook from "./pages/Report/cashBook";
 import ExpiryReport from "./pages/Stock/report/expiryReport";
 import Sidemenu from "./components/sidemenu";
 import TrialBalance from "./pages/Report/trialBalance";
+import DayBook from "./pages/Report/dayBook";
+import OutstandingReport from "./pages/Report/outstandingReport";
 import jQuery from "jquery";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -354,6 +356,17 @@ root.render(
           exact
           path="/AccountingReport/CashBook"
           element={<PrivateRouteNew Page={<CashBook />} />}
+        />
+        <Route
+          exact
+          path="/AccountingReport/DayBook"
+          element={<PrivateRouteNew Page={<DayBook />} />}
+        />
+        OutstandingReport
+        <Route
+          exact
+          path="/AccountingReport/OutstandingReport"
+          element={<PrivateRouteNew Page={<OutstandingReport />} />}
         />
       </Switch>
     </Router>

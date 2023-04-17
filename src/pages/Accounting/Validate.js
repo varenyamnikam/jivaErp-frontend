@@ -4,6 +4,7 @@ export default function Validate(fieldValues, errors, setErrors, flag) {
   function check(key) {
     if (key in fieldValues)
       temp[key] = fieldValues[key] ? "" : "This field is required.";
+    console.log(key, temp[key]);
   }
   check("vouDate");
   if (flag) {

@@ -92,7 +92,7 @@ export default function SmartAutosuggest(props) {
     name1,
     label,
     code1,
-    name2,
+    name2, //arr of obj
     code2,
     error = null,
 

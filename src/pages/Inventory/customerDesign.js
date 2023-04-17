@@ -348,11 +348,15 @@ export default function CustomerForm(props) {
                       const refInput = reference.find(
                         (item) => item.vouNo == input.refNo
                       );
-                      const refItemList = common.voucherItems.filter(
-                        (item) => item.vouNo == input.refNo
-                      );
+                      const refItemList = common.voucherItems
+                        .filter((item) => item.vouNo == input.refNo)
+                        .map((item) => {
+                          delete item._id;
+                          return item;
+                        });
 
                       console.log("refInput", refInput);
+                      delete refInput._id;
                       refInput &&
                         setInput({
                           ...refInput,

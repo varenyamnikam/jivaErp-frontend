@@ -45,12 +45,16 @@ export default function AcForm(props) {
     setNotify,
     setButtonPopup,
   } = props;
+  initialValues.narration = "";
+
   const [otherErrors, setOtherErrors] = useState(initialFilterValues);
   const [disabled1, setDisabled1] = useState(false);
   const [errors, setErrors] = useState(initialFilterValues);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
-      let newRecords = items.filter((item) => item.vouNo !== "X X X X");
+      let newRecords = items.filter(
+        (item) => item.vouNo !== "X X X X" && item.srNo
+      );
       return newRecords;
     },
   });
@@ -67,7 +71,7 @@ export default function AcForm(props) {
   const [headCells, setHeadCells] = useState(headcells);
 
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  console.log(settings);
+  console.log(initialValues);
   const {
     TblContainer,
     TblHead,
@@ -124,6 +128,7 @@ export default function AcForm(props) {
   };
 
   const user = AuthHandler.getUser();
+  //for new vouNo
   if (
     !bankValues.vouNo.includes(
       user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
@@ -144,7 +149,8 @@ export default function AcForm(props) {
       vouNo:
         user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
     });
-  console.log(headcells);
+  console.log(errors);
+  console.log(initialValues);
 
   function finalCalc(obj) {
     let temp = 0;
@@ -157,6 +163,7 @@ export default function AcForm(props) {
       obj.credit = 0;
       obj.debit = temp;
     } else {
+      //for jv no use of bankvalues
       obj.debit = 0;
       obj.credit = 0;
     }
@@ -174,15 +181,18 @@ export default function AcForm(props) {
           x = false;
         }
       });
-      let Fil = itemList.filter((item) => item.vouNo !== "X X X X");
+      let Fil = itemList.filter(
+        (item) => item.vouNo !== "X X X X" && item.srNo
+      );
       if (bankValues.docCode !== "JV") {
         console.log(Fil);
         Fil = Fil.map((item, i) => {
-          return { ...item, srNo: i + 2, vouNo: bankValues.vouNo };
+          return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
         });
-        bankValues.srNo = 1;
+        // bankValues.srNo = 1;
         let obj = finalCalc(bankValues);
         Fil.push(obj);
+        console.log(Fil);
       } else {
         console.log(Fil);
         Fil = Fil.map((item, i) => {
@@ -261,6 +271,8 @@ export default function AcForm(props) {
             console.log(err);
           });
       }
+      console.log(initialFilterValues);
+      setErrors(initialFilterValues);
     }
   };
   function calc(list) {
@@ -268,14 +280,17 @@ export default function AcForm(props) {
     let debit = 0;
     let net = 0;
     list.map((item) => {
-      credit += Number(item.credit);
-      debit += Number(item.debit);
+      if (item.srNo) {
+        //dont add bank debit/credit
+        credit += Number(item.credit);
+        debit += Number(item.debit);
+      }
     });
     let obj = { credit: credit, debit: debit };
     return obj;
   }
+  console.log(itemList);
   useEffect(() => {
-    console.log(itemList);
     let obj = calc(itemList);
     let credit = obj.credit;
     let debit = obj.debit;
@@ -285,6 +300,8 @@ export default function AcForm(props) {
     }
   }, [itemList]);
   const handleAdd = () => {
+    console.log(otherValues);
+
     console.log(Validate(otherValues, otherErrors, setOtherErrors, false));
     if (Validate(otherValues, otherErrors, setOtherErrors, false)) {
       let x = true;
@@ -295,14 +312,25 @@ export default function AcForm(props) {
         }
         ite.narration = bankValues.narration;
       });
+      console.log(x);
+
       if (x) {
+        function findMaxSrNo(arr) {
+          return arr.reduce((max, obj) => {
+            const srNo = parseInt(obj.srNo);
+            return srNo > max ? srNo : max;
+          }, 0);
+        }
+
         const latest = [
           ...itemList,
           {
             ...otherValues,
-            srNo: Number(itemList[itemList.length - 1].srNo) + 1,
+            srNo: findMaxSrNo(itemList) + 1,
           },
         ];
+        console.log(latest);
+
         setItemList(latest);
         setOtherValues(initialValues);
       } else {
@@ -320,6 +348,7 @@ export default function AcForm(props) {
       }
       console.log(bankValues, itemList, x);
     }
+    console.log(initialValues);
   };
   function getName(code) {
     let name = "";

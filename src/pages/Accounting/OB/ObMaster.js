@@ -245,12 +245,20 @@ export default function AcMaster({ title = "Opening Balance" }) {
     });
     const token = AuthHandler.getLoginToken();
     axios
-      .delete(Config.batch + query, {
+      .delete(Config.accounting + query, {
         headers: {
           authorization: "Bearer" + token,
         },
         data: item,
       })
+      .then(() => {
+        setNotify({
+          isOpen: true,
+          message: `${item.vouNo} deleted`,
+          type: "warning",
+        });
+      })
+
       .catch((err) => {
         console.log(err);
       });

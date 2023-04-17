@@ -354,35 +354,6 @@ export default function DCReport({ docCode }) {
       .finally(() => {});
   }
 
-  function onDelete(item) {
-    // roleService.deleteBranch(item);
-    let newRecord = [];
-    newRecord = records.filter((record) => {
-      return record.refNo !== item.refNo;
-    });
-    if (newRecord.length == 0) {
-      setRecords([initialFilterValues]);
-    } else {
-      setRecords(newRecord);
-    }
-
-    setConfirmDialog({
-      ...confirmDialog,
-      isOpen: false,
-    });
-    const token = AuthHandler.getLoginToken();
-    axios
-      .delete(Config.batch + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-        data: item,
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
   console.log(products);
   function handleFilter(e) {
     const value = e.target.value;
@@ -418,80 +389,6 @@ export default function DCReport({ docCode }) {
       },
     });
   }
-
-  const handleSubmit = (input) => {
-    let x = true;
-    records.map((item) => {
-      if (item.refNo == input.refNo) {
-        x = false;
-      }
-    });
-
-    const token = AuthHandler.getLoginToken();
-    setButtonPopup(false);
-    if (x) {
-      axios
-        .put(
-          Config.batch + query,
-          {
-            obj: {
-              input: input,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          const res = response.data.values;
-          console.log(response.data);
-          setRecords([
-            ...records,
-            {
-              ...res,
-              getDate: getDate(res.vouDate),
-            },
-          ]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err.err);
-        });
-    } else {
-      axios
-        .patch(
-          Config.batch + query,
-          {
-            obj: {
-              input: input,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          const updatedRecords = records.map((item) =>
-            item.refNo == input.refNo ? response.data.values : item
-          );
-          setRecords(updatedRecords);
-
-          setNotify({
-            isOpen: true,
-            message: "Voucher updated  successfully",
-            type: "success",
-          });
-        });
-    }
-  };
   return (
     <>
       <div className="hold-transition sidebar-mini">
@@ -639,45 +536,7 @@ export default function DCReport({ docCode }) {
                                       borderRight: "1px solid rgba(0,0,0,0.2)",
                                     }}
                                   >
-                                    {headcell.label == "Edit" ? (
-                                      <>
-                                        <Controls.LoadingActionButton
-                                          value={values}
-                                          color="primary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            setValues(item);
-                                            setButtonPopup(true);
-                                          }}
-                                        >
-                                          <EditOutlinedIcon fontSize="small" />
-                                        </Controls.LoadingActionButton>
-                                        <Controls.ActionButton
-                                          color="secondary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-
-                                            setConfirmDialog({
-                                              isOpen: true,
-                                              title:
-                                                "Are you sure to delete this record?",
-                                              subTitle:
-                                                "You can't undo this operation",
-                                              onConfirm: (e) => {
-                                                onDelete(item);
-                                                console.log(
-                                                  "records:" + records
-                                                );
-                                              },
-                                            });
-                                          }}
-                                        >
-                                          <CloseIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                      </>
-                                    ) : (
-                                      item[headcell.feild]
-                                    )}
+                                    {item[headcell.feild]}
                                   </TableCell>
                                 ))}
                               </TableRow>

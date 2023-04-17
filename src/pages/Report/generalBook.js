@@ -11,6 +11,7 @@ import {
   Toolbar,
   InputAdornment,
   TableContainer,
+  Typography,
 } from "@material-ui/core";
 import useTable from "../../components/useTable";
 import Controls from "../../components/controls/Controls";
@@ -34,7 +35,9 @@ import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import CmnToolBar from "../../components/CommonToolBar";
 import Outer from "../../components/outer";
-
+import ExportSwitch from "../../components/controls/Switch";
+import DocCodes from "../../components/docCodes";
+import UnusedAutosuggest from "../../components/unusedautosuggest";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -71,32 +74,40 @@ function getD() {
 }
 const initialValues = {
   srNo: "",
-  acCode: "0",
+  acCode: "",
   credit: 0,
   debit: 0,
   acName: "",
   openingBalance: "",
   closingBalance: "",
+  docCode: "",
+  vouDate: "",
+  narration: "",
 };
 const initialAccount = {
   acCode: "",
   acName: "",
 };
-
+const cashAccGrpNo = "A1018";
+const bankAccGrpNo = "A1016";
 export default function BankBook({ docCode1, docCode2 }) {
-  const headCells = [
+  let headCells = [
+    { id: "Vou No", label: "Vou Date", feild: "vouDate" },
     { id: "Vou No", label: "Vou No", feild: "vouNo" },
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
     { id: "Narration", label: "Narration", feild: "narration" },
-    { id: "Debit", label: "Debit", feild: "debit" },
-    { id: "Credit", label: "Credit", feild: "credit" },
+    { id: "Debit", label: "Payment", feild: "debit" },
+    { id: "Credit", label: "Reciept", feild: "credit" },
     {
       id: "Balance",
       label: "Balance",
       feild: "currentBalance",
     },
   ];
+  const isDayBook = docCode1 == "DAY";
+
+  isDayBook && headCells.pop();
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = user.userCode;
   const userCompanyCode = user.userCompanyCode;
@@ -105,14 +116,22 @@ export default function BankBook({ docCode1, docCode2 }) {
   ).userBatchNo;
   let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
   const { getD } = DateCalc(user);
-
+  const { acTransactnDocCodes, transactnDocCodes } = DocCodes();
+  const docCodeOptions = [...acTransactnDocCodes, ...transactnDocCodes];
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
+    docCode: "",
   };
+  const openingObj = {
+    ...initialValues,
+    srNo: 1,
+    acName: "OPENING",
+  };
+
   const [filter, setFilter] = useState(initialFilterValues);
 
   const initialFilterFn = {
@@ -120,7 +139,7 @@ export default function BankBook({ docCode1, docCode2 }) {
       let newRecords = items.filter((item) => {
         if (item.srNo !== "") return item;
       });
-      console.log(items, filter.acCode, filter.acCode == "0");
+      console.log(items, filter.acCode, filter.acCode == "");
       console.log(newRecords);
       return newRecords;
     },
@@ -133,6 +152,7 @@ export default function BankBook({ docCode1, docCode2 }) {
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
   const [loading1, setLoading1] = useState(true);
+  const [dayWise, setDayWise] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
   const [accounts, setAccounts] = useState([initialAccount]);
@@ -156,6 +176,7 @@ export default function BankBook({ docCode1, docCode2 }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log(Config.batch);
+  console.log(records[0], refresh);
   if ((records[0] && records[0].srNo == "") || refresh) {
     query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
     const token = AuthHandler.getLoginToken();
@@ -174,28 +195,47 @@ export default function BankBook({ docCode1, docCode2 }) {
         let arr = [];
         let credit = 0;
         let debit = 0;
-        if (filter.acCode != "0")
+        if (filter.acCode != "" && !isDayBook)
           arr[0] = {
-            srNo: 1,
-            acCode: "",
-            acName: "OPENING",
-            credit: "",
-            debit: "",
+            ...openingObj,
             currentBalance: openingBalance,
-            vouNo: "",
           };
+        data = data.sort((a, b) => new Date(a.vouDate) - new Date(b.vouDate));
         data.map((item, i) => {
           credit += Number(item.debit);
           debit += Number(item.credit);
-          arr[i + 1] = {
+          if (
+            docCode1 != "DAY" &&
+            dayWise &&
+            i > 1 &&
+            data[i].vouDate &&
+            data[i].vouDate !== data[i - 1].vouDate
+          ) {
+            console.log(arr);
+            arr.push({
+              ...openingObj,
+              acName: "CLOSING",
+              currentBalance: arr[arr.length - 1].currentBalance,
+            });
+
+            arr.push({
+              ...openingObj,
+              currentBalance: arr[arr.length - 1].currentBalance,
+            });
+            console.log(arr);
+          }
+
+          arr.push({
             ...item,
-            acName: getAcName(item.acCode),
+            acName: getAcName(item.acCode, acc),
             currentBalance: openingBalance + debit - credit,
             credit: Number(item.debit),
             debit: Number(item.credit),
             narration: item.narration,
             srNo: i + 2,
-          };
+            vouDate: new Date(item.vouDate).toLocaleDateString(),
+            docCode: item.docCode,
+          });
         });
         if (acc.length != 0) setAccounts(acc);
         console.log(arr);
@@ -231,14 +271,68 @@ export default function BankBook({ docCode1, docCode2 }) {
   }
 
   console.log(filter);
+
+  function getAcName(code, arr) {
+    let name = "";
+    arr.map((item) => {
+      if (item.acCode == code) name = item.acName;
+    });
+    return name;
+  }
+  const accountOptions = accounts
+    .filter((item) => groupCodeCondition(item))
+    .map((item) => item.acName);
+  function groupCodeCondition(acc) {
+    if (
+      docCode1 == "CR" &&
+      acc.acGroupCode == cashAccGrpNo //only cash acc
+    ) {
+      return true;
+    } else if (
+      docCode1 == "BR" &&
+      acc.acGroupCode == bankAccGrpNo //only bank acc
+    ) {
+      return true;
+    } else if (isDayBook) {
+      //all acc
+      return true;
+    } else {
+      return false;
+    }
+  }
+  function searchFilter() {
+    console.log(filter);
+    setFilterFn({
+      fn: (items) => {
+        let newRecords = items;
+        function filterConditnWise(feild) {
+          newRecords = newRecords.filter(
+            (item) => item[feild] == filter[feild]
+          );
+          console.log(newRecords, feild);
+        }
+        isDayBook && filter.acCode && filterConditnWise("acCode");
+        isDayBook && filter.docCode && filterConditnWise("docCode");
+        // newRecords = newRecords.filter((item) => {
+        //   if (item.docCode == filter.docCode) return item;
+        // });
+
+        return newRecords;
+      },
+    });
+  }
   function search(allfields) {
     console.log(allfields);
     setFilterFn({
       fn: (items) => {
         let newRecords = items;
+        console.log(newRecords);
         newRecords = items.filter((item) => {
-          console.log(item, allfields);
-          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (
+            item.acName.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.narration.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.vouDate.toLowerCase().includes(allfields.toLowerCase())
+          )
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -248,23 +342,44 @@ export default function BankBook({ docCode1, docCode2 }) {
       },
     });
   }
-  function getAcName(code) {
-    let name = "";
-    accounts.map((item) => {
-      if (item.acCode == code) name = item.acName;
-    });
-    return name;
+  const display = recordsAfterPagingAndSorting();
+  console.log(display);
+
+  function Switch() {
+    docCode1 !== "DAY" ? (
+      <>
+        {" "}
+        <Grid
+          item
+          sm={2}
+          xs={12}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ExportSwitch
+            checked={dayWise}
+            onChange={() => {
+              setDayWise((prev) => !prev);
+              setRefresh(true);
+            }}
+          />{" "}
+          <Typography>DayWise</Typography>
+        </Grid>
+      </>
+    ) : (
+      <></>
+    );
   }
-  const accountOptions = accounts
-    .filter((item) => item.acCode.slice(0, 1) == "G")
-    .map((item) => item.acName);
   return (
     <>
       <div className="hold-transition sidebar-mini">
         <div className="wrapper">
           <div className="content-wrapper">
             <PageHeader
-              title={`${docCode1} Report`}
+              title={`${docCode1} BOOK`}
               icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
             />
             <section className="content">
@@ -293,6 +408,7 @@ export default function BankBook({ docCode1, docCode2 }) {
                       initialHeadCells={headCells}
                       selected={selected}
                       setSelected={setSelected}
+                      additionalComponent={Switch}
                     />
                     <TableContainer>
                       <TblContainer>
@@ -301,29 +417,34 @@ export default function BankBook({ docCode1, docCode2 }) {
                           <MuiSkeleton />
                         ) : (
                           <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {typeof item[headcell.feild] == "number"
-                                      ? Math.abs(item[headcell.feild])
-                                      : item[headcell.feild]}
-                                    {headcell.feild == "currentBalance"
-                                      ? item.currentBalance == 0
-                                        ? ""
-                                        : item.currentBalance < 0
-                                        ? "CR"
-                                        : "DR"
-                                      : ""}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
+                            {display.map((item, i) => (
+                              <>
+                                <TableRow>
+                                  {headcells.map((headcell, i) => (
+                                    <TableCell
+                                      key={headcell.id}
+                                      // sortDirection={orderBy === headcell.id ? order : false}
+                                      style={{
+                                        borderRight:
+                                          "1px solid rgba(0,0,0,0.2)",
+                                      }}
+                                    >
+                                      {typeof item[headcell.feild] == "number"
+                                        ? Math.abs(
+                                            item[headcell.feild].toFixed(2)
+                                          )
+                                        : item[headcell.feild]}
+                                      {headcell.feild == "currentBalance"
+                                        ? item.currentBalance == 0
+                                          ? ""
+                                          : item.currentBalance < 0
+                                          ? "CR"
+                                          : "DR"
+                                        : ""}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              </>
                             ))}
                           </TableBody>
                         )}
@@ -357,7 +478,12 @@ export default function BankBook({ docCode1, docCode2 }) {
                           setValue={setFilter}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12} className={classes.input}>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={isDayBook ? 6 : 12}
+                        className={classes.input}
+                      >
                         <SmartAutoSuggest
                           style={{
                             width: "100%",
@@ -375,7 +501,17 @@ export default function BankBook({ docCode1, docCode2 }) {
                           options2={accounts}
                         />
                       </Grid>
-
+                      {isDayBook && (
+                        <Grid item xs={12} sm={6} className={classes.input}>
+                          <UnusedAutosuggest
+                            value={filter}
+                            setValue={setFilter}
+                            options={docCodeOptions}
+                            name="docCode"
+                            label="Doc code"
+                          />
+                        </Grid>
+                      )}
                       <Grid item xs={6}>
                         <Controls.Button
                           text="Submit"
@@ -383,6 +519,7 @@ export default function BankBook({ docCode1, docCode2 }) {
                             setRefresh(true);
                             setFilterPopup(false);
                             setFilterIcon(false);
+                            searchFilter();
                           }}
                         />
                       </Grid>
@@ -403,3 +540,9 @@ export default function BankBook({ docCode1, docCode2 }) {
     </>
   );
 }
+// {(
+//   i > 1 &&
+//   display[i - 1].vouDate &&
+//   display[i].vouDate.getDate() !==
+//     display[i - 1].vouDate.getDate()
+// )(<TableRow>HI</TableRow>)}

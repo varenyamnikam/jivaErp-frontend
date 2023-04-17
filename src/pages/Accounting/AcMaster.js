@@ -92,6 +92,8 @@ export default function AcMaster(props) {
   const { title, initialValues } = props;
   const user = JSON.parse(localStorage.getItem("user"));
   const { getD } = DateCalc(user);
+  initialValues.narration = "";
+  console.log(initialValues);
 
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
@@ -121,7 +123,15 @@ export default function AcMaster(props) {
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.vouNo !== "" && item.srNo == 1) return item;
+        if (initialValues.docCode !== "JV" && item.vouNo !== "" && !item.srNo) {
+          return item;
+        } else if (
+          initialValues.docCode == "JV" &&
+          item.vouNo !== "" &&
+          Number(item.srNo) == 1
+        ) {
+          return item;
+        }
       });
       console.log(newRecords);
       return newRecords;
@@ -132,7 +142,7 @@ export default function AcMaster(props) {
   const [buttonPopup, setButtonPopup] = useState(false);
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
-  const [values, setValues] = useState(initialValues);
+  const [values, setValues] = useState({ ...initialValues });
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
   const [itemList, setItemList] = useState([initialValues]);
@@ -187,6 +197,8 @@ export default function AcMaster(props) {
             getDate: new Date(item.vouDate).toLocaleDateString(),
           }));
         }
+        //filter fn only shows srNo:1 in the table ie
+        //table info
         setRecords(function () {
           if (temp.length !== 0) {
             return temp;
@@ -206,6 +218,7 @@ export default function AcMaster(props) {
 
   function onDelete(item) {
     // roleService.deleteBranch(item);
+    console.log(item);
     let newRecord = [];
     newRecord = records.filter((record) => {
       return record.vouNo !== item.vouNo;
@@ -222,11 +235,18 @@ export default function AcMaster(props) {
     });
     const token = AuthHandler.getLoginToken();
     axios
-      .delete(Config.batch + query, {
+      .delete(Config.accounting + query, {
         headers: {
           authorization: "Bearer" + token,
         },
         data: item,
+      })
+      .then(() => {
+        setNotify({
+          isOpen: true,
+          message: `${item.vouNo} deleted`,
+          type: "warning",
+        });
       })
       .catch((err) => {
         console.log(err);
@@ -286,13 +306,11 @@ export default function AcMaster(props) {
   }
   function edit(e, ite) {
     e.preventDefault();
-    // const arr = records.filter(
-    //   (item) =>
-    //     item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo !== "X X X X"
-    // );
     const arr = records.filter(
       (item) => item.vouNo == ite.vouNo && item.vouNo !== "X X X X"
     );
+    //filter fn  shows everything except srNo:1 in the grid ie
+    //grid info (in the form)
 
     setItemList(arr);
     setValues(ite);

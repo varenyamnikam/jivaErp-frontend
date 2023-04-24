@@ -49,6 +49,7 @@ export default function ReuseTable(props) {
     setValues,
     setButtonPopup,
     setConfirmDialog,
+    setNotify,
     onDelete,
   } = props;
   if (title == "COUNTRY")
@@ -56,35 +57,24 @@ export default function ReuseTable(props) {
       <TableRow key={item._id}>
         <TableCell>{item.countryCode}</TableCell>
         <TableCell>{item.countryName}</TableCell>
-        <TableCell>{item.countryStatus}</TableCell>
         <TableCell>
-          <Controls.ActionButton
-            color="primary"
-            onClick={() => {
-              setValues(item);
-              setButtonPopup(true);
-            }}
-          >
-            <EditOutlinedIcon fontSize="small" />
-          </Controls.ActionButton>
-          <Controls.ActionButton
-            color="secondary"
-            onClick={(e) => {
-              console.log(item);
-              setConfirmDialog({
-                isOpen: true,
-                title: "Are you sure to delete this record?",
-                subTitle: "You can't undo this operation",
-                onConfirm: (e) => {
+          {item.userCompanyCode !== "all" && (
+            <>
+              <Controls.EditButton
+                handleClick={() => {
+                  setValues(item);
+                  setButtonPopup(true);
+                }}
+              />
+              <Controls.DeleteButton
+                handleConfirm={(e) => {
                   onDelete(item);
                   e.preventDefault();
-                },
-              });
-              e.preventDefault();
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </Controls.ActionButton>
+                }}
+                setConfirmDialog={setConfirmDialog}
+              />
+            </>
+          )}
         </TableCell>
       </TableRow>
     ));
@@ -95,35 +85,24 @@ export default function ReuseTable(props) {
         <TableCell>{item.countryCode}</TableCell>
         <TableCell>{item.stateCode}</TableCell>
         <TableCell>{item.stateName}</TableCell>
-        <TableCell>{item.stateStatus}</TableCell>
         <TableCell>
-          <Controls.ActionButton
-            color="primary"
-            onClick={() => {
-              setValues(item);
-              setButtonPopup(true);
-            }}
-          >
-            <EditOutlinedIcon fontSize="small" />
-          </Controls.ActionButton>
-          <Controls.ActionButton
-            color="secondary"
-            onClick={(e) => {
-              console.log(item);
-              setConfirmDialog({
-                isOpen: true,
-                title: "Are you sure to delete this record?",
-                subTitle: "You can't undo this operation",
-                onConfirm: (e) => {
+          {item.userCompanyCode !== "all" && (
+            <>
+              <Controls.EditButton
+                handleClick={() => {
+                  setValues(item);
+                  setButtonPopup(true);
+                }}
+              />
+              <Controls.DeleteButton
+                handleConfirm={(e) => {
                   onDelete(item);
                   e.preventDefault();
-                },
-              });
-              e.preventDefault();
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </Controls.ActionButton>
+                }}
+                setConfirmDialog={setConfirmDialog}
+              />
+            </>
+          )}
         </TableCell>
       </TableRow>
     ));

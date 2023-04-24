@@ -9,6 +9,8 @@ import LoadingActionButton from "./LoadingActionButton";
 import Password from "./password";
 import Percent from "./percentage";
 import Switch from "./Switch";
+import EditButton from "./editButton";
+import DeleteButton from "./deleteButton";
 const Controls = {
   Input,
   RadioGroup,
@@ -21,6 +23,8 @@ const Controls = {
   LoadingActionButton,
   Password,
   Switch,
+  EditButton,
+  DeleteButton,
 };
 
 export default Controls;

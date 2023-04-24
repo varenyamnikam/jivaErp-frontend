@@ -1,34 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useForm, Form } from "../../components/useForm";
-import Controls from "../../components/controls/Controls";
+import Controls from "../../../components/controls/Controls";
 import { Grid, makeStyles } from "@material-ui/core";
-import DropDownMenu from "../Usermaster/dropdownmenu";
-import BasicSelect from "../Usermaster/basicselect";
-import { Link, animateScroll as scroll } from "react-scroll";
-import Config from "../../Utils/Config";
-import * as roleService from "../../services/roleService";
-import ControllableStates from "../../components/selectsearchstate";
-import DisabledInputs1 from "./disabledinputs1";
-import DisabledInputs2 from "./disabledinputs2";
-import AuthHandler from "../../Utils/AuthHandler";
-import GetData from "./data";
-import Location from "./location";
-import States from "../../components/statesSelect";
-import Districts from "../../components/districtSelect";
-import Countries from "../../components/countrySelect";
-import Talukas from "../../components/talukaSelect";
-import UnusedAutosuggest from "../../components/unusedautosuggest";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
+import Config from "../../../Utils/Config";
+import * as roleService from "../../../services/roleService";
+import DisabledInputs1 from "./inputs1";
+import DisabledInputs2 from "./inputs2";
+import AuthHandler from "../../../Utils/AuthHandler";
+import States from "../../../components/statesSelect";
+import Countries from "../../../components/countrySelect";
+import UnusedAutosuggest from "../../../components/unusedautosuggest";
 import { useNavigate } from "react-router-dom";
-
-const hello = makeStyles((theme) => ({
-  Weddings: {
-    padding: "8px",
-    margin: "5px",
-  },
-}));
+import { NotifyMsg } from "../../../components/notificationMsg";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
 // user;
 const useStyles = makeStyles((theme) => ({
   Weddings: {
@@ -41,12 +24,6 @@ const useStyles = makeStyles((theme) => ({
     margin: "10px",
   },
 }));
-// const branchTypes = [
-//   "PLANT",
-//   "PRODUCTION",
-//   "PLANT AND PRODUCTION",
-//   "SALES OFFICE",
-// ];
 const branchTypes = ["BRANCH", "Point Of Sale", "Godown"];
 const initialLocation = {
   countryCode: "",
@@ -58,22 +35,17 @@ const initialLocation = {
   talukaName: "",
 };
 export default function Branchform(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const company = AuthHandler.getCompany();
+
   const page = useNavigate();
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     setRecords,
-    setPage,
     values,
     setValues,
-    initialValues,
     initialFilterValues,
     setButtonPopup,
     setNotify,
-    count,
-    setCount,
     country,
     states,
   } = props;
@@ -97,18 +69,21 @@ export default function Branchform(props) {
     }
     var expr = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
     console.log(expr.test(fieldValues.GSTno));
+    const gstConditn = company.gstRegType == "UnRegistered";
 
     Object.keys(temp).map((x) => {
-      check(x);
+      x !== "branchCode" && check(x);
     });
-    if (!expr.test(fieldValues.GSTno)) {
+    if (!expr.test(fieldValues.GSTno) && !gstConditn) {
       temp.GSTno = "incorrect format";
     } else {
       temp.GSTno = "";
     }
     let x = "branchName";
     let y = "branchCode";
-
+    //same branchName but diff branchcode not allowed
+    //i.e while updating, if branchcode is same, same branchname
+    //is allowed
     let found = records.find(
       (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
     );
@@ -118,8 +93,18 @@ export default function Branchform(props) {
     setErrors({
       ...temp,
     });
-
-    if (fieldValues == input) return Object.values(temp).every((x) => x == "");
+    const hasRight = fieldValues[y]
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues[y] ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
+    console.log(
+      fieldValues.branchName,
+      hasRight,
+      !hasRight && fieldValues.branchName
+    );
+    if (fieldValues == input)
+      return Object.values(temp).every((x) => x == "") && hasRight;
   };
   useEffect(() => {
     if (!Object.values(errors).every((x) => x == "")) validate();
@@ -147,80 +132,40 @@ export default function Branchform(props) {
     let x = true;
     let y = true;
     records.map((item) => {
-      if (item.branchCode == input.branchCode) {
-        x = false;
-      }
+      if (item.branchCode == input.branchCode) x = false;
+
       if (
         item.branchName == input.branchName &&
         item.branchCode !== input.branchCode
-      ) {
+      )
         y = false;
-      }
     });
+    const url = Config.Branch;
+    const body = { input };
+    function handleErr(err) {
+      setNotify(NotifyMsg(4));
+      console.log(err);
+    }
 
     if (validate()) {
-      if (x) {
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
+      if (x && y) {
         //while creating new branch prevent duplicate name
-        y
-          ? axios
-              .post(
-                Config.Branch + query,
-                { input },
-                {
-                  headers: {
-                    authorization: "Bearer" + token,
-                  },
-                }
-              )
-              .then((response) => {
-                const value = response.data.values;
-                setRecords([...records, value]);
-                setNotify({
-                  isOpen: true,
-                  message: "Branch created  successfully",
-                  type: "success",
-                });
-                setButtonPopup(false);
-              })
-              .catch((error) => {
-                setNotify({
-                  isOpen: true,
-                  message: "Unable to connect to servers",
-                  type: "warning",
-                });
-              })
-          : setErrors({ ...errors, branchName: "this name already exists" });
+
+        const handleRes = (response) => {
+          const value = response.data.values;
+          setRecords([...records, value]);
+          setNotify(NotifyMsg(1));
+          setButtonPopup(false);
+        };
+        roleService.axiosPut(url, body, handleRes, handleErr, () => {});
 
         // scroll.scrollToBottom();
       } else {
-        const token = AuthHandler.getLoginToken();
-        axios
-          .patch(
-            Config.Branch + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            setNotify({
-              isOpen: true,
-              message: "Branch updated  successfully",
-              type: "success",
-            });
-            setButtonPopup(false);
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
+        const handleRes = (response) => {
+          setNotify(NotifyMsg(2));
+          setButtonPopup(false);
+        };
+        roleService.axiosPatch(url, body, handleRes, handleErr, () => {});
 
         //   roleService.updateBranch(input);
         const newrecord = records.filter((item) => {
@@ -228,15 +173,6 @@ export default function Branchform(props) {
         });
         console.log(newrecord);
         setRecords([...newrecord, input]);
-        if (
-          input.branchCode ==
-          JSON.parse(localStorage.getItem("user")).defaultBranchCode
-        ) {
-          alert("plz login again");
-
-          page("/");
-        }
-        // scroll.scrollToBottom();
       }
     }
   };
@@ -250,42 +186,6 @@ export default function Branchform(props) {
   if (input.districtName && talukaDisable) {
     setTalukaDisable(false);
   }
-  ///////////////////////////////////////////////////////
-  if (input.acBranchName) {
-    console.log("hi...");
-    records.map((item) => {
-      if (
-        input.acBranchName == item.branchName &&
-        input.acBranchCode !== item.branchCode
-      ) {
-        console.log(input.acBranchCode, input.acBranchName);
-        setInput({
-          ...input,
-          acBranchCode: item.branchCode,
-        });
-      }
-    });
-  }
-  if (!input.acBranchName && input.acBranchCode) {
-    console.log("hi...");
-    records.map((item) => {
-      if (input.acBranchCode == item.branchCode) {
-        setInput({ ...input, acBranchName: item.branchName });
-      }
-    });
-  }
-  // if (input.acBranchName && input.acBranchCode) {
-  //   console.log("hi...update name");
-  //   records.map((item) => {
-  //     if (
-  //       input.acBranchCode == item.branchCode &&
-  //       input.acBranchName !== item.branchName
-  //     ) {
-  //       console.log("hi...update ", item);
-  //       setInput({ ...input, acBranchName: item.branchName });
-  //     }
-  //   });
-  // }
 
   return (
     <Grid container spacing={2}>
@@ -305,11 +205,15 @@ export default function Branchform(props) {
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <UnusedAutosuggest
-          options={acBranchOptions}
+        <SmartAutosuggest
+          options1={acBranchOptions}
+          options2={records}
           setValue={setInput}
           value={input}
-          name="acBranchName"
+          name1="acBranchName"
+          code1="acBranchCode"
+          name2="branchName"
+          code2="branchCode"
           label="A.C Branch"
           error={errors.acBranchName}
         />
@@ -361,7 +265,7 @@ export default function Branchform(props) {
         item
         xs={12}
         sm={6}
-        style={{ display: "flex", justifyContent: "center" }}
+        style={{ display: "flex", justifyContent: "flex-end" }}
       >
         <Controls.Button text="Reset" color="default" onClick={handleReset} />
         <Controls.Button
@@ -410,3 +314,39 @@ export default function Branchform(props) {
 //   disable={talukaDisable}
 //   // getOptionDisabled={(option) => option == stateName[25]}
 // />
+///////////////////////////////////////////////////////
+// if (input.acBranchName) {
+//   console.log("hi...");
+//   records.map((item) => {
+//     if (
+//       input.acBranchName == item.branchName &&
+//       input.acBranchCode !== item.branchCode
+//     ) {
+//       console.log(input.acBranchCode, input.acBranchName);
+//       setInput({
+//         ...input,
+//         acBranchCode: item.branchCode,
+//       });
+//     }
+//   });
+// }
+// if (!input.acBranchName && input.acBranchCode) {
+//   console.log("hi...");
+//   records.map((item) => {
+//     if (input.acBranchCode == item.branchCode) {
+//       setInput({ ...input, acBranchName: item.branchName });
+//     }
+//   });
+// }
+// if (input.acBranchName && input.acBranchCode) {
+//   console.log("hi...update name");
+//   records.map((item) => {
+//     if (
+//       input.acBranchCode == item.branchCode &&
+//       input.acBranchName !== item.branchName
+//     ) {
+//       console.log("hi...update ", item);
+//       setInput({ ...input, acBranchName: item.branchName });
+//     }
+//   });
+// }

@@ -1,7 +1,7 @@
 import GeneralAccountMaster from "./generalAccountMaster";
 
 const initialValues = {
-  acCode: "X X X X",
+  acCode: "",
   acc: "",
   preFix: "S",
   firmType: "",
@@ -17,15 +17,15 @@ const initialValues = {
   panNo: "",
   aadharNo: "",
   gstNo: "",
-  seedLicenNo: "NULL",
-  bankName: "NULL",
-  ifscCode: "NULL",
-  bankAcNo: "NULL",
+  seedLicenNo: "",
+  bankName: "",
+  ifscCode: "",
+  bankAcNo: "",
   acRegMob: "",
   mktArea: "",
   mktAreaCode: "",
   parentAreaCode: "",
-  prdAreaCode: "NULL",
+  prdAreaCode: "",
   acStatus: "Active",
 };
 

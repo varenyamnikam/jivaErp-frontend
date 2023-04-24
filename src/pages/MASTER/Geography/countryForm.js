@@ -6,10 +6,7 @@ import Config from "../../../Utils/Config";
 import * as roleService from "../../../services/roleService";
 import Controls from "../../../components/controls/Controls";
 import { Grid } from "@material-ui/core";
-import { Form } from "../../../components/useForm";
-import Countries from "../../../components/countrySelect";
-import States from "../../../components/statesSelect";
-import Districts from "../../../components/districtSelect";
+import { NotifyMsg } from "../../../components/notificationMsg";
 const initialFValues = {
   id: 0,
   roleCode: "",
@@ -26,11 +23,11 @@ export default function CountryForm(props) {
     country,
     state,
     District,
+    setNotify,
+    setButtonPopup,
   } = props;
   console.log(country, state, District);
   console.log(values);
-  const [stateDisable, setStateDisable] = useState(true);
-  const [districtDisable, setDistrictDisable] = useState(true);
   const [errors, setErrors] = useState({});
   console.log(values);
   console.log(errors);
@@ -46,23 +43,16 @@ export default function CountryForm(props) {
       temp.countryCode = fieldValues.countryCode
         ? ""
         : "This field is required.";
-    // let x = "countryName";
-    // let y = "countryCode";
-    // let found = records.find(
-    //   (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
-    // );
-    // if (fieldValues[x])
-    //   temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
     console.log(temp);
     if ("countryName" in fieldValues) {
       let x = "countryName";
       let found = records.find((item) => item[x] == fieldValues[x]);
       if (fieldValues[x])
         temp[x] = found ? `${found[x]} already exists at ` : "";
-      let y = "countryCode";
-      let founde = records.find((item) => item[y] == fieldValues[y]);
-      if (fieldValues[y])
-        temp[y] = founde ? `${founde[y]} already exists  ` : "";
+      // let y = "countryCode";
+      // let founde = records.find((item) => item[y] == fieldValues[y]);
+      // if (fieldValues[y])
+      //   temp[y] = founde ? `${founde[y]} already exists  ` : "";
     }
 
     setErrors({
@@ -78,6 +68,40 @@ export default function CountryForm(props) {
       roleService.insertLocation({ ...values, countryStatus: "ACTIVE" });
       setRecords([...records, { ...values, countryStatus: "ACTIVE" }]);
     }
+    if (validate()) {
+      console.log(values);
+      const url = Config.location;
+
+      const handleErr = (error) => {
+        setNotify(NotifyMsg(4));
+      };
+
+      let cntry = records.find(
+        (item) => item.countryCode == values.countryCode
+      );
+      console.log(cntry);
+      if (!cntry) {
+        const handleRes = (response) => {
+          setRecords([...records, values]);
+          setButtonPopup(false);
+          setNotify(NotifyMsg(1));
+        };
+
+        roleService.axiosPut(url, values, handleRes, handleErr, () => {});
+      } else {
+        const handleRes = (response) => {
+          const newRecords = records.map((item) =>
+            item.countryCode == values.countryCode ? values : item
+          );
+          setRecords(newRecords);
+          setNotify(NotifyMsg(2));
+
+          setButtonPopup(false);
+        };
+
+        roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
+      }
+    }
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,31 +112,39 @@ export default function CountryForm(props) {
     });
     console.log(values);
   };
-  console.log(values.countryName);
-  return (
-    <Form onSubmit={handleSubmit}>
-      <Grid container>
-        <Controls.Input
-          name="countryCode"
-          label="Country Code"
-          value={values.countryCode}
-          onChange={handleInputChange}
-          error={errors.countryCode}
-        />
 
-        <Controls.Input
-          name="countryName"
-          label="Country Name"
-          value={values.countryName}
-          onChange={handleInputChange}
-          error={errors.countryName}
-        />
+  return (
+    <>
+      <Grid container spacing={2}>
+        <Grid item sx={12} sm={6}>
+          <Controls.Input
+            name="countryCode"
+            label="Country Code"
+            value={values.countryCode}
+            onChange={handleInputChange}
+            error={errors.countryCode}
+          />
+        </Grid>{" "}
+        <Grid item sx={12} sm={6}>
+          <Controls.Input
+            name="countryName"
+            label="Country Name"
+            value={values.countryName}
+            onChange={handleInputChange}
+            error={errors.countryName}
+          />
+        </Grid>{" "}
+        <Grid
+          item
+          sx={12}
+          sm={6}
+          style={{ display: "flex", justifyContent: "flex-end" }}
+        >
+          <Controls.Button type="submit" text="Submit" onClick={handleSubmit} />
+          <Controls.Button text="Reset" color="default" />
+        </Grid>
       </Grid>
-      <div>
-        <Controls.Button type="submit" text="Submit" />
-        <Controls.Button text="Reset" color="default" onClick={() => {}} />
-      </div>
-    </Form>
+    </>
   );
 }
 // <States

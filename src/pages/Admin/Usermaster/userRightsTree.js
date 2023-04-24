@@ -9,21 +9,11 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import { cube } from "react-icons-kit/ionicons/cube";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-const initialUserRights = {
-  id: 0,
-  userCode: "",
-  screenCode: "",
-  menuRight: "",
-  editRight: "",
-  addRight: "",
-  deleteRight: "",
-};
 export default function ControlledTreeView(props) {
-  const { values, setValues, userRights } = props;
+  const { values, setValues, right, initialUserRights } = props;
   let data = AuthHandler.getMenuItem();
   const [expanded, setExpanded] = React.useState([]);
   const [selected, setSelected] = React.useState([]);
-  const [selectedTree, setSelectedTree] = React.useState([]);
 
   const handleToggle = (event, nodeIds) => {
     setExpanded(nodeIds);
@@ -33,36 +23,57 @@ export default function ControlledTreeView(props) {
     console.log("hi", nodeIds, name);
     setSelected(nodeIds);
     let x = true;
-    userRights.map((item) => {
-      if (item.userCode == values.userCode && item.screenName == name) {
-        console.log("hi", item, values);
-
-        if (
-          values.menuRight !== item.menuRight ||
-          values.editRight !== item.editRight ||
-          values.addRight !== item.addRight ||
-          values.deleteRight !== item.deleteRight
-        ) {
-          x = false;
-          setValues({ ...item, screenCode: nodeIds, screenName: name });
-        }
-      }
-    });
-    if (x) {
-      setValues({
-        ...values,
-        screenName: name,
-        screenCode: nodeIds,
-        menuRight: "Y",
-        editRight: "Y",
-        addRight: "Y",
-        deleteRight: "Y",
-      });
-      console.log("hi");
+    let menuArr = right.menuRight;
+    let editArr = right.editRight;
+    let addArr = right.addRight;
+    let deleteArr = right.deleteRight;
+    // const rightsArr = [menuArr, editArr, addArr, deleteArr];
+    if (menuArr.includes(nodeIds)) setValues({ ...values, menuRight: "Y" });
+    else {
+      setValues(initialUserRights);
     }
-  };
+    function getYorN(arr) {
+      return arr.includes(nodeIds) ? "Y" : "N";
+    }
+    setValues({
+      ...values,
+      screenCode: nodeIds,
+      screenName: name,
+      menuRight: getYorN(menuArr),
+      editRight: getYorN(editArr),
+      addRight: getYorN(addArr),
+      deleteRight: getYorN(deleteArr),
+    });
+    // rightsArr.map((arr) => {
+    //   arr.map((item) => {
+    //     if (item.userCode == values.userCode && item.screenName == name) {
+    //       console.log("hi", item, values);
 
-  console.log(selectedTree, values, data);
+    //       if (
+    //         values.menuRight !== item.menuRight ||
+    //         values.editRight !== item.editRight ||
+    //         values.addRight !== item.addRight ||
+    //         values.deleteRight !== item.deleteRight
+    //       ) {
+    //         x = false;
+    //         setValues({ ...item, screenCode: nodeIds, screenName: name });
+    //       }
+    //     }
+    //   });
+    // });
+    // if (x) {
+    //   setValues({
+    //     ...values,
+    //     screenName: name,
+    //     screenCode: nodeIds,
+    //     menuRight: "Y",
+    //     editRight: "Y",
+    //     addRight: "Y",
+    //     deleteRight: "Y",
+    //   });
+    //   console.log("hi");
+    // }
+  };
 
   const renderTree = (nodes) => (
     <TreeItem

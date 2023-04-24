@@ -36,20 +36,21 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../../components/public.css";
 import MuiSkeleton from "../../../components/skeleton";
 import { NotifyMsg } from "../../../components/notificationMsg";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
 const statusItems = [
   { id: "Active", title: "Active" },
   { id: "Inactive", title: "Inactive" },
 ];
 const headCells = [
-  { id: "Actype", label: "A C Type" },
-  { id: "Actypefor", label: "A C Type For" },
+  { id: "Code", label: "CODE" },
+  { id: "GroupName", label: "GROUP NAME" },
   { id: "status", label: "STATUS", disableSorting: true },
   { id: "Edit", label: "EDIT" },
 ];
 const initialFilterFn = {
   fn: (items) => {
     let newRecords = items.filter((item) => {
-      if (item.acType !== "") return item;
+      if (item.acGroupCode !== "") return item;
     });
     console.log(newRecords);
     return newRecords;
@@ -82,27 +83,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const initialValues = {
-  acType: "",
-  acTypeFor: "",
-  acTypeStatus: "",
+  acGroupCode: "",
+  parentGroupName: "",
+  parentGroupCode: "",
+  acGroupName: "",
+  acGroupStatus: "",
+  groupType: "",
 };
 const initialFilterValues = {
-  acType: "",
-  acTypeStatus: "",
-  acTypeFor: "",
+  acGroupCode: "",
+  acGroupName: "",
+  acGroupStatus: "",
   allFields: "",
+  groupType: "",
 };
 
-export default function AccountTypesMaster() {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
+export default function AcGlGroup() {
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [records, setRecords] = useState([initialValues]);
+  const [loading, setLoading] = useState(true);
+
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -114,25 +117,25 @@ export default function AccountTypesMaster() {
     subTitle: "",
   });
   const [errors, setErrors] = useState({});
-  const groupTypes = ["Customer", "Supplier", "Employee", "General"];
-  const [loading, setLoading] = useState(true);
-
+  const groupTypes = records.map((item) => {
+    return item.acGroupName;
+  });
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
     function check(key) {
       if (key in fieldValues)
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
-    Object.keys(initialValues).map((x) => {
-      check(x);
+    Object.keys(initialFilterValues).map((x) => {
+      x !== "acGroupCode" && check(x);
     });
-    let x = "acType";
-    let y = "acTypeFor";
+    let x = "acGroupName";
+    let y = "acGroupCode";
     let found = records.find(
-      (item) => item[x] == fieldValues[x] && item[y] == fieldValues[y]
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
     );
     if (fieldValues[x])
-      temp[x] = found ? `${found[x]} already exists for ${found[y]}` : "";
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
     console.log(temp);
     const hasRight = fieldValues[y]
       ? AuthHandler.canEdit()
@@ -151,7 +154,7 @@ export default function AccountTypesMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.acgl;
+  const url = Config.acglgroup;
 
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
@@ -160,9 +163,8 @@ export default function AccountTypesMaster() {
 
   if (loading) {
     const handleRes = (response) => {
-      if (response.data.mst_acTypes.length !== 0)
-        setRecords(response.data.mst_acTypes);
-
+      if (response.data.mst_acglgroup.length !== 0)
+        setRecords(response.data.mst_acglgroup);
       loading && setLoading(false);
     };
     roleService.axiosGet(url, handleRes, handleErr, () => {});
@@ -181,10 +183,9 @@ export default function AccountTypesMaster() {
     const handleRes = (response) => {
       let newRecord = [];
       newRecord = records.filter((record) => {
-        return record.acType !== item.acType;
+        return record.acGroupCode !== item.acGroupCode;
       });
       if (newRecord.length == 0) {
-        console.log("record empty!");
         setRecords([initialValues]);
       } else {
         setRecords(newRecord);
@@ -201,29 +202,25 @@ export default function AccountTypesMaster() {
     e.preventDefault();
     if (validate()) {
       let x = true;
-      if (values._id) {
-        const updatedRecords = records.map((p) =>
-          p._id == values._id ? values : p
-        );
-        setRecords(updatedRecords);
-        x = false;
-      }
-
+      x = records.find((item) => item.acGroupCode == values.acGroupCode);
       setButtonPopup(false);
-
-      const token = AuthHandler.getLoginToken();
-      if (x) {
+      if (!x) {
         const handleRes = (response) => {
-          console.log(response.data);
-          setRecords([...records, { _id: response.data.id, ...values }]);
+          console.log(response.data.values);
+          setRecords([...records, response.data.values]);
           setNotify(NotifyMsg(1));
         };
 
         roleService.axiosPut(url, values, handleRes, handleErr, () => {});
       } else {
         const handleRes = (response) => {
-          console.log(response);
+          const updatedRecords = records.map((p) =>
+            p.acGroupCode === values.acGroupCode ? values : p
+          );
+          console.log(updatedRecords);
           setNotify(NotifyMsg(2));
+
+          setRecords(updatedRecords);
         };
 
         roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
@@ -245,8 +242,8 @@ export default function AccountTypesMaster() {
         newRecords = items.filter((item) => {
           console.log(item, allfields);
           if (
-            item.acType.toLowerCase().includes(allfields.toLowerCase()) ||
-            item.acTypeFor.toLowerCase().includes(allfields.toLowerCase())
+            item.acGroupCode.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.acGroupName.toLowerCase().includes(allfields.toLowerCase())
           )
             return item;
         });
@@ -255,11 +252,31 @@ export default function AccountTypesMaster() {
       },
     });
   }
+  if (values.parentGroupName) {
+    records.map((item) => {
+      if (
+        values.parentGroupName == item.acGroupName &&
+        values.parentGroupCode !== item.acGroupCode
+      ) {
+        setValues({
+          ...values,
+          parentGroupCode: item.acGroupCode,
+        });
+      }
+    });
+  }
+  if (!values.parentGroupName && values.parentGroupCode) {
+    records.map((item) => {
+      if (values.parentGroupCode == item.acGroupCode) {
+        setValues({ ...values, parentGroupName: item.acGroupName });
+      }
+    });
+  }
 
   return (
     <>
       <PageHeader
-        title="Account Types"
+        title="Account  Groups"
         icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
       />
       <section className="content">
@@ -270,7 +287,7 @@ export default function AccountTypesMaster() {
                 <Grid container style={{ display: "flex", flexGrow: 1 }}>
                   <Grid item xs={12} sm={8}>
                     <Controls.Input
-                      label="Search AC Type"
+                      label="Search Role Name"
                       className={classes.searchInput}
                       InputProps={{
                         startAdornment: (
@@ -311,7 +328,7 @@ export default function AccountTypesMaster() {
                       startIcon={<AddIcon />}
                       onClick={(e) => {
                         setButtonPopup(true);
-                        setValues(initialFilterValues);
+                        setValues(initialValues);
                         setErrors({});
                       }}
                     />
@@ -327,11 +344,11 @@ export default function AccountTypesMaster() {
                     <TableBody>
                       {recordsAfterPagingAndSorting().map((item) => (
                         <TableRow key={item._id}>
-                          <TableCell>{item.acType}</TableCell>
-                          <TableCell>{item.acTypeFor}</TableCell>
+                          <TableCell>{item.acGroupCode}</TableCell>
+                          <TableCell>{item.acGroupName}</TableCell>
                           <TableCell>
-                            <span className={item.acTypeStatus}>
-                              {item.acTypeStatus}
+                            <span className={item.acGroupStatus}>
+                              {item.acGroupStatus}
                             </span>
                           </TableCell>
                           <TableCell>
@@ -363,61 +380,78 @@ export default function AccountTypesMaster() {
               <TblPagination />
             </section>
             <Popup
-              title="Account Types Form"
+              title="Group Master Form"
               openPopup={buttonPopup}
               setOpenPopup={setButtonPopup}
             >
               <Grid container spacing={2}>
                 <Grid item sx={12} sm={6}>
-                  {" "}
                   <Controls.Input
-                    name="acType"
-                    label="A C Type"
-                    value={values.acType}
+                    name="acGroupCode"
+                    label="Code"
+                    value={values.acGroupCode ? values.acGroupCode : "N E W"}
                     onChange={handleInputChange}
-                    error={errors.acType}
+                    error={errors.acGroupCode}
+                    disabled={true}
                   />
-                </Grid>
+                </Grid>{" "}
                 <Grid item sx={12} sm={6}>
-                  <UnusedAutosuggest
-                    name="acTypeFor"
-                    label="A C Type For"
+                  <Controls.Input
+                    name="acGroupName"
+                    label="Group Name"
+                    value={values.acGroupName}
+                    onChange={handleInputChange}
+                    error={errors.acGroupName}
+                  />
+                </Grid>{" "}
+                <Grid item sx={12} sm={6}>
+                  <SmartAutosuggest
+                    name="parentGroupName"
+                    label="Parent"
+                    name1="parentGroupName"
+                    code1="parentGroupCode"
+                    code2="acGroupCode"
+                    name2="acGroupName"
                     value={values}
                     setValue={setValues}
-                    options={groupTypes}
-                    error={errors.acTypeFor}
+                    options1={groupTypes}
+                    options2={records}
+                    error={errors.parentGroupName}
                   />
-                </Grid>
+                </Grid>{" "}
+                <Grid item sx={12} sm={6}>
+                  <UnusedAutosuggest
+                    name="groupType"
+                    label="Group Type"
+                    value={values}
+                    setValue={setValues}
+                    options={["Asset", "Laibality", "Income"]}
+                    error={errors.groupType}
+                  />
+                </Grid>{" "}
                 <Grid item sx={12} sm={6}>
                   <Controls.RadioGroup
-                    name="acTypeStatus"
+                    name="acGroupStatus"
                     label="Status"
-                    value={values.acTypeStatus}
+                    value={values.acGroupStatus}
                     onChange={handleInputChange}
                     items={statusItems}
-                    error={errors.acTypeStatus}
+                    error={errors.acGroupStatus}
                   />
-                </Grid>
+                </Grid>{" "}
                 <Grid
                   item
                   sx={12}
                   sm={6}
                   style={{ display: "flex", justifyContent: "flex-end" }}
                 >
-                  <div>
-                    <Controls.Button
-                      text="Reset"
-                      color="default"
-                      onClick={() => {}}
-                    />{" "}
-                    <Controls.Button
-                      type="submit"
-                      text="Submit"
-                      onClick={handleSubmit}
-                    />
-                  </div>
-                </Grid>{" "}
-              </Grid>{" "}
+                  <Controls.Button
+                    type="submit"
+                    text="Submit"
+                    onClick={handleSubmit}
+                  />
+                </Grid>
+              </Grid>
             </Popup>
 
             <Notification notify={notify} setNotify={setNotify} />

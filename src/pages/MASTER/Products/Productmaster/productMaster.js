@@ -41,7 +41,7 @@ import MuiSkeleton from "../../../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import GstForm from "./gstForm";
 import Filter from "../../../../components/filterButton";
-
+import { NotifyMsg } from "../../../../components/notificationMsg";
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "name", label: "NAME" },
@@ -99,10 +99,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const initialValues = {
-  prodCode: "X X X X",
+  prodCode: "",
   barcode: "",
-  itemType: "",
-  prodCompany: "",
+  prodTypeCode: "",
+  prodTypeName: "",
+  prodCompanyCode: "",
+  prodCompanyName: "",
   prodName: "",
   prodDesc: "",
   UOM: "",
@@ -128,12 +130,10 @@ export default function ProductMaster(props) {
 
   const [records, setRecords] = useState([initialValues]);
   const [unitNames, setUnitNames] = useState(["unable to get units"]);
-  const [prodCompanyNames, setProdCompanyNames] = useState([
-    "unable to get prodCompany",
+  const [prodCompany, setProdCompany] = useState([
+    "unable to get prodCompanyCode",
   ]);
-  const [prodTypesNames, setProdTypesNames] = useState([
-    "unable to get prodType",
-  ]);
+  const [prodType, setProdTypes] = useState(["unable to get prodType"]);
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
   const [filter, setFilter] = useState(initialFilterValues);
@@ -153,150 +153,60 @@ export default function ProductMaster(props) {
     title: "",
     subTitle: "",
   });
+  const [loading, setLoading] = useState(true);
+
   // const [count, setCount] = useState(records[records.length - 1].branchCode);
   const classes = useStyles();
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  React.useEffect(() => {
-    const token = AuthHandler.getLoginToken();
-    if (records[0].prodCode && records[0].prodCode == "X X X X") {
-      axios
-        .get(Config.prodMaster + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          if (response.data.mst_prodMaster[0])
-            setRecords(response.data.mst_prodMaster);
-          else {
-            setRecords([initialFilterValues]);
-          }
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
-    }
+  const handleErr = (err) => {
+    setNotify(NotifyMsg(4));
+    setLoading(false);
+  };
+  const url = Config.prodMaster;
 
-    if (unitNames[0] == "unable to get units") {
-      axios
-        .get(Config.unit + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          const unitNameArr = [];
-          console.log(response);
-          if (response.data.mst_unit[0]) {
-            response.data.mst_unit.map((item) => {
-              unitNameArr.push(item.UOM);
-            });
-            setUnitNames(unitNameArr);
-          } else {
-            setUnitNames([""]);
-          }
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
-    }
-    if (prodCompanyNames[0] == "unable to get prodCompany") {
-      axios
-        .get(Config.prodCompany + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          if (response.data.mst_prodCompany[0]) {
-            const prodCompanyNameArr = [];
-            response.data.mst_prodCompany.map((item) => {
-              prodCompanyNameArr.push(item.prodCompany);
-            });
-            setProdCompanyNames(prodCompanyNameArr);
-          } else {
-            setProdCompanyNames([""]);
-          }
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
-    }
-    if (prodTypesNames[0] == "unable to get prodType") {
-      axios
-        .get(Config.prodType + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          if (response.data.mst_prodTypes[0]) {
-            const prodTypesNameArr = [];
-            response.data.mst_prodTypes.map((item) => {
-              prodTypesNameArr.push(item.prodType);
-            });
-            setProdTypesNames(prodTypesNameArr);
-          } else {
-            setProdTypesNames([""]);
-          }
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
-    }
-  }, []);
-  console.log(records, unitNames, prodCompanyNames, prodTypesNames);
+  if (loading) {
+    const handleRes = (response) => {
+      const products = response.data.mst_prodMaster;
+      const units = response.data.mst_unit;
+      const companies = response.data.mst_prodCompany;
+      const prodTypes = response.data.mst_prodTypes;
+      products.length !== 0 && setRecords(products);
+
+      const unitNameArr = units.map((item) => item.UOM);
+
+      unitNameArr.length !== 0 && setUnitNames(unitNameArr);
+
+      companies.length !== 0 && setProdCompany(companies);
+
+      prodTypes.length !== 0 && setProdTypes(prodTypes);
+
+      setLoading(false);
+    };
+
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
+  }
+
+  console.log(records, unitNames, prodCompany, prodType);
   function onDelete(item) {
-    let newRecord = [];
-    newRecord = records.filter((record) => {
-      return record.prodCode !== item.prodCode;
-    });
-    if (newRecord.length == 0) {
-      setRecords([initialFilterValues]);
-    } else {
-      setRecords(newRecord);
-    }
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
-    const token = AuthHandler.getLoginToken();
-    axios
-      .put(
-        Config.prodMaster + query,
-        { item },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
+    const handleRes = (res) => {
+      let newRecord = [];
+      newRecord = records.filter((record) => {
+        return record.prodCode !== item.prodCode;
       });
+      if (newRecord.length == 0) {
+        setRecords([initialFilterValues]);
+      } else {
+        setRecords(newRecord);
+      }
+    };
+    roleService.axiosDelete(url, item, handleRes, handleErr);
   }
   function searchFilter() {
     setFilterFn({
@@ -348,277 +258,246 @@ export default function ProductMaster(props) {
       },
     });
   }
-  function getCancel() {
-    if (filter.allFields) {
-      return (
-        <InputAdornment position="end">
-          <IconButton
-            onClick={() => {
-              setFilter(initialFilterValues);
-              setFilterFn({
-                fn: (items) => {
-                  return items;
-                },
-              });
-            }}
-            style={{ boxShadow: "none" }}
-          >
-            <ClearIcon />
-          </IconButton>
-        </InputAdornment>
-      );
-    } else {
-      return <></>;
-    }
-  }
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Item Master"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title="Item Master"
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
 
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                        <Grid item xs={12} sm={8}>
-                          <Controls.Input
-                            label="Search Role Name"
-                            name="allFields"
-                            className={classes.searchInput}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                              endAdornment: getCancel(),
-                            }}
-                            value={filter.allFields}
-                            onChange={handleFilter}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          sm={1}
-                          xs={4}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Filter
-                            filterIcon={filterIcon}
-                            setFilterPopup={setFilterPopup}
-                            setFilter={setFilter}
-                            setFilterFn={setFilterFn}
-                            setFilterIcon={setFilterIcon}
-                            initialFilterValues={initialFilterValues}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          sm={3}
-                          xs={8}
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Controls.Button
-                            text="Add New"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={(e) => {
-                              setButtonPopup(true);
-                              setValues(initialValues);
-                            }}
-                            size="medium"
-                          />
-                        </Grid>
-                      </Grid>
-                    </Toolbar>
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0].prodCode == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow key={item._id}>
-                                <TableCell>{item.prodCode}</TableCell>
-                                <TableCell>{item.prodName}</TableCell>
-                                <TableCell>{item.MRP}</TableCell>{" "}
-                                <TableCell>
-                                  <IconButton
-                                    className={classes.gst}
-                                    aria-label="Example"
-                                    onClick={() => {
-                                      setValues(item);
-                                      setPopup(true);
-                                    }}
-                                  >
-                                    G.S.T
-                                  </IconButton>
-                                </TableCell>
-                                <TableCell>
-                                  <IconButton
-                                    className={classes[item.prodStatus]}
-                                    onClick={() => {}}
-                                  >
-                                    {item.prodStatus}
-                                  </IconButton>
-                                </TableCell>
-                                <TableCell>
-                                  <Controls.ActionButton
-                                    color="primary"
-                                    onClick={() => {
-                                      setValues(item);
-                                      setButtonPopup(true);
-                                    }}
-                                  >
-                                    <EditOutlinedIcon fontSize="small" />
-                                  </Controls.ActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      console.log(item);
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
-                                          e.preventDefault();
-                                          console.log("records:" + records);
-                                        },
-                                      });
-                                      e.preventDefault();
-                                    }}
-                                  >
-                                    <DeleteIconOutline fontSize="small" />
-                                  </Controls.ActionButton>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>{" "}
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title="Product form"
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                    size="md"
+              <Toolbar>
+                <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                  <Grid item xs={12} sm={8}>
+                    <Controls.Input
+                      label="Search Role Name"
+                      name="allFields"
+                      className={classes.searchInput}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                        endAdornment: filter.allFields && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setFilter(initialFilterValues);
+                                setFilterFn(initialFilterFn);
+                              }}
+                              style={{ boxShadow: "none" }}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      value={filter.allFields}
+                      onChange={handleFilter}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    sm={1}
+                    xs={4}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <Productform
-                      records={records}
-                      setRecords={setRecords}
-                      input={values}
-                      setInput={setValues}
-                      initialValues={initialValues}
+                    <Filter
+                      filterIcon={filterIcon}
+                      setFilterPopup={setFilterPopup}
+                      setFilter={setFilter}
+                      setFilterFn={setFilterFn}
+                      setFilterIcon={setFilterIcon}
                       initialFilterValues={initialFilterValues}
-                      unitNames={unitNames}
-                      prodCompanyNames={prodCompanyNames}
-                      prodTypesNames={prodTypesNames}
-                      setNotify={setNotify}
-                      setGstPopup={setPopup}
-                      setFormPopup={setButtonPopup}
                     />
-                  </Popup>
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                    // size="md"
+                  </Grid>
+                  <Grid
+                    item
+                    sm={3}
+                    xs={8}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
                   >
-                    <Grid container spacing={2} style={{ marginTop: "10px" }}>
-                      <Grid item xs={12} sm={6}>
-                        {" "}
-                        <Controls.Input
-                          name="prodCode"
-                          label="Product Code"
-                          value={filter.prodCode}
-                          setValue={setFilter}
-                          onChange={handleFilter}
-                        />
-                      </Grid>{" "}
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="prodName"
-                          label="Product Name"
-                          value={filter.prodName}
-                          setValue={setFilter}
-                          onChange={handleFilter}
-                        />
-                      </Grid>{" "}
-                      <Grid item xs={12} sm={6}>
-                        <Controls.Input
-                          name="MRP"
-                          label="M.R.P"
-                          value={filter.MRP}
-                          setValue={setFilter}
-                          onChange={handleFilter}
-                        />
-                      </Grid>{" "}
-                      <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        style={{ justifyContent: "flex-end", display: "flex" }}
-                      >
-                        <Controls.Button
-                          type="submit"
-                          text="Submit"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            searchFilter();
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>{" "}
-                    </Grid>{" "}
-                  </Popup>
-                  <Popup
-                    size="md"
-                    title="GST Form"
-                    openPopup={popup}
-                    setOpenPopup={setPopup}
-                  >
-                    <GstForm
-                      setNotify={setNotify}
-                      setPopup={setPopup}
-                      values={values}
-                      setValues={setValues}
-                      records={records}
-                      setRecords={setRecords}
+                    <Controls.Button
+                      text="Add New"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={(e) => {
+                        setButtonPopup(true);
+                        setValues(initialValues);
+                      }}
+                      size="medium"
                     />
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                  </Grid>
+                </Grid>
+              </Toolbar>
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {recordsAfterPagingAndSorting().map((item) => (
+                        <TableRow key={item._id}>
+                          <TableCell>{item.prodCode}</TableCell>
+                          <TableCell>{item.prodName}</TableCell>
+                          <TableCell>{item.MRP}</TableCell>{" "}
+                          <TableCell>
+                            <IconButton
+                              className={classes.gst}
+                              aria-label="Example"
+                              onClick={() => {
+                                setValues(item);
+                                setPopup(true);
+                              }}
+                            >
+                              G.S.T
+                            </IconButton>
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              className={classes[item.prodStatus]}
+                              onClick={() => {}}
+                            >
+                              {item.prodStatus}
+                            </IconButton>
+                          </TableCell>
+                          <TableCell>
+                            <Controls.EditButton
+                              handleClick={() => {
+                                setValues(item);
+                                setButtonPopup(true);
+                              }}
+                            />
+                            <Controls.DeleteButton
+                              handleConfirm={(e) => {
+                                AuthHandler.canDelete()
+                                  ? onDelete(item)
+                                  : setNotify(NotifyMsg(8));
+                                e.preventDefault();
+                                console.log("records:" + records);
+                              }}
+                              setConfirmDialog={setConfirmDialog}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>{" "}
+              <TblPagination />
             </section>
+            <Popup
+              title="Product form"
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+              size="md"
+            >
+              <Productform
+                records={records}
+                setRecords={setRecords}
+                input={values}
+                setInput={setValues}
+                initialValues={initialValues}
+                initialFilterValues={initialFilterValues}
+                unitNames={unitNames}
+                prodCompany={prodCompany}
+                prodType={prodType}
+                setNotify={setNotify}
+                setGstPopup={setPopup}
+                setFormPopup={setButtonPopup}
+              />
+            </Popup>
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+              // size="md"
+            >
+              <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                <Grid item xs={12} sm={6}>
+                  {" "}
+                  <Controls.Input
+                    name="prodCode"
+                    label="Product Code"
+                    value={filter.prodCode}
+                    setValue={setFilter}
+                    onChange={handleFilter}
+                  />
+                </Grid>{" "}
+                <Grid item xs={12} sm={6}>
+                  <Controls.Input
+                    name="prodName"
+                    label="Product Name"
+                    value={filter.prodName}
+                    setValue={setFilter}
+                    onChange={handleFilter}
+                  />
+                </Grid>{" "}
+                <Grid item xs={12} sm={6}>
+                  <Controls.Input
+                    name="MRP"
+                    label="M.R.P"
+                    value={filter.MRP}
+                    setValue={setFilter}
+                    onChange={handleFilter}
+                  />
+                </Grid>{" "}
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{ justifyContent: "flex-end", display: "flex" }}
+                >
+                  <Controls.Button
+                    type="submit"
+                    text="Submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      searchFilter();
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                    }}
+                  />
+                </Grid>{" "}
+              </Grid>{" "}
+            </Popup>
+            <Popup
+              size="md"
+              title="GST Form"
+              openPopup={popup}
+              setOpenPopup={setPopup}
+            >
+              <GstForm
+                setNotify={setNotify}
+                setPopup={setPopup}
+                values={values}
+                setValues={setValues}
+                records={records}
+                setRecords={setRecords}
+              />
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

@@ -8,6 +8,9 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import "./table.scss";
 import { useNavigate } from "react-router-dom";
+import * as roleService from "../../../services/roleService";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -50,8 +53,6 @@ export default function Userform(props) {
     setValues,
     initialValues,
     branchNames,
-    count,
-    setCount,
     setButtonPopup,
     initialFilterValues,
     finYear,
@@ -69,8 +70,7 @@ export default function Userform(props) {
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
     Object.keys(temp).map((x) => {
-      console.log(x);
-      check(x);
+      x !== "userCode" && check(x);
     });
     if ("Emailid" in fieldValues && fieldValues.Emailid !== "")
       temp.Emailid = /$^|.+@.+..+/.test(fieldValues.Emailid)
@@ -99,11 +99,15 @@ export default function Userform(props) {
       temp.userName = found
         ? `${found.userName} already exists at ${found.userCode}`
         : "";
-
+    const hasRight = fieldValues.userCode
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues.userCode ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
     console.log(temp);
     setErrors(temp);
 
-    return Object.values(temp).every((x) => x == "" || x == null);
+    return Object.values(temp).every((x) => x == "" || x == null) && hasRight;
   };
   // useEffect(() => {
   //   if (!Object.values(errors).every((x) => x == "")) validate();
@@ -124,84 +128,39 @@ export default function Userform(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     let x = true;
-    records.filter((item) => {
-      return item.userCode !== values.userCode;
-    });
+
     records.map((item) => {
       if (item.userCode == values.userCode) {
         x = false;
       }
     });
     console.log(values);
+
     if (validate()) {
+      const url = Config.usermasterUrl;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+      };
       if (x) {
-        setCount(parseInt(count) + 1);
-        console.log(values, count);
-        setRecords([...records, values]);
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .post(
-            Config.usermasterUrl + query,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-            setRecords([...records, response.data.values]);
-            setNotify({
-              isOpen: true,
-              message: "User created  successfully",
-              type: "success",
-            });
-            setButtonPopup(false);
-          })
-          .catch(function (error) {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
+        const handleRes = (response) => {
+          console.log("hi....", response.data.values);
+          setRecords([...records, response.data.values]);
+          setNotify(NotifyMsg(1));
+          setButtonPopup(false);
+        };
+        roleService.axiosPut(url, values, handleRes, handleErr, () => {});
       } else {
-        const token = AuthHandler.getLoginToken();
-        axios
-          .patch(
-            Config.usermasterUrl + query,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then(function (response) {
-            if (response.data.auth) {
-              console.log(response.data.err);
-            }
-          })
-          .catch(function (error) {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-            console.log(error);
+        const handleRes = (response) => {
+          setNotify(NotifyMsg(2));
+          console.log(response.data.err);
+          const newrecord = records.filter((item) => {
+            return item.userCode !== values.userCode;
           });
-        const newrecord = records.filter((item) => {
-          return item.userCode !== values.userCode;
-        });
-        setNotify({
-          isOpen: true,
-          message: "User updated  successfully",
-          type: "success",
-        });
-        setRecords([...newrecord, values]);
-        setButtonPopup(false);
+          setRecords([...newrecord, values]);
+          setButtonPopup(false);
+        };
+
+        roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
         if (
           values.userCode == JSON.parse(localStorage.getItem("user")).userCode
         ) {
@@ -219,213 +178,140 @@ export default function Userform(props) {
     return item.finYear;
   });
 
-  ///////////////code=>name || name=>code///////////////
-
-  if (values.defaultBranchName) {
-    console.log("hi...");
-    branchNames.map((item) => {
-      if (
-        values.defaultBranchName == item.spacedOption &&
-        values.defaultBranchCode !== item.option
-      ) {
-        console.log(values.defaultBranchCode, values.defaultBranchName);
-        setValues({
-          ...values,
-          defaultBranchCode: item.option,
-        });
-      }
-    });
-  }
-  if (!values.defaultBranchName && values.defaultBranchCode) {
-    console.log("hi...");
-    branchNames.map((item) => {
-      if (values.defaultBranchCode == item.option) {
-        setValues({ ...values, defaultBranchName: item.spacedOption });
-      }
-    });
-  }
-  if (values.defaultFinYear) {
-  }
-  // if (values.defaultBranchName && values.defaultBranchCode) {
-  //   console.log("hi...update name");
-  //   branchNames.map((item) => {
-  //     if (
-  //       values.defaultBranchCode == item.option &&
-  //       values.defaultBranchName !== item.spacedOption
-  //     ) {
-  //       console.log("hi...update ", item);
-  //       setValues({ ...values, defaultBranchName: item.spacedOption });
-  //     }
-  //   });
-  // }
-
-  /////////////////////////////////////////////////////////////
-  ///////////////code=>name || name=>code///////////////
-
-  if (values.defaultFinYear) {
-    console.log("hi...");
-    finYear.map((item) => {
-      if (
-        (values.defaultFinYear == item.finYear) &
-        (values.defaultYearCode !== item.yearCode)
-      ) {
-        console.log(values.defaultYearCode, values.defaultFinYear);
-        setValues({
-          ...values,
-          defaultYearCode: item.yearCode,
-          defaultYearStart: item.yearStartDate,
-          defaultYearEnd: item.yearEndDate,
-        });
-      }
-    });
-  }
-  if (!values.defaultFinYear && values.defaultYearCode) {
-    console.log("hi...");
-    finYear.map((item) => {
-      if (values.defaultYearCode == item.yearCode) {
-        setValues({ ...values, defaultFinYear: item.finYear });
-      }
-    });
-  }
-  /////////////////////////////////////////////////////////////
-
-  console.log(options);
   return (
-    <Form
-      onSubmit={(e) => {
-        handleSubmit(e);
-      }}
-    >
-      <Grid container>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="userCode"
-            label="User Code"
-            value={values.userCode}
-            disabled={true}
-            onChange={handleChange}
-            autoComplete="new-password"
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="userName"
-            label="User Name"
-            value={values.userName}
-            error={errors.userName}
-            onChange={handleChange}
-            autoComplete="new-password"
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Password
-            name="Password"
-            label=" Password"
-            value={values.Password}
-            error={errors.Password}
-            onChange={handleChange}
-            autoComplete="new-password"
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Password
-            name="RePassword"
-            label=" Re-Password"
-            value={values.RePassword}
-            error={errors.RePassword}
-            onChange={handleChange}
-            autoComplete="new-password"
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="Mobileno"
-            label="Mobile no."
-            value={values.Mobileno}
-            error={errors.Mobileno}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.Input
-            name="Emailid"
-            label="Email id"
-            value={values.Emailid}
-            error={errors.Emailid}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12} style={{ margin: "0px" }}>
-          <UnusedAutosuggest
-            name="defaultBranchName"
-            label="Branch Name"
-            value={values}
-            setValue={setValues}
-            options={options}
-            error={errors.defaultBranchName}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12} style={{ margin: "0px" }}>
-          <UnusedAutosuggest
-            name="defaultFinYear"
-            label="Financial Year"
-            value={values}
-            setValue={setValues}
-            options={finOptions}
-            error={errors.defaultFinYear}
-          />
-        </Grid>
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="AllowYearChange"
-            label="Allow Year Change"
-            value={values.AllowYearChange}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.AllowYearChange}
-          />{" "}
-        </Grid>{" "}
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="AllowBranchChange"
-            label="Allow Branch Change"
-            value={values.AllowBranchChange}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.AllowBranchChange}
-          />{" "}
-        </Grid>{" "}
-        <Grid item sm={6} xs={12}>
-          <Controls.RadioGroup
-            name="Status"
-            label="Status"
-            value={values.Status}
-            onChange={handleChange}
-            items={statusItems}
-            error={errors.Status}
-          />{" "}
-        </Grid>
-        <Grid
-          item
-          sm={6}
-          xs={12}
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            paddingRight: "70px",
-          }}
-        >
-          <div>
-            <Controls.Button type="submit" text="Submit" />
-            <Controls.Button
-              text="Reset"
-              color="default"
-              onClick={handleReset}
-            />
-          </div>
-        </Grid>
+    <Grid container spacing={2}>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="userCode"
+          label="User Code"
+          value={values.userCode ? values.userCode : "N E W"}
+          disabled={true}
+          onChange={handleChange}
+          autoComplete="new-password"
+        />
       </Grid>
-    </Form>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="userName"
+          label="User Name"
+          value={values.userName}
+          error={errors.userName}
+          onChange={handleChange}
+          autoComplete="new-password"
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Password
+          name="Password"
+          label=" Password"
+          value={values.Password}
+          error={errors.Password}
+          onChange={handleChange}
+          autoComplete="new-password"
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Password
+          name="RePassword"
+          label=" Re-Password"
+          value={values.RePassword}
+          error={errors.RePassword}
+          onChange={handleChange}
+          autoComplete="new-password"
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="Mobileno"
+          label="Mobile no."
+          value={values.Mobileno}
+          error={errors.Mobileno}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.Input
+          name="Emailid"
+          label="Email id"
+          value={values.Emailid}
+          error={errors.Emailid}
+          onChange={handleChange}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12} style={{ margin: "0px" }}>
+        <SmartAutosuggest
+          label="Branch Name"
+          name1="defaultBranchName"
+          code1="defaultBranchCode"
+          name2="spacedOption"
+          code2="option"
+          value={values}
+          setValue={setValues}
+          options1={options}
+          options2={branchNames}
+          error={errors.defaultBranchName}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12} style={{ margin: "0px" }}>
+        <SmartAutosuggest
+          label="Financial Year"
+          name1="defaultFinYear"
+          code1="defaultYearCode"
+          name2="finYear"
+          code2="yearCode"
+          value={values}
+          setValue={setValues}
+          options1={finOptions}
+          options2={finYear}
+          error={errors.defaultFinYear}
+        />
+      </Grid>
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="AllowYearChange"
+          label="Allow Year Change"
+          value={values.AllowYearChange}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.AllowYearChange}
+        />{" "}
+      </Grid>{" "}
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="AllowBranchChange"
+          label="Allow Branch Change"
+          value={values.AllowBranchChange}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.AllowBranchChange}
+        />{" "}
+      </Grid>{" "}
+      <Grid item sm={6} xs={12}>
+        <Controls.RadioGroup
+          name="Status"
+          label="Status"
+          value={values.Status}
+          onChange={handleChange}
+          items={statusItems}
+          error={errors.Status}
+        />{" "}
+      </Grid>
+      <Grid
+        item
+        sm={6}
+        xs={12}
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          paddingRight: "70px",
+        }}
+      >
+        <div>
+          <Controls.Button type="submit" text="Submit" onClick={handleSubmit} />
+          <Controls.Button text="Reset" color="default" onClick={handleReset} />
+        </div>
+      </Grid>
+    </Grid>
   );
 }
 // <BasicSelect

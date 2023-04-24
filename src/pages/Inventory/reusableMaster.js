@@ -576,11 +576,7 @@ export default function ReuseMaster(props) {
                                   <IconButton
                                     onClick={() => {
                                       setFilter(initialFilterValues);
-                                      setFilterFn({
-                                        fn: (items) => {
-                                          return items;
-                                        },
-                                      });
+                                      setFilterFn(initialFilterFn);
                                     }}
                                     style={{ boxShadow: "none" }}
                                   >

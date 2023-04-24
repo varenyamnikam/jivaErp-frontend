@@ -12,15 +12,15 @@ import MainComponent from "./components/MainComponent";
 import Dashboard from "./pages/dashboard";
 import Rolemaster from "./pages/Rolemaster/rolemaster";
 import Usermaster from "./pages/Admin/Usermaster/usermaster";
-import Branchmaster from "./pages/Branchmaster/branchmaster";
+import Branchmaster from "./pages/Admin/BranchMaster/branchmaster";
 import { PrivateRouteNew } from "./Utils/PrivateRouteNew";
 import Countrymaster from "./pages/MASTER/Geography/countryMaster";
 import Statemaster from "./pages/MASTER/Geography/stateMaster";
 import Districtmaster from "./pages/MASTER/Geography/districtMaster";
 import Talukamaster from "./pages/MASTER/Geography/talukaMaster";
 import MarketingArea from "./pages/MASTER/Geography/marketingAreaMaster";
-import AcGlGroup from "./pages/MASTER/Accounts/GlGroupMaster";
-import AcGl from "./pages/MASTER/Accounts/GlMaster";
+import AcGlGroup from "./pages/MASTER/Accounts/groupMaster";
+import AcGl from "./components/GlMaster";
 import AccountMaster from "./pages/MASTER/Accounts/accountsMaster";
 import Customers from "./pages/MASTER/Accounts/CustomersMaster";
 import Suppliers from "./pages/MASTER/Accounts/SupplierMaster";
@@ -29,11 +29,11 @@ import SignIn from "./pages/newLogin";
 import RegisterForm from "./pages/register";
 import Home from "./pages/home/Home";
 import ProductMaster from "./pages/MASTER/Products/Productmaster/productMaster";
-import FinancialYearMaster from "./pages/FinancialYear/Admin/financialYearMaster";
+import FinancialYearMaster from "./pages/Admin//FinancialYear/financialYearMaster";
 import AccountTypesMaster from "./pages/MASTER/Accounts/accountTypesMaster";
 import DCMaster from "./pages/Inventory/D.C/dcMaster";
 import PayTermMaster from "./pages/Inventory/paymentTermMaster";
-import Settings from "./pages/Admin/SoftwareSetting";
+import Settings from "./pages/Admin/SoftwareSettings/SoftwareSetting";
 import GrMaster from "./pages/Inventory/G.R/newGr";
 import SIMaster from "./pages/Inventory/S.I/S.I";
 import QTMaster from "./pages/Inventory/QT/qt";
@@ -71,6 +71,8 @@ import Sidemenu from "./components/sidemenu";
 import TrialBalance from "./pages/Report/trialBalance";
 import DayBook from "./pages/Report/dayBook";
 import OutstandingReport from "./pages/Report/outstandingReport";
+import ProdTypeMaster from "./pages/MASTER/Products/prodTypeMaster";
+import ProductCompanyMaster from "./pages/MASTER/Products/prodCompanyMaster";
 import jQuery from "jquery";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -166,6 +168,16 @@ root.render(
           exact
           path="/Inventory/ProductMaster"
           element={<PrivateRouteNew Page={<ProductMaster />} />}
+        />{" "}
+        <Route
+          exact
+          path="/Inventory/ProductTypeMaster"
+          element={<PrivateRouteNew Page={<ProdTypeMaster />} />}
+        />
+        <Route
+          exact
+          path="/Inventory/ProductCompanyMaster"
+          element={<PrivateRouteNew Page={<ProductCompanyMaster />} />}
         />
         <Route
           exact

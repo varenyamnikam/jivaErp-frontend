@@ -8,6 +8,9 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import Divider from "@mui/material/Divider";
 import axios from "axios";
 import Config from "../../../Utils/Config";
+import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import { useNavigate } from "react-router-dom";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -17,25 +20,32 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RightsForm(props) {
-  const usrCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${usrCode}`;
-  const { userCode, setUserRights, userRights, setNotify, setPopup } = props;
+  const {
+    userCode,
+    setUserRights,
+    userRights,
+    right,
+    setNotify,
+    setPopup,
+    userCodeOptions,
+  } = props;
   const initialUserRights = {
-    id: 0,
     userCode: userCode,
+    copyUserRights: "",
     screenCode: "",
     screenName: "",
-    menuRight: "Y",
-    editRight: "Y",
-    addRight: "Y",
-    deleteRight: "Y",
+    menuRight: "N",
+    editRight: "N",
+    addRight: "N",
+    deleteRight: "N",
   };
+
   const classes = useStyles();
-  let data = AuthHandler.getMenuItem();
+  const page = useNavigate();
+
   const [values, setValues] = React.useState(initialUserRights);
   const [errors, setErrors] = React.useState({});
-  console.log(values);
+  console.log(values, right);
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
     if ("userCode" in fieldValues)
@@ -45,72 +55,100 @@ export default function RightsForm(props) {
     setErrors({
       ...temp,
     });
+    const hasRight = AuthHandler.canEdit();
+    if (!hasRight)
+      fieldValues.userCode ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
-    if (fieldValues == values) return Object.values(temp).every((x) => x == "");
+    if (fieldValues == values)
+      return Object.values(temp).every((x) => x == "") && hasRight;
   };
-  // console.log(new Date(new Date().getFullYear() + 1, 2, 31));
-  const start =
-    String(Array.from(String(new Date().getFullYear()), Number)[2]) +
-    String(Array.from(String(new Date().getFullYear()), Number)[3]);
-  const end =
-    String(Array.from(String(new Date().getFullYear() + 1), Number)[2]) +
-    String(Array.from(String(new Date().getFullYear() + 1), Number)[3]);
-
-  console.log(
-    start + end,
-    "20" + start + "-" + end,
-    new Date(new Date().getFullYear() + 1, 3, 1),
-    new Date(new Date().getFullYear(), 2, 31)
-  );
+  console.log(userRights);
 
   const handleSubmit = (e) => {
+    console.log(userRights);
     e.preventDefault();
     if (validate()) {
       let x = true;
-      const updatedRights = userRights.map((item) => {
-        console.log(item);
-        if (
-          values.screenCode == item.screenCode &&
-          values.userCode == item.userCode
-        ) {
+      function remove(arr) {
+        let newArr = arr.filter((item) => item !== values.screenCode);
+        return newArr;
+      }
+      function add(arr) {
+        if (!arr.includes(values.screenCode)) arr.push(values.screenCode);
+        return arr;
+      }
+      let newUserRights;
+
+      if (values.copyUserRights) {
+        let found = userRights.find(
+          (item) => item.userCode == values.copyUserRights
+        );
+        newUserRights = found ? found : right;
+        newUserRights.userCode = userCode;
+        console.log(userRights, newUserRights);
+
+        if (!found) {
+          setNotify(NotifyMsg(5));
           x = false;
-          return values;
-        } else {
-          return item;
         }
-      });
-      console.log(updatedRights);
-      if (!x) setUserRights(updatedRights);
+      } else {
+        newUserRights = {
+          userCode: userCode,
+          menuRight:
+            values.menuRight == "Y"
+              ? add(right.menuRight)
+              : remove(right.menuRight),
+          editRight:
+            values.editRight == "Y"
+              ? add(right.editRight)
+              : remove(right.editRight),
+          addRight:
+            values.addRight == "Y"
+              ? add(right.addRight)
+              : remove(right.addRight),
+          deleteRight:
+            values.deleteRight == "Y"
+              ? add(right.deleteRight)
+              : remove(right.deleteRight),
+        };
+      }
+      console.log(userRights);
+      let updatedRights = userRights.filter(
+        (item) => item.userCode !== newUserRights.userCode
+      );
+      updatedRights.push(newUserRights);
+      console.log(newUserRights, updatedRights);
+
+      // if (!x) setUserRights(updatedRights);
       const token = AuthHandler.getLoginToken();
-      const body = { hello: "hello" };
-      axios
-        .post(
-          Config.userRightsUrl + query,
-          { values },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
+      // const body = { hello: "hello" };
+      if (x) {
+        const handleRes = (response) => {
           console.log("hi....", values);
-          if (x) setUserRights([...userRights, values]);
-          setNotify({
-            isOpen: true,
-            message: "User rights updated  successfully",
-            type: "success",
-          });
+          setNotify(NotifyMsg(2));
           setPopup(false);
-        })
-        .catch(function (error) {
-          console.log(error);
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
+          setUserRights(updatedRights);
+          if (userCode == JSON.parse(localStorage.getItem("user")).userCode) {
+            alert("plz login again");
+            localStorage.clear();
+            page("/");
+          }
+        };
+
+        const url = Config.userRightsUrl;
+        const handleErr = (err) => {
+          console.log(err);
+          setNotify(NotifyMsg(4));
+        };
+        roleService.axiosPost(
+          url,
+          { newUserRights },
+          handleRes,
+          handleErr,
+          () => {},
+          token
+        );
+      }
     }
   };
   const handleInputChange = (e) => {
@@ -120,18 +158,6 @@ export default function RightsForm(props) {
       [name]: value,
     });
   };
-  function findScreenCode(name) {
-    let y = "";
-    let x;
-    data.map((item) => {
-      if (!"subnav" in item) {
-        x = recursiveSearch(item.subNav, name);
-        if (x) y = x;
-      }
-    });
-    console.log(y);
-    return y;
-  }
   const recursiveSearch = (nodes, name) => {
     // if (nodes.screenName == name) {
     //   console.log("hi");
@@ -153,38 +179,53 @@ export default function RightsForm(props) {
   const resetForm = (e) => {
     setValues(initialUserRights);
   };
-  console.log(userRights);
+  console.log(right);
   return (
-    <Form onSubmit={handleSubmit}>
-      <Grid container>
+    <>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={3}>
           <ControlledTreeView
             values={values}
             setValues={setValues}
-            userRights={userRights}
+            right={right}
+            initialUserRights={initialUserRights}
           />
         </Grid>
         <Grid item xs={12} sm={9}>
-          <Grid container>
-            <Grid item xs={12} sm={6} className={classes.right}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={4}>
               <Controls.Input
                 name="userCode"
                 label="User Code"
                 value={values.userCode}
                 onChange={handleInputChange}
                 error={errors.userCode}
+                fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.right}>
+            <Grid item xs={12} sm={4}>
               <Controls.Input
                 name="screenName"
                 label="Screen Name"
                 value={values.screenName}
                 onChange={handleInputChange}
                 error={errors.screenName}
+                fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.right}>
+            <Grid item xs={12} sm={4}>
+              <UnusedAutosuggest
+                name="copyUserRights"
+                label="Copy Rights From-"
+                value={values}
+                setValue={setValues}
+                options={userCodeOptions}
+                error={errors.copyUserRights}
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
               <Controls.RadioGroup
                 name="menuRight"
                 label="Display In Menu"
@@ -193,7 +234,7 @@ export default function RightsForm(props) {
                 items={menuRightsItems}
               />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.right}>
+            <Grid item xs={12} sm={6}>
               <Controls.RadioGroup
                 name="editRight"
                 label="Rights for Edit Records"
@@ -202,7 +243,7 @@ export default function RightsForm(props) {
                 items={menuRightsItems}
               />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.right}>
+            <Grid item xs={12} sm={6}>
               <Controls.RadioGroup
                 name="addRight"
                 label="Rights for Add Record"
@@ -211,7 +252,7 @@ export default function RightsForm(props) {
                 items={menuRightsItems}
               />
             </Grid>
-            <Grid item xs={12} sm={6} className={classes.right}>
+            <Grid item xs={12} sm={6}>
               <Controls.RadioGroup
                 name="deleteRight"
                 label="Rights for Delete Records"
@@ -229,12 +270,19 @@ export default function RightsForm(props) {
                   color="default"
                   onClick={resetForm}
                 />
-                <Controls.Button type="submit" text="Submit" />
+                <Controls.Button
+                  type="submit"
+                  text="Submit"
+                  onClick={(e) => {
+                    console.log(userRights);
+                    handleSubmit(e);
+                  }}
+                />
               </div>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Form>
+    </>
   );
 }

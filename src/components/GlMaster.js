@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import PageHeader from "../../../components/PageHeader";
-import AuthHandler from "../../../Utils/AuthHandler";
+import PageHeader from "./PageHeader";
+import AuthHandler from "../Utils/AuthHandler";
 import axios from "axios";
-import Config from "../../../Utils/Config";
-import * as roleService from "../../../services/roleService";
+import Config from "../Utils/Config";
+import * as roleService from "../services/roleService";
 import {
   Paper,
   makeStyles,
@@ -14,27 +14,26 @@ import {
   Toolbar,
   InputAdornment,
 } from "@material-ui/core";
-import useTable from "../../../components/useTable";
-import Controls from "../../../components/controls/Controls";
+import useTable from "./useTable";
+import Controls from "./controls/Controls";
 import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
 import { RestaurantRounded, Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
-import Usermasterpopup from "../../../components/userMasterPopup";
+import Usermasterpopup from "./userMasterPopup";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
 import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
-import Notification from "../../../components/Notification";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import Popup from "../../../components/Popup";
+import Notification from "./Notification";
+import ConfirmDialog from "./ConfirmDialog";
+import Popup from "./Popup";
 import { Grid } from "@material-ui/core";
-import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
+import { Form } from "./useForm";
 import Gimasterform from "./GlMasterForm";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@material-ui/core/IconButton";
-import "../../../components/public.css";
-import MuiSkeleton from "../../../components/skeleton";
+// import "../../../components/public.css";
+import MuiSkeleton from "./skeleton";
 
 const statusItems = [
   { id: "Active", title: "Active" },
@@ -161,14 +160,14 @@ export default function AcGl() {
         } else {
           setRecords([initialFilterValues]);
         }
-      })        .catch((error) => {
+      })
+      .catch((error) => {
         setNotify({
           isOpen: true,
           message: "Unable to connect to servers",
           type: "warning",
         });
       });
-;
   }
   if (groups[0] && groups[0].glGroupCode == "X X X X") {
     console.log("req sent");
@@ -186,14 +185,14 @@ export default function AcGl() {
         } else {
           setGroups([initialGroupFilterValues]);
         }
-      })        .catch((error) => {
+      })
+      .catch((error) => {
         setNotify({
           isOpen: true,
           message: "Unable to connect to servers",
           type: "warning",
         });
       });
-;
   }
   // setBranchNames(branchOption);
   //       setRecords(response.data.country);
@@ -212,22 +211,23 @@ export default function AcGl() {
       isOpen: false,
     });
     const token = AuthHandler.getLoginToken();
-    axios.post(
-      Config.acgl + query,
-      { item },
-      {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      }
-    )        .catch((error) => {
-      setNotify({
-        isOpen: true,
-        message: "Unable to connect to servers",
-        type: "warning",
+    axios
+      .post(
+        Config.acgl + query,
+        { item },
+        {
+          headers: {
+            authorization: "Bearer" + token,
+          },
+        }
+      )
+      .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Unable to connect to servers",
+          type: "warning",
+        });
       });
-    });
-;
   }
   console.log("GL" + (parseInt("G105".match(/(\d+)/)[0]) + 1).toString());
   function getGlGroupName(code) {

@@ -24,6 +24,7 @@ import ControllableStates from "../../../components/selectsearchstate";
 import { right } from "@popperjs/core";
 import RichObjectTreeView from "../../../components/newTreeView";
 import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -96,13 +97,18 @@ export default function MarketingArea() {
   const [dataBases, setDataBases] = useState(dataBase);
   const [editText, setEditText] = useState("EDIT");
   const [disable, setDisable] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const url = Config.accounts;
+  const handleErr = (error) => {
+    setNotify(NotifyMsg(4));
+    console.log(error);
+  };
 
   useEffect(() => {
     // if (!loading) {
     //   const token = AuthHandler.getLoginToken();
     //   axios
-    //     .get(Config.mktArea + query, {
+    //     .get(Config.mktArea , {
     //       headers: {
     //         authorization: "Bearer" + token,
     //       },
@@ -123,37 +129,30 @@ export default function MarketingArea() {
     //     });
     // }
 
-    if (!loading) {
+    if (loading) {
       // console.log(employeeData);
-      const token = AuthHandler.getLoginToken();
-      const body = { hello: "hello" };
-      axios
-        .get(Config.accounts + query, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          if (response.data.mst_accounts.length !== 0) {
-            setEmployeeData(function () {
-              const temp = response.data.mst_accounts.filter((item) => {
-                return item.preFix == "E";
-              });
-              if (temp.length !== 0) {
-                return temp;
-              } else {
-                return [initialFilterEValues];
-              }
+      const handleRes = (response) => {
+        console.log(response.data);
+        if (response.data.mst_accounts.length !== 0) {
+          setEmployeeData(() => {
+            const temp = response.data.mst_accounts.filter((item) => {
+              return item.preFix == "E";
             });
-          }
-          if (response.data.mst_mktArea.length !== 0) {
-            setDataBases(response.data.mst_mktArea);
-          }
-        })
-        .finally(() => {
-          setLoading(true);
-        });
+            if (temp.length !== 0) {
+              return temp;
+            } else {
+              return [initialFilterEValues];
+            }
+          });
+        }
+        if (response.data.mst_mktArea.length !== 0) {
+          setDataBases(response.data.mst_mktArea);
+        }
+      };
+
+      roleService.axiosGet(url, handleRes, handleErr, () => {
+        setLoading(false);
+      });
     }
   });
   const validate = (fieldValues = values) => {
@@ -188,6 +187,8 @@ export default function MarketingArea() {
     ).toString();
   }
   const handleSubmit = (e) => {
+    const url = Config.mktArea;
+
     if (validate()) {
       if (editText == "EDIT") {
         dataBases.map((item, index) => {
@@ -208,7 +209,6 @@ export default function MarketingArea() {
               }
             });
             console.log(parent);
-            const token = AuthHandler.getLoginToken();
             const input = {
               parentAreaCode: values.mktAreaCode,
               mktArea: values.newArea,
@@ -217,20 +217,13 @@ export default function MarketingArea() {
               child: [],
               parent: parent[0],
             };
-            axios
-              .put(
-                Config.mktArea + query,
-                { input },
-                {
-                  headers: {
-                    authorization: "Bearer" + token,
-                  },
-                }
-              )
-              .then((response) => {
-                setDataBases(response.data.mst_mktArea);
-                console.log(response.data.mst_mktArea);
-              });
+            const handleRes = (response) => {
+              setDataBases(response.data.mst_mktArea);
+              console.log(response.data.mst_mktArea);
+              setNotify(NotifyMsg(1));
+            };
+
+            roleService.axiosPut(url, input, handleRes, handleErr, () => {});
 
             console.log("hi");
           }
@@ -241,27 +234,17 @@ export default function MarketingArea() {
           mktArea: values.mktArea,
           assignTo: values.acCode,
         };
-        const token = AuthHandler.getLoginToken();
         dataBases.map((item, index) => {
           if (item.mktAreaCode == values.mktAreaCode) {
             const updatedDataBase = dataBases.filter(
               (p) => p.mktAreaCode !== values.mktAreaCode
             );
-            axios
-              .patch(
-                Config.mktArea + query,
-                { input },
-                {
-                  headers: {
-                    authorization: "Bearer" + token,
-                  },
-                }
-              )
-              .then((response) => {
-                setDataBases([...updatedDataBase, response.data.values]);
-                console.log([...updatedDataBase, response.data.values]);
-              });
-
+            const handleRes = (response) => {
+              setDataBases([...updatedDataBase, response.data.values]);
+              console.log([...updatedDataBase, response.data.values]);
+              setNotify(NotifyMsg(2));
+            };
+            roleService.axiosPatch(url, input, handleRes, handleErr, () => {});
             console.log([...updatedDataBase, values]);
           }
         });
@@ -301,112 +284,101 @@ export default function MarketingArea() {
   });
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Marketing Area Master"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title="Marketing Area Master"
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
 
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <div style={{ padding: 20, margin: 20 }}>
-                      {" "}
-                      <Grid
-                        container
-                        rowSpacing={1}
-                        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-                      >
-                        <Grid item xs={12} sm={6}>
-                          {" "}
-                          <RichObjectTreeView
-                            values={values}
-                            setValues={setValues}
-                            dataBase={dataBases}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={12}>
-                              <Controls.Input
-                                name="mktArea"
-                                label="Parent area"
-                                value={values.mktArea}
-                                onChange={handleChange}
-                                style={{ width: "100%" }}
-                                error={errors.mktArea}
-                              />
-                            </Grid>{" "}
-                            <Grid item xs={12} sm={12}>
-                              <Controls.Input
-                                name="newArea"
-                                label="Market area"
-                                value={values.newArea}
-                                onChange={handleChange}
-                                style={{ width: "100%" }}
-                                disabled={disable}
-                                error={errors.newArea}
-                              />
-                            </Grid>{" "}
-                            <Grid item xs={12} sm={12}>
-                              <UnusedAutosuggest
-                                value={values}
-                                setValue={setValues}
-                                name={"acName"}
-                                label={getLabel()}
-                                disable="false"
-                                options={employeeOptions}
-                                error={errors.acName}
-                              />
-                            </Grid>
-                            <Grid
-                              item
-                              xs={12}
-                              sm={12}
-                              style={{
-                                display: "flex",
-                                justifyContent: "flex-end",
-                              }}
-                            >
-                              <Controls.Button
-                                value="Hello World"
-                                text={editText}
-                                color="default"
-                                onClick={() => {
-                                  setEditText(
-                                    editText == "EDIT" ? "CANCEL" : "EDIT"
-                                  );
-                                  setDisable((prev) => {
-                                    return !prev;
-                                  });
-                                  setValues({ ...values, newArea: "" });
-                                }}
-                              />
-
-                              <Controls.Button
-                                onClick={handleSubmit}
-                                text="Submit"
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
+              <div style={{ padding: 20, margin: 20 }}>
+                {" "}
+                <Grid
+                  container
+                  rowSpacing={1}
+                  columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                >
+                  <Grid item xs={12} sm={6}>
+                    {" "}
+                    <RichObjectTreeView
+                      values={values}
+                      setValues={setValues}
+                      dataBase={dataBases}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={12}>
+                        <Controls.Input
+                          name="mktArea"
+                          label="Parent area"
+                          value={values.mktArea}
+                          onChange={handleChange}
+                          style={{ width: "100%" }}
+                          error={errors.mktArea}
+                        />
+                      </Grid>{" "}
+                      <Grid item xs={12} sm={12}>
+                        <Controls.Input
+                          name="newArea"
+                          label="Market area"
+                          value={values.newArea}
+                          onChange={handleChange}
+                          style={{ width: "100%" }}
+                          disabled={disable}
+                          error={errors.newArea}
+                        />
+                      </Grid>{" "}
+                      <Grid item xs={12} sm={12}>
+                        <UnusedAutosuggest
+                          value={values}
+                          setValue={setValues}
+                          name={"acName"}
+                          label={getLabel()}
+                          disable="false"
+                          options={employeeOptions}
+                          error={errors.acName}
+                        />
                       </Grid>
-                    </div>
-                  </section>
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Controls.Button
+                          value="Hello World"
+                          text={editText}
+                          color="default"
+                          onClick={() => {
+                            setEditText(editText == "EDIT" ? "CANCEL" : "EDIT");
+                            setDisable((prev) => {
+                              return !prev;
+                            });
+                            setValues({ ...values, newArea: "" });
+                          }}
+                        />
+
+                        <Controls.Button onClick={handleSubmit} text="Submit" />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </div>
             </section>
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

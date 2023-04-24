@@ -57,6 +57,8 @@ const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
 export default function MyAutocomplete({ data }) {
   let history = useNavigate();
   const [inputValue, setInputValue] = React.useState("");
+  const [linkValue, setLinkValue] = React.useState("");
+
   const classes = useStyles();
   let temp = [];
   function flattenArray(array = data) {
@@ -77,38 +79,54 @@ export default function MyAutocomplete({ data }) {
   //   ];
 
   return (
-    <Autocomplete
-      options={temp}
-      classes={{
-        root: classes.root,
-        inputRoot: classes.inputRoot,
-      }}
-      getOptionLabel={(option) => option.screenName}
-      onChange={(event, newValue, reason) => {
-        if (reason == "clear") setInputValue("");
-        else {
-          console.log(newValue.link);
-          history(newValue.link);
-          setInputValue(newValue);
-        }
-        //other codes go here like setting the value of input
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Search"
-          variant="outlined"
-          size="small"
-          value={inputValue}
-          InputProps={{
-            ...params.InputProps,
-            className: classes.input,
+    <>
+      <Autocomplete
+        options={temp}
+        classes={{
+          root: classes.root,
+          inputRoot: classes.inputRoot,
+        }}
+        getOptionLabel={(option) => option.screenName}
+        onChange={(event, newValue, reason) => {
+          if (reason == "clear") setInputValue("");
+          else {
+            console.log(newValue.link);
+            history(newValue.link);
+            setLinkValue(newValue.link);
+            setInputValue(newValue);
+            localStorage.setItem("screenCode", newValue.screenCode);
+          }
+          //other codes go here like setting the value of input
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            placeholder="Search"
+            variant="outlined"
+            size="small"
+            value={inputValue}
+            InputProps={{
+              ...params.InputProps,
+              className: classes.input,
+            }}
+          />
+        )}
+        onBlur={() => {
+          setInputValue("");
+        }}
+      />
+      <div className="input-group-append">
+        <button
+          className="btn btn-sidebar"
+          style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}
+          onClick={() => {
+            console.log(linkValue);
+            linkValue && history(linkValue);
           }}
-        />
-      )}
-      onBlur={() => {
-        setInputValue("");
-      }}
-    />
+        >
+          <i className="fas fa-search fa-fw"></i>
+        </button>
+      </div>
+    </>
   );
 }

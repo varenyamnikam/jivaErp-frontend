@@ -15,6 +15,7 @@ import { makeStyles, IconButton } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
   root: {
     //top: 5,
+    height: "40px",
     "& .MuiFormLabel-root": {
       fontSize: 15,
       // color: "#D3D3D3",
@@ -56,11 +57,13 @@ export default function Password(props) {
       value={value}
       onChange={onChange}
       className={classes.root}
+      style={{ height: "40px" }}
       {...other}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
             <IconButton
+              size="small"
               aria-label="toggle password visibility"
               onClick={handleClickShowPassword}
               onMouseDown={handleMouseDownPassword}

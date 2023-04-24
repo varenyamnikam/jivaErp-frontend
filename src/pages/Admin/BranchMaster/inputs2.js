@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Controls from "../../components/controls/Controls";
+import Controls from "../../../components/controls/Controls";
 import { Grid, TextField, makeStyles } from "@material-ui/core";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -11,7 +11,7 @@ export default function DisabledInputs2(props) {
   const { values, errors, handleChange } = props;
   const classes = useStyles();
   return (
-    <Grid container spacing={2}>
+    <>
       <Grid item xs={12} sm={6}>
         <Controls.Input
           name="pinCode"
@@ -50,7 +50,7 @@ export default function DisabledInputs2(props) {
           onChange={handleChange}
         />
       </Grid>
-    </Grid>
+    </>
   );
 }
 // <Grid item xs={12} sm={6}>

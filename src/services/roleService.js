@@ -10,6 +10,110 @@ const KEYS = {
   roleId: "roleId",
 };
 
+export function axiosGet(url, responseFn, errFn, finalFn = () => {}) {
+  const token = AuthHandler.getLoginToken();
+  console.log(token);
+
+  const body = { hello: "hello" };
+  axios
+    .get(url, {
+      headers: {
+        authorization: "Bearer" + token,
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      responseFn(response);
+    })
+    .catch((error) => {
+      console.log(error);
+      errFn(error);
+    })
+    .finally(() => {
+      finalFn();
+    });
+}
+export function axiosPost(url, data, responseFn, errFn, finalFn = () => {}) {
+  const token = AuthHandler.getLoginToken();
+  console.log(token);
+  axios
+    .post(url, data, {
+      headers: {
+        authorization: "Bearer" + token,
+      },
+    })
+    .then((response) => {
+      responseFn(response);
+    })
+    .catch((error) => {
+      console.log(error);
+      errFn(error);
+    })
+    .finally(() => {
+      finalFn();
+    });
+}
+export function axiosPut(url, data, responseFn, errFn, finalFn = () => {}) {
+  const token = AuthHandler.getLoginToken();
+  console.log(token);
+  axios
+    .put(url, data, {
+      headers: {
+        authorization: "Bearer" + token,
+      },
+    })
+    .then((response) => {
+      responseFn(response);
+    })
+    .catch((error) => {
+      console.log(error);
+      errFn(error);
+    })
+    .finally(() => {
+      finalFn();
+    });
+}
+export function axiosPatch(url, data, responseFn, errFn, finalFn = () => {}) {
+  const token = AuthHandler.getLoginToken();
+  console.log(token);
+  axios
+    .patch(url, data, {
+      headers: {
+        authorization: "Bearer" + token,
+      },
+    })
+    .then((response) => {
+      responseFn(response);
+    })
+    .catch((error) => {
+      console.log(error);
+      errFn(error);
+    })
+    .finally(() => {
+      finalFn();
+    });
+}
+export function axiosDelete(url, data, responseFn, errFn, finalFn = () => {}) {
+  const token = AuthHandler.getLoginToken();
+  console.log(url, data, responseFn, errFn, (finalFn = () => {}));
+  axios
+    .delete(url, {
+      headers: {
+        authorization: "Bearer" + token,
+      },
+      data: data,
+    })
+    .then((response) => {
+      responseFn(response);
+    })
+    .catch((error) => {
+      console.log(error);
+      errFn(error);
+    })
+    .finally(() => {
+      finalFn();
+    });
+}
 export function GetAllRoles() {
   const token = AuthHandler.getLoginToken();
   console.log(token);

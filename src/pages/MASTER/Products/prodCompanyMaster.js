@@ -36,20 +36,20 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../../components/public.css";
 import MuiSkeleton from "../../../components/skeleton";
 import { NotifyMsg } from "../../../components/notificationMsg";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
 const statusItems = [
   { id: "Active", title: "Active" },
   { id: "Inactive", title: "Inactive" },
 ];
 const headCells = [
-  { id: "Actype", label: "A C Type" },
-  { id: "Actypefor", label: "A C Type For" },
-  { id: "status", label: "STATUS", disableSorting: true },
+  { id: "Prod Company Code", label: "Prod Company Code" },
+  { id: "Name", label: "Prod Company Name" },
   { id: "Edit", label: "EDIT" },
 ];
 const initialFilterFn = {
   fn: (items) => {
     let newRecords = items.filter((item) => {
-      if (item.acType !== "") return item;
+      if (item.prodCompanyCode) return item;
     });
     console.log(newRecords);
     return newRecords;
@@ -82,27 +82,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const initialValues = {
-  acType: "",
-  acTypeFor: "",
-  acTypeStatus: "",
+  prodCompanyCode: "",
+  prodCompanyName: "",
 };
-const initialFilterValues = {
-  acType: "",
-  acTypeStatus: "",
-  acTypeFor: "",
-  allFields: "",
-};
+const initialFilterValues = initialValues;
 
-export default function AccountTypesMaster() {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
+export default function ProdTypeMaster() {
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [records, setRecords] = useState([initialValues]);
+  const [loading, setLoading] = useState(true);
+
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -114,25 +106,25 @@ export default function AccountTypesMaster() {
     subTitle: "",
   });
   const [errors, setErrors] = useState({});
-  const groupTypes = ["Customer", "Supplier", "Employee", "General"];
-  const [loading, setLoading] = useState(true);
-
+  const groupTypes = records.map((item) => {
+    return item.prodCompanyName;
+  });
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
     function check(key) {
       if (key in fieldValues)
         temp[key] = fieldValues[key] ? "" : "This field is required.";
     }
-    Object.keys(initialValues).map((x) => {
-      check(x);
+    Object.keys(initialFilterValues).map((x) => {
+      x !== "prodCompanyCode" && check(x);
     });
-    let x = "acType";
-    let y = "acTypeFor";
+    let x = "prodCompanyName";
+    let y = "prodCompanyCode";
     let found = records.find(
-      (item) => item[x] == fieldValues[x] && item[y] == fieldValues[y]
+      (item) => item[x] == fieldValues[x] && item[y] !== fieldValues[y]
     );
     if (fieldValues[x])
-      temp[x] = found ? `${found[x]} already exists for ${found[y]}` : "";
+      temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
     console.log(temp);
     const hasRight = fieldValues[y]
       ? AuthHandler.canEdit()
@@ -151,26 +143,27 @@ export default function AccountTypesMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.acgl;
+  const url = Config.prodCompany;
 
-  const handleErr = (error) => {
+  const handleErr = (err) => {
     setNotify(NotifyMsg(4));
-    console.log(error);
+    console.error(err);
+    loading && setLoading(false);
+
   };
 
   if (loading) {
-    const handleRes = (response) => {
-      if (response.data.mst_acTypes.length !== 0)
-        setRecords(response.data.mst_acTypes);
-
+    const handleRes = (res) => {
+      if (res.data.mst_prodCompany.length !== 0)
+        setRecords(res.data.mst_prodCompany);
       loading && setLoading(false);
     };
     roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
   // setBranchNames(branchOption);
-  //       setRecords(response.data.country);
-  //       console.log(response.data.country);
-  //       console.log("hi....", records, response.data);
+  //       setRecords(res.data.country);
+  //       console.log(res.data.country);
+  //       console.log("hi....", records, res.data);
   //     });
   console.log(records);
   function onDelete(item) {
@@ -178,13 +171,12 @@ export default function AccountTypesMaster() {
       ...confirmDialog,
       isOpen: false,
     });
-    const handleRes = (response) => {
+    const handleRes = (res) => {
       let newRecord = [];
       newRecord = records.filter((record) => {
-        return record.acType !== item.acType;
+        return record.prodCompanyCode !== item.prodCompanyCode;
       });
       if (newRecord.length == 0) {
-        console.log("record empty!");
         setRecords([initialValues]);
       } else {
         setRecords(newRecord);
@@ -201,29 +193,28 @@ export default function AccountTypesMaster() {
     e.preventDefault();
     if (validate()) {
       let x = true;
-      if (values._id) {
-        const updatedRecords = records.map((p) =>
-          p._id == values._id ? values : p
-        );
-        setRecords(updatedRecords);
-        x = false;
-      }
-
+      x = records.find(
+        (item) =>
+          item.prodCompanyCode == values.prodCompanyCode && item.prodCompanyCode
+      );
       setButtonPopup(false);
-
-      const token = AuthHandler.getLoginToken();
-      if (x) {
-        const handleRes = (response) => {
-          console.log(response.data);
-          setRecords([...records, { _id: response.data.id, ...values }]);
+      if (!x) {
+        const handleRes = (res) => {
+          console.log(res.data.values);
+          setRecords([...records, res.data.values]);
           setNotify(NotifyMsg(1));
         };
 
         roleService.axiosPut(url, values, handleRes, handleErr, () => {});
       } else {
-        const handleRes = (response) => {
-          console.log(response);
+        const handleRes = (res) => {
+          const updatedRecords = records.map((p) =>
+            p.prodCompanyCode === values.prodCompanyCode ? values : p
+          );
+          console.log(updatedRecords);
           setNotify(NotifyMsg(2));
+
+          setRecords(updatedRecords);
         };
 
         roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
@@ -245,8 +236,10 @@ export default function AccountTypesMaster() {
         newRecords = items.filter((item) => {
           console.log(item, allfields);
           if (
-            item.acType.toLowerCase().includes(allfields.toLowerCase()) ||
-            item.acTypeFor.toLowerCase().includes(allfields.toLowerCase())
+            item.prodCompanyCode
+              .toLowerCase()
+              .includes(allfields.toLowerCase()) ||
+            item.prodCompanyName.toLowerCase().includes(allfields.toLowerCase())
           )
             return item;
         });
@@ -259,7 +252,7 @@ export default function AccountTypesMaster() {
   return (
     <>
       <PageHeader
-        title="Account Types"
+        title="Product Types"
         icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
       />
       <section className="content">
@@ -270,7 +263,7 @@ export default function AccountTypesMaster() {
                 <Grid container style={{ display: "flex", flexGrow: 1 }}>
                   <Grid item xs={12} sm={8}>
                     <Controls.Input
-                      label="Search AC Type"
+                      label="Search Role Name"
                       className={classes.searchInput}
                       InputProps={{
                         startAdornment: (
@@ -311,7 +304,7 @@ export default function AccountTypesMaster() {
                       startIcon={<AddIcon />}
                       onClick={(e) => {
                         setButtonPopup(true);
-                        setValues(initialFilterValues);
+                        setValues(initialValues);
                         setErrors({});
                       }}
                     />
@@ -327,13 +320,8 @@ export default function AccountTypesMaster() {
                     <TableBody>
                       {recordsAfterPagingAndSorting().map((item) => (
                         <TableRow key={item._id}>
-                          <TableCell>{item.acType}</TableCell>
-                          <TableCell>{item.acTypeFor}</TableCell>
-                          <TableCell>
-                            <span className={item.acTypeStatus}>
-                              {item.acTypeStatus}
-                            </span>
-                          </TableCell>
+                          <TableCell>{item.prodCompanyCode}</TableCell>
+                          <TableCell>{item.prodCompanyName}</TableCell>
                           <TableCell>
                             {item.userCompanyCode !== "all" && (
                               <>
@@ -363,61 +351,45 @@ export default function AccountTypesMaster() {
               <TblPagination />
             </section>
             <Popup
-              title="Account Types Form"
+              title="Group Master Form"
               openPopup={buttonPopup}
               setOpenPopup={setButtonPopup}
             >
               <Grid container spacing={2}>
                 <Grid item sx={12} sm={6}>
-                  {" "}
                   <Controls.Input
-                    name="acType"
-                    label="A C Type"
-                    value={values.acType}
+                    name="prodCompanyCode"
+                    label="Prod Type Code"
+                    value={
+                      values.prodCompanyCode ? values.prodCompanyCode : "N E W"
+                    }
                     onChange={handleInputChange}
-                    error={errors.acType}
+                    error={errors.prodCompanyCode}
+                    disabled={true}
                   />
-                </Grid>
+                </Grid>{" "}
                 <Grid item sx={12} sm={6}>
-                  <UnusedAutosuggest
-                    name="acTypeFor"
-                    label="A C Type For"
-                    value={values}
-                    setValue={setValues}
-                    options={groupTypes}
-                    error={errors.acTypeFor}
-                  />
-                </Grid>
-                <Grid item sx={12} sm={6}>
-                  <Controls.RadioGroup
-                    name="acTypeStatus"
-                    label="Status"
-                    value={values.acTypeStatus}
+                  <Controls.Input
+                    name="prodCompanyName"
+                    label="Prod Type Name"
+                    value={values.prodCompanyName}
                     onChange={handleInputChange}
-                    items={statusItems}
-                    error={errors.acTypeStatus}
+                    error={errors.prodCompanyName}
                   />
-                </Grid>
+                </Grid>{" "}
                 <Grid
                   item
                   sx={12}
                   sm={6}
                   style={{ display: "flex", justifyContent: "flex-end" }}
                 >
-                  <div>
-                    <Controls.Button
-                      text="Reset"
-                      color="default"
-                      onClick={() => {}}
-                    />{" "}
-                    <Controls.Button
-                      type="submit"
-                      text="Submit"
-                      onClick={handleSubmit}
-                    />
-                  </div>
-                </Grid>{" "}
-              </Grid>{" "}
+                  <Controls.Button
+                    type="submit"
+                    text="Submit"
+                    onClick={handleSubmit}
+                  />
+                </Grid>
+              </Grid>
             </Popup>
 
             <Notification notify={notify} setNotify={setNotify} />

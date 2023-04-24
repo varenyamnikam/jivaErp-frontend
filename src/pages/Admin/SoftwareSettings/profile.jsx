@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { reactLocalStorage } from "reactjs-localstorage";
-import "./profile.scss";
+import "../../../components/profile.scss";
 import { Grid } from "@material-ui/core";
-import Controls from "./controls/Controls";
-import AuthHandler from "../Utils/AuthHandler";
+import Controls from "../../../components/controls/Controls";
+import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
-import Countries from "./countrySelect";
-import States from "./statesSelect";
-import Config from "../Utils/Config";
-import UnusedAutosuggest from "./specialAutoSuggest";
-import NormalAutoSuggest from "./normalAutoSuggest";
-import ButtonLoader from "./loading";
-import ImageUpload from "./getImages";
-const Profile = () => {
+import Countries from "../../../components/countrySelect";
+import States from "../../../components/statesSelect";
+import Config from "../../../Utils/Config";
+import UnusedAutosuggest from "../../../components/specialAutoSuggest";
+import NormalAutoSuggest from "../../../components/normalAutoSuggest";
+import ButtonLoader from "../../../components/loading";
+import ImageUpload from "../../../components/getImages";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService"
+const Profile = ({setNotify}) => {
   const recentImageDataUrl = localStorage.getItem("recent-image");
   let company = JSON.parse(reactLocalStorage.get("company"));
   const userCode = localStorage.getItem("userCode");
@@ -21,13 +23,36 @@ const Profile = () => {
   const [values, setValues] = useState(company);
   const [errors, setErrors] = useState({});
   const [location, setLocation] = useState({
-    country: [{}],
+    countries: [{countryName:""}],
     districts: [{}],
-    states: [{ stateName: "X X X X" }],
+    states: [{ stateName: "" }],
     talukas: [{}],
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
   const [save, setSave] = useState(true);
+
+  const validate = (fieldValues = values) => {
+    let temp = { ...errors };
+    function check(key) {
+      if (key in fieldValues)
+        temp[key] = fieldValues[key] ? "" : "This field is required.";
+    }
+    Object.keys(values).map((x) => {
+      check(x);
+    });
+    const hasRight = AuthHandler.canEdit();
+
+    if (!hasRight) setNotify(NotifyMsg(7));
+
+    setErrors({
+      ...temp,
+    });
+
+    return Object.values(temp).every((x) => x == "") && hasRight;
+  };
+
 
   const gstType = ["UnRegistered", "Regular", "Composition"];
   function handleInputChange(e) {
@@ -35,23 +60,22 @@ const Profile = () => {
     setValues({ ...values, [name]: value });
     // !save && setSave(true);
   }
-  useEffect(() => {
-    if (location.states[0].stateName == "X X X X") {
-      console.log("location set");
-      const token = AuthHandler.getLoginToken();
-      const body = { hello: "hello" };
-      axios
-        .post(Config.location, body, {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        })
-        .then((response) => {
-          setLocation(response.data);
-        });
-    }
-  });
+  const url = Config.location;
+  
+  const handleErr = (error) => {
+    setNotify(NotifyMsg(4));
+    setLoading(false);
+  };
 
+    if (loading) {
+      const handleRes = (response) => {
+        console.log(response.data);
+          setLocation(response.data);
+        setLoading(false);
+      };
+  
+      roleService.axiosGet(url, handleRes, handleErr, () => {});
+    }
   function getImage() {
     if (recentImageDataUrl) {
       return recentImageDataUrl;
@@ -59,25 +83,19 @@ const Profile = () => {
       return "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
   }
   const handleSubmit = () => {
-    setLoading(true);
+    if(validate()){
+    setButtonLoading(true);
     setSave(false);
 
     reactLocalStorage.set("company", JSON.stringify(values));
-    const token = AuthHandler.getLoginToken();
-    axios
-      .patch(
-        Config.register + query,
-        { values: values },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((response) => {
-        setLoading(false);
+    const url = Config.register ;
+      const handleRes = (response) => {
+        setButtonLoading(false);
         setValues(values);
-      });
+      };
+  
+      roleService.axiosPatch(url,values, handleRes, handleErr, () => {});
+}
   };
   useEffect(() => {
     !save && setSave(true);
@@ -145,7 +163,7 @@ const Profile = () => {
                   <Countries
                     value={values}
                     setValue={setValues}
-                    options={location.country}
+                    options={location.countries}
                     error={errors.countryName}
                   />
                 </Grid>
@@ -159,7 +177,7 @@ const Profile = () => {
                     value={values}
                     setValue={setValues}
                     options={location.states}
-                    countries={location.country}
+                    countries={location.countries}
                     country={values.countryName}
                     error={errors.stateName}
                   />
@@ -260,8 +278,8 @@ const Profile = () => {
                   }}
                 >
                   <ButtonLoader
-                    loading={loading}
-                    setLoading={setLoading}
+                    loading={buttonLoading}
+                    setLoading={setButtonLoading}
                     onClick={handleSubmit}
                     save={save}
                     setSave={setSave}

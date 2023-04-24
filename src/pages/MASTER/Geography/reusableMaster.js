@@ -30,6 +30,7 @@ import ReuseForm from "./reusableForm";
 import StateForm from "./stateForm";
 import Talukaform from "./talukaForm";
 import CountryForm from "./countryForm";
+import { NotifyMsg } from "../../../components/notificationMsg";
 const initialBranchValues = {
   contactNo: "",
   Mobileno: "",
@@ -80,23 +81,22 @@ const Reusemaster = (props) => {
   const [buttonPopup, setButtonPopup] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [branchNames, setBranchNames] = useState([]);
-  const [notify, setNotify] = useState({
-    isOpen: false,
-    message: "",
-    type: "",
-  });
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: "",
     subTitle: "",
   });
-  // const [count, setCount] = useState(records[records.length - 1].branchCode);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
   const classes = useStyles();
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(records, headCells, filterFn);
   console.log(values);
   console.log(District);
-
+  console.log(records, recordsAfterPagingAndSorting());
   // React.useEffect(() => {
   //   const token = AuthHandler.getLoginToken();
   //   const body = { hello: "hello" };
@@ -122,18 +122,26 @@ const Reusemaster = (props) => {
   //     });
   // }, []);
   console.log(records);
-  function onDelete(item) {
-    // roleService.deleteBranch(item);
-    let newRecord = [];
-    setConfirmDialog({
-      ...confirmDialog,
-      isOpen: false,
-    });
 
-    newRecord = records.filter((record) => {
-      return record[m2] !== item[m2];
-    });
-    setRecords(newRecord);
+  function onDelete(item) {
+    const url = Config.location;
+    function handleRes(res) {
+      let newRecord = [];
+      setConfirmDialog({
+        ...confirmDialog,
+        isOpen: false,
+      });
+
+      newRecord = records.filter((record) => {
+        return record[m2] !== item[m2];
+      });
+      setRecords(newRecord);
+      setNotify(NotifyMsg(3));
+    }
+    const handleErr = (error) => {
+      setNotify(NotifyMsg(4));
+    };
+    roleService.axiosDelete(url, item, handleRes, handleErr, () => {});
   }
   function getForm() {
     if (title == "STATE") {
@@ -147,6 +155,8 @@ const Reusemaster = (props) => {
           country={country}
           state={state}
           District={District}
+          setNotify={setNotify}
+          setButtonPopup={setButtonPopup}
         />
       );
     }
@@ -189,6 +199,8 @@ const Reusemaster = (props) => {
           country={country}
           state={state}
           District={District}
+          setNotify={setNotify}
+          setButtonPopup={setButtonPopup}
         />
       );
     }
@@ -196,78 +208,71 @@ const Reusemaster = (props) => {
   // console.log(count);
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title={title}
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
 
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Controls.Input
-                        label="Search Role Name"
-                        className={classes.searchInput}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Search />
-                            </InputAdornment>
-                          ),
-                        }}
-                        onChange={() => {}}
-                      />
-                      <Controls.Button
-                        text="Add New"
-                        variant="outlined"
-                        startIcon={<AddIcon />}
-                        className={classes.newButton}
-                        onClick={(e) => {
-                          setButtonPopup(true);
-                          setValues(initialValues);
-                        }}
-                      />
-                    </Toolbar>
-                    <TblContainer>
-                      <TblHead />
-                      <TableBody>
-                        <ReuseTable
-                          title={title}
-                          setValues={setValues}
-                          setButtonPopup={setButtonPopup}
-                          setConfirmDialog={setConfirmDialog}
-                          recordsAfterPagingAndSorting={
-                            recordsAfterPagingAndSorting
-                          }
-                          onDelete={onDelete}
-                        />
-                      </TableBody>
-                    </TblContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title="User form"
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                  >
-                    {getForm()}
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
+              <Toolbar>
+                <Controls.Input
+                  label="Search Role Name"
+                  className={classes.searchInput}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={() => {}}
+                />
+                <Controls.Button
+                  text="Add New"
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  className={classes.newButton}
+                  onClick={(e) => {
+                    setButtonPopup(true);
+                    setValues(initialValues);
+                  }}
+                />
+              </Toolbar>
+              <TblContainer>
+                <TblHead />
+                <TableBody>
+                  <ReuseTable
+                    title={title}
+                    setValues={setValues}
+                    setButtonPopup={setButtonPopup}
                     setConfirmDialog={setConfirmDialog}
+                    recordsAfterPagingAndSorting={recordsAfterPagingAndSorting}
+                    onDelete={onDelete}
+                    setNotify={setNotify}
                   />
-                </div>
-              </div>
+                </TableBody>
+              </TblContainer>
+              <TblPagination />
             </section>
+            <Popup
+              title="User form"
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+            >
+              {getForm()}
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

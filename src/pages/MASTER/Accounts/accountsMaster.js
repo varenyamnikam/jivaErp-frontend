@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import * as roleService from "../../../services/roleService";
 import {
@@ -35,12 +34,13 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../../components/public.css";
 import MuiSkeleton from "../../../components/skeleton";
 import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
 
 const statusItems = [
   { id: "Active", title: "Active" },
   { id: "Inactive", title: "Inactive" },
 ];
-const groupTypes = ["ASSET", "LIABILITY", "INCOME", "EXPENSE"];
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "Account Type", label: "Account Type " },
@@ -84,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const initialValues = {
-  acCode: "X X X X",
+  acCode: "",
   acc: "",
   preFix: "G",
   acGroupCode: "",
@@ -113,6 +113,7 @@ const initialValues = {
 const initialFilterValues = {
   ...initialValues,
   acCode: "",
+  allFields: "",
 };
 
 export default function AccountMaster() {
@@ -126,7 +127,7 @@ export default function AccountMaster() {
   const [values, setValues] = useState(initialValues);
   const [records, setRecords] = useState([initialValues]);
   const [acTypeOptions, setAcTypeOptions] = useState([""]);
-  const [firmTypeOptions, setFirmTypeOptions] = useState([""]);
+  const [loading, setLoading] = useState(true);
   const [acGroupData, setAcGroup] = useState([{ acGroupName: "" }]);
   const [notify, setNotify] = useState({
     isOpen: false,
@@ -156,108 +157,87 @@ export default function AccountMaster() {
     );
     if (fieldValues[x])
       temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
-console.log(temp)
+    console.log(temp);
     setErrors({
       ...temp,
     });
+    const hasRight = fieldValues[y]
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues[y] ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
-    return Object.values(temp).every((x) => x == "");
+    return Object.values(temp).every((x) => x == "") && hasRight;
   };
 
   const classes = useStyles();
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(records, headCells, filterFn);
   console.log(values);
-  if (records[0] && records[0].acCode == "X X X X") {
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .get(Config.accounts + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        if (response.data.mst_accounts.length !== 0) {
-          setRecords(function () {
-            const temp = response.data.mst_accounts.filter((item) => {
-              return item.preFix == "G";
-            });
-            if (temp.length !== 0) {
-              return temp;
-            } else {
-              return [initialFilterValues];
-            }
-          });
+
+  const url = Config.accounts + query;
+  const handleErr = (error) => {
+    setNotify(NotifyMsg(4));
+    loading && setLoading(false);
+  };
+
+  if (loading) {
+    const handleRes = (response) => {
+      console.log(response.data);
+      const { mst_accounts, mst_acTypes, mst_acGroup } = response.data;
+      if (mst_accounts.length !== 0) {
+        const temp = mst_accounts.filter((item) => item.preFix === "G");
+        if (temp.length !== 0) {
+          setRecords(temp);
         } else {
           setRecords([initialFilterValues]);
         }
-        if (response.data.mst_acTypes.length !== 0) {
-          setAcTypeOptions(function () {
-            const temp = response.data.mst_acTypes.filter((item) => {
-              if (item.acTypeFor == "General" && item.acTypeStatus == "Active")
-                return item;
-            });
-            if (temp.length !== 0) {
-              return temp.map((item) => {
-                return item.acType;
-              });
-            } else {
-              return [""];
-            }
-          });
+      }
+      if (mst_acTypes.length !== 0) {
+        const temp = mst_acTypes.filter(
+          (item) =>
+            item.acTypeFor === "General" && item.acTypeStatus === "Active"
+        );
+        if (temp.length !== 0) {
+          setAcTypeOptions(temp.map((item) => item.acType));
+        } else {
+          setAcTypeOptions([""]);
         }
-        if (response.data.mst_acGroup.length !== 0) {
-          setAcGroup(response.data.mst_acGroup);
-        }
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      });
+      }
+      if (mst_acGroup.length !== 0) {
+        setAcGroup(mst_acGroup);
+      }
+      loading && setLoading(false);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
+
   console.log(records, acTypeOptions, acGroupData);
+
   function onDelete(item) {
-    let newRecord = [];
-    newRecord = records.filter((record) => {
-      return record.acCode !== item.acCode;
-    });
-    if (newRecord.length == 0) {
-      setRecords([initialValues]);
-    } else {
-      setRecords(newRecord);
-    }
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
-    const token = AuthHandler.getLoginToken();
-    axios
-      .post(
-        Config.accounts + query,
-        { item },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
+    const handleRes = () => {
+      let newRecord = [];
+      newRecord = records.filter((record) => {
+        return record.acCode !== item.acCode;
       });
+      if (newRecord.length == 0) {
+        setRecords([initialValues]);
+      } else {
+        setRecords(newRecord);
+      }
+    };
+    roleService.axiosDelete(url, item, handleRes, handleErr, () => {});
   }
+
   function handleInputChange(e) {
     const { value, name } = e.target;
     setValues({ ...values, [name]: value });
   }
+
   function handleSubmit(e) {
     e.preventDefault();
     console.log(validate(), errors);
@@ -265,73 +245,33 @@ console.log(temp)
       let x = true;
       records.map((item, index) => {
         if (item.acCode == values.acCode) {
+          x = false;
+        }
+      });
+      console.log(x);
+
+      if (x) {
+        const handleRes = (response) => {
+          console.log("hi....", response.data.values);
+          setRecords([...records, response.data.values]);
+          setNotify(NotifyMsg(1));
+          setButtonPopup(false);
+        };
+
+        roleService.axiosPut(url, values, handleRes, handleErr, () => {});
+      } else {
+        const handleRes = (response) => {
+          console.log("hi....", response.data.values);
           const updatedRecords = records.map((p) =>
             p.acCode === values.acCode ? values : p
           );
           console.log(updatedRecords);
           setRecords(updatedRecords);
-          x = false;
-        }
-      });
-      console.log(x);
-      if (x) {
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .put(
-            Config.accounts + query,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-            setRecords([...records, response.data.values]);
-            setNotify({
-              isOpen: true,
-              message: "Account created  successfully",
-              type: "success",
-            });
-            setButtonPopup(false);
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
-      } else {
-        const token = AuthHandler.getLoginToken();
-        console.log("updated");
-        axios
-          .patch(
-            Config.accounts + query,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            setNotify({
-              isOpen: true,
-              message: "Account updated  successfully",
-              type: "success",
-            });
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
-        setButtonPopup(false);
+          setNotify(NotifyMsg(2));
+          setButtonPopup(false);
+        };
+
+        roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
       }
     }
   }
@@ -342,6 +282,8 @@ console.log(temp)
   }
   console.log(filter.allFields);
 
+  //search and smartAutoSuggest
+
   function search(allfields) {
     console.log(allfields);
     setFilterFn({
@@ -350,7 +292,7 @@ console.log(temp)
         newRecords = items.filter((item) => {
           console.log(item, allfields);
           if (
-            item.acGroupName.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.acType.toLowerCase().includes(allfields.toLowerCase()) ||
             item.acCode.toLowerCase().includes(allfields.toLowerCase()) ||
             item.acName.toLowerCase().includes(allfields.toLowerCase())
           )
@@ -361,247 +303,223 @@ console.log(temp)
       },
     });
   }
-  function getCancel() {
-    if (filter.allFields) {
-      return (
-        <InputAdornment position="end">
-          <IconButton
-            onClick={() => {
-              setFilter({ initialFilterValues, allFields: "" });
-              setFilterFn({
-                fn: (items) => {
-                  return items;
-                },
-              });
-            }}
-            style={{ boxShadow: "none" }}
-          >
-            <ClearIcon />
-          </IconButton>
-        </InputAdornment>
-      );
-    } else {
-      return <></>;
-    }
-  }
   console.log(acGroupData.filter((item) => item.acGroupStatus == "Active"));
   const acGroupOptions = acGroupData
     .filter((item) => item.acGroupStatus == "Active")
     .map((item) => {
       return item.acGroupName;
     });
-  if (values.acGroupName) {
-    acGroupData.map((item) => {
-      if (
-        values.acGroupName == item.acGroupName &&
-        values.acGroupCode !== item.acGroupCode
-      ) {
-        setValues({
-          ...values,
-          acGroupCode: item.acGroupCode,
-        });
-      }
-    });
-  }
-  if (!values.acGroupName && values.acGroupCode) {
-    console.log("hi", acGroupData, values.acGroupCode);
-    acGroupData.map((item) => {
-      if (values.acGroupCode == item.acGroupCode) {
-        setValues({ ...values, acGroupName: item.acGroupName });
-      }
-    });
-  }
-
+  // if (values.acGroupName) {
+  //   acGroupData.map((item) => {
+  //     if (
+  //       values.acGroupName == item.acGroupName &&
+  //       values.acGroupCode !== item.acGroupCode
+  //     ) {
+  //       setValues({
+  //         ...values,
+  //         acGroupCode: item.acGroupCode,
+  //       });
+  //     }
+  //   });
+  // }
+  // if (!values.acGroupName && values.acGroupCode) {
+  //   console.log("hi", acGroupData, values.acGroupCode);
+  //   acGroupData.map((item) => {
+  //     if (values.acGroupCode == item.acGroupCode) {
+  //       setValues({ ...values, acGroupName: item.acGroupName });
+  //     }
+  //   });
+  // }
+  console.log(values);
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Account Master"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title="Account Master"
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                        <Grid item xs={12} sm={8}>
-                          <Controls.Input
-                            label="Search Role Name"
-                            className={classes.searchInput}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                              endAdornment: getCancel(),
-                            }}
-                            value={filter.allFields}
-                            onChange={handleFilter}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          sm={4}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Controls.Button
-                            text="Add New"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={(e) => {
-                              setButtonPopup(true);
-                              setValues(initialValues);
-                              setErrors({});
-                            }}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Toolbar>
-                    <TblContainer>
-                      <TblHead />
-                      {records[0].acCode == "X X X X" ? (
-                        <MuiSkeleton />
-                      ) : (
-                        <TableBody>
-                          {recordsAfterPagingAndSorting().map((item) => (
-                            <TableRow key={item._id}>
-                              <TableCell>{item.acCode}</TableCell>
-                              <TableCell>{item.acType}</TableCell>
-                              <TableCell>{item.acName}</TableCell>
-                              <TableCell>
-                                <span className={item.acStatus}>
-                                  {item.acStatus}
-                                </span>
-                              </TableCell>
-                              <TableCell>
-                                {item.userCompanyCode !== "all" && (
-                                  <>
-                                    <Controls.ActionButton
-                                      color="primary"
-                                      onClick={() => {
-                                        setValues(item);
-                                        setButtonPopup(true);
-                                      }}
-                                    >
-                                      <EditOutlinedIcon fontSize="small" />
-                                    </Controls.ActionButton>
-                                    <Controls.ActionButton
-                                      color="secondary"
-                                      onClick={(e) => {
-                                        console.log(item);
-                                        setConfirmDialog({
-                                          isOpen: true,
-                                          title:
-                                            "Are you sure to delete this record?",
-                                          subTitle:
-                                            "You can't undo this operation",
-                                          onConfirm: (e) => {
-                                            onDelete(item);
-                                            e.preventDefault();
-                                          },
-                                        });
-                                        e.preventDefault();
-                                      }}
-                                    >
-                                      <DeleteIconOutline fontSize="small" />
-                                    </Controls.ActionButton>
-                                  </>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      )}
-                    </TblContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title="ACCOUNT form"
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
+              <Toolbar>
+                <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                  <Grid item xs={12} sm={8}>
+                    <Controls.Input
+                      label="Search Role Name"
+                      className={classes.searchInput}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                        endAdornment: filter.allFields && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setFilter(initialFilterValues);
+                                setFilterFn(initialFilterFn);
+                              }}
+                              style={{ boxShadow: "none" }}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      value={filter.allFields}
+                      onChange={handleFilter}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    sm={4}
+                    xs={12}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
                   >
-                    <Form onSubmit={handleSubmit}>
-                      <Grid container>
-                        <Grid item sm={6} xs={12}>
-                          <Controls.Input
-                            name="acCode"
-                            label="Code"
-                            value={values.acCode}
-                            onChange={handleInputChange}
-                            disabled={true}
-                          />
-                        </Grid>
-                        <Grid item sm={6} xs={12}>
-                          <Controls.Input
-                            name="acName"
-                            label=" Name"
-                            value={values.acName}
-                            onChange={handleInputChange}
-                            error={errors.acName}
-                          />
-                        </Grid>
-                        <Grid item sm={6} xs={12}>
-                          <UnusedAutosuggest
-                            name="acType"
-                            label="A C Type "
-                            value={values}
-                            setValue={setValues}
-                            options={acTypeOptions}
-                            error={errors.acType}
-                          />
-                        </Grid>
-                        <Grid item sm={6} xs={12}>
-                          <UnusedAutosuggest
-                            name="acGroupName"
-                            label="A.C Group"
-                            value={values}
-                            setValue={setValues}
-                            options={acGroupOptions}
-                            error={errors.acGroupName}
-                          />
-                        </Grid>
-                        <Grid item sm={6} xs={12}>
-                          <Controls.RadioGroup
-                            name="acStatus"
-                            label="Status"
-                            value={values.acStatus}
-                            onChange={handleInputChange}
-                            items={statusItems}
-                            error={errors.acStatus}
-                          />
-                        </Grid>
-                      </Grid>
-
-                      <div>
-                        <Controls.Button type="submit" text="Submit" />
-                        <Controls.Button
-                          text="Reset"
-                          color="default"
-                          onClick={() => {}}
-                        />
-                      </div>
-                    </Form>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                    <Controls.Button
+                      text="Add New"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={(e) => {
+                        setButtonPopup(true);
+                        setValues(initialValues);
+                        setErrors({});
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Toolbar>
+              <TblContainer>
+                <TblHead />
+                {loading ? (
+                  <MuiSkeleton />
+                ) : (
+                  <TableBody>
+                    {recordsAfterPagingAndSorting().map((item) => (
+                      <TableRow key={item._id}>
+                        <TableCell>{item.acCode}</TableCell>
+                        <TableCell>{item.acType}</TableCell>
+                        <TableCell>{item.acName}</TableCell>
+                        <TableCell>
+                          <span className={item.acStatus}>{item.acStatus}</span>
+                        </TableCell>
+                        <TableCell>
+                          {item.userCompanyCode !== "all" && (
+                            <>
+                              <Controls.EditButton
+                                handleClick={() => {
+                                  setValues(item);
+                                  setButtonPopup(true);
+                                }}
+                              />
+                              <Controls.DeleteButton
+                                handleConfirm={(e) => {
+                                  AuthHandler.canDelete()
+                                    ? onDelete(item)
+                                    : setNotify(NotifyMsg(8));
+                                }}
+                                setConfirmDialog={setConfirmDialog}
+                              />
+                            </>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
+              </TblContainer>
+              <TblPagination />
             </section>
+            <Popup
+              title="ACCOUNT form"
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item sm={6} xs={12}>
+                  <Controls.Input
+                    name="acCode"
+                    label="Code"
+                    value={values.acCode}
+                    onChange={handleInputChange}
+                    disabled={true}
+                  />
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <Controls.Input
+                    name="acName"
+                    label=" Name"
+                    value={values.acName}
+                    onChange={handleInputChange}
+                    error={errors.acName}
+                  />
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <UnusedAutosuggest
+                    name="acType"
+                    label="A C Type "
+                    value={values}
+                    setValue={setValues}
+                    options={acTypeOptions}
+                    error={errors.acType}
+                  />
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <SmartAutosuggest
+                    name1="acGroupName"
+                    code1="acGroupCode"
+                    name2="acGroupName"
+                    code2="acGroupCode"
+                    label="A.C Group"
+                    value={values}
+                    setValue={setValues}
+                    options1={acGroupOptions}
+                    options2={acGroupData}
+                    error={errors.acGroupName}
+                  />
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <Controls.RadioGroup
+                    name="acStatus"
+                    label="Status"
+                    value={values.acStatus}
+                    onChange={handleInputChange}
+                    items={statusItems}
+                    error={errors.acStatus}
+                  />
+                </Grid>{" "}
+                <Grid
+                  item
+                  sm={6}
+                  xs={12}
+                  style={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  <Controls.Button
+                    text="Reset"
+                    color="default"
+                    onClick={() => {}}
+                  />{" "}
+                  <Controls.Button
+                    type="submit"
+                    text="Submit"
+                    onClick={handleSubmit}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

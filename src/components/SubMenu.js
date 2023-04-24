@@ -20,6 +20,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import Collapse from "@mui/material/Collapse";
 const SidebarLabel = styled.span`
   margin-left: 16px;
 `;
@@ -36,17 +37,8 @@ function getRights(node) {
   let adm_userrights = JSON.parse(localStorage.getItem("adm_userrights"));
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   let x = true;
-  if (adm_userrights) {
-    adm_userrights.map((right) => {
-      if (
-        right.screenCode == node.screenCode &&
-        right.userCode == AuthHandler.getUserCode() &&
-        right.menuRight == "N"
-      ) {
-        console.log("hi", node);
-        x = false;
-      }
-    });
+  if (adm_userrights.menuRight) {
+    x = adm_userrights.menuRight.includes(node.screenCode);
   }
   if (
     settings.saleStockUpdateUsing == "Invoice" &&
@@ -99,6 +91,9 @@ const TreeNode = ({ node }) => {
             justifyContent: "space-between",
             color: "white",
           }}
+          onClick={() => {
+            localStorage.setItem("screenCode", node.screenCode);
+          }}
         >
           <div className="glow">
             {node.screenName == "ADMIN" ? (
@@ -140,16 +135,11 @@ const TreeNode = ({ node }) => {
           )}
         </DropdownLink>
       </div>
-
-      {hasChild && childVisible && (
-        <div className="d-tree-content">
-          <Fade left>
-            <ul className="d-flex d-tree-container flex-column">
-              <SubMenu data={node.subNav} />
-            </ul>
-          </Fade>
-        </div>
-      )}
+      <Collapse in={hasChild && childVisible} timeout={500}>
+        <ul className="d-flex d-tree-container flex-column">
+          <SubMenu data={node.subNav} />
+        </ul>
+      </Collapse>
     </li>
   );
 };

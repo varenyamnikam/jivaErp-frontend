@@ -11,6 +11,9 @@ import ButtonLoader from "./loading";
 import SmartAutosuggest from "./smartAutoSuggest";
 import Divider from "@mui/material/Divider";
 import DefaultAcc from "./hardCoded/defaultAcc";
+import { NotifyMsg } from "./notificationMsg";
+import * as roleService from "../services/roleService";
+
 const initialAccValues = { acCode: "", acName: "" };
 const dividerStyle = { borderBottomWidth: 2 };
 const dividerGridStyle = { padding: "0px" };
@@ -43,6 +46,9 @@ export default function AcLedgerSettings({
   setValues,
   values,
   handleSubmit,
+  save,
+  setSave,
+  setNotify,
 }) {
   let company = JSON.parse(reactLocalStorage.get("company"));
   const token = AuthHandler.getLoginToken();
@@ -51,29 +57,27 @@ export default function AcLedgerSettings({
   const [purchaseErrors, setPurchaseErrors] = useState(purchaseErrObj);
   const [saleErrors, setSaleErrors] = useState(saleErrObj);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState([initialAccValues]);
-  const [save, setSave] = useState(true);
-
+  const [loading, setLoading] = useState(true);
   //   function handleInputChange(e) {
   //     const { value, name } = e.target;
   //     setValues({ ...values, [name]: value });
   //     // !save && setSave(true);
   //   }
   if (loading) {
-    axios
-      .get(Config.accounts + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        const temp = response.data.mst_accounts.filter((item) => {
-          return item.preFix == "G";
-        });
-        if (temp.length !== 0) setAccounts(temp);
-        setLoading(false);
+    function handleRes(response) {
+      const temp = response.data.mst_accounts.filter((item) => {
+        return item.preFix == "G";
       });
+      if (temp.length !== 0) setAccounts(temp);
+    }
+    function handleErr(err) {
+      console.log(err);
+      setNotify(NotifyMsg(4));
+    }
+    roleService.axiosGet(Config.accounts, handleRes, handleErr, () => {
+      setLoading(false);
+    });
   }
   //   const handleSubmit = () => {
   //validate first
@@ -113,6 +117,10 @@ export default function AcLedgerSettings({
       return temp;
     }
     //separately validate purchaseValues
+    const hasRight = AuthHandler.canEdit();
+
+    if (!hasRight) setNotify(NotifyMsg(7));
+
     let validatePurchase = validateObj(purchaseErrObj, purchaseValues);
     let isPurchaseAccValidated = Object.values(validatePurchase).every(
       (x) => x == ""
@@ -126,7 +134,7 @@ export default function AcLedgerSettings({
 
     const areBothValid = isSaleAccValidated && isPurchaseAccValidated;
     console.log(areBothValid);
-    return areBothValid;
+    return areBothValid && hasRight;
   }
   useEffect(() => {
     !save && setSave(true);

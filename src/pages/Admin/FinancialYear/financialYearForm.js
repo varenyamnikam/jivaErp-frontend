@@ -1,35 +1,13 @@
 import React, { useEffect, useState } from "react";
-import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import * as roleService from "../../../services/roleService";
-import {
-  Paper,
-  makeStyles,
-  TableBody,
-  TableRow,
-  TableCell,
-  Toolbar,
-  InputAdornment,
-} from "@material-ui/core";
-import TextField from "@mui/material/TextField";
-import useTable from "../../../components/useTable";
+import { makeStyles } from "@material-ui/core";
 import Controls from "../../../components/controls/Controls";
-import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
-import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
-import { RestaurantRounded, Search } from "@material-ui/icons";
-import AddIcon from "@material-ui/icons/Add";
-import Usermasterpopup from "../../../components/userMasterPopup";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
-import Notification from "../../../components/Notification";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import Input from "../../../components/controls/Input";
 import { Grid } from "@material-ui/core";
-import { useForm, Form } from "../../../components/useForm";
 import StaticDatePickerLandscape from "../../../components/calendarLandscape";
 import { useNavigate } from "react-router-dom";
+import { NotifyMsg } from "../../../components/notificationMsg";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -39,10 +17,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FinancialYearform(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
   const page = useNavigate();
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     setRecords,
@@ -52,6 +27,8 @@ export default function FinancialYearform(props) {
     initialFilterValues,
     setButtonPopup,
     setNotify,
+    loading,
+    setLoading,
   } = props;
   const [errors, setErrors] = useState({
     ...initialFilterValues,
@@ -86,17 +63,20 @@ export default function FinancialYearform(props) {
     );
     if (fieldValues[x])
       temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
+    const hasRight = fieldValues[y]
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues[y] ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
     console.log(temp);
     setErrors({
       ...temp,
     });
 
-    if (fieldValues == input) return Object.values(temp).every((x) => x == "");
+    if (fieldValues == input)
+      return Object.values(temp).every((x) => x == "") && hasRight;
   };
-  console.log(input);
-  console.log(errors);
-  console.log(typeof input.yearStartDate, input.yearStartDate);
   const classes = useStyles();
 
   const handleChange = (e) => {
@@ -121,138 +101,110 @@ export default function FinancialYearform(props) {
     });
     console.log(typeof input.yearStartDate, input.yearStartDate, validate());
     if (validate()) {
-      const token = AuthHandler.getLoginToken();
       setButtonPopup(false);
-      axios
-        .post(
-          // Config.addUser,
-          Config.finYear + query,
-          { input },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log("hi....", response.data.values);
-          if (x) {
-            console.log(input);
-            setRecords([...records, input]);
-            setNotify({
-              isOpen: true,
-              message: "Financial Year created  successfully",
-              type: "success",
-            });
-          } else {
-            //   roleService.updateuser(input);
-            const newrecord = records.filter((item) => {
-              return item.yearCode !== input.yearCode;
-            });
-            console.log(newrecord);
-            setRecords([...newrecord, input]);
-            setNotify({
-              isOpen: true,
-              message: "Financial Year updated  successfully",
-              type: "success",
-            });
-            if (
-              input.yearCode ==
-              JSON.parse(localStorage.getItem("user")).defaultYearCode
-            ) {
-              alert("plz login again");
-
-              page("/");
-            }
-          }
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
+      const handleRes = (response) => {
+        console.log("hi....", response.data.values);
+        if (x) {
+          console.log(input);
+          setRecords([...records, input]);
+          setNotify(NotifyMsg(1));
+        } else {
+          const newrecord = records.filter((item) => {
+            return item.yearCode !== input.yearCode;
           });
-        });
+          console.log(newrecord);
+          setRecords([...newrecord, input]);
+          setNotify(NotifyMsg(2));
+          if (
+            input.yearCode ==
+            JSON.parse(localStorage.getItem("user")).defaultYearCode
+          ) {
+            alert("plz login again");
+
+            page("/");
+          }
+        }
+      };
+      const url = Config.finYear;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+        loading && setLoading(false);
+      };
+      roleService.axiosPost(url, input, handleRes, handleErr, () => {});
     }
   };
   return (
-    <Form
-      onSubmit={(e) => {
-        handleSubmit(e);
-      }}
-    >
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          className={classes.input}
-          style={{ flexGrow: 1 }}
-        >
-          <Controls.Input
-            name="yearCode"
-            label="Year Code"
-            placeholder="eg 2223"
-            value={input.yearCode}
-            onChange={handleChange}
-            error={errors.yearCode}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} className={classes.input}>
-          <Controls.Input
-            name="finYear"
-            label="Financial Year"
-            placeholder="eg 2022-23"
-            value={input.finYear}
-            onChange={handleChange}
-            error={errors.finYear}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} className={classes.input}>
-          <StaticDatePickerLandscape
-            name="yearStartDate"
-            label="Start Year From-"
-            value={input}
-            setValue={setInput}
-            error={errors.yearStartDate}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} className={classes.input}>
-          <StaticDatePickerLandscape
-            name="yearEndDate"
-            label="To-"
-            value={input}
-            setValue={setInput}
-            error={errors.yearEndDate}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} className={classes.input}>
-          <Controls.RadioGroup
-            name="isDefaultYear"
-            label="Is Default Year"
-            value={input.isDefaultYear}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.isDefaultYear}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} className={classes.input}>
-          <Controls.RadioGroup
-            name="isClosed"
-            label="Is closed"
-            value={input.isClosed}
-            onChange={handleChange}
-            items={menuRightsItems}
-            error={errors.isClosed}
-          />
-        </Grid>
-        <div className={{ marginTop: "25px" }}>
-          <Controls.Button type="submit" text="Submit" />
-          <Controls.Button text="Reset" color="default" onClick={handleReset} />
-        </div>
+    <Grid container spacing={2}>
+      <Grid
+        item
+        xs={12}
+        sm={6}
+        className={classes.input}
+        style={{ flexGrow: 1 }}
+      >
+        <Controls.Input
+          name="yearCode"
+          label="Year Code"
+          placeholder="eg 2223"
+          value={input.yearCode}
+          onChange={handleChange}
+          error={errors.yearCode}
+        />
       </Grid>
-    </Form>
+      <Grid item xs={12} sm={6} className={classes.input}>
+        <Controls.Input
+          name="finYear"
+          label="Financial Year"
+          placeholder="eg 2022-23"
+          value={input.finYear}
+          onChange={handleChange}
+          error={errors.finYear}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6} className={classes.input}>
+        <StaticDatePickerLandscape
+          name="yearStartDate"
+          label="Start Year From-"
+          value={input}
+          setValue={setInput}
+          error={errors.yearStartDate}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6} className={classes.input}>
+        <StaticDatePickerLandscape
+          name="yearEndDate"
+          label="To-"
+          value={input}
+          setValue={setInput}
+          error={errors.yearEndDate}
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} className={classes.input}>
+        <Controls.RadioGroup
+          name="isDefaultYear"
+          label="Is Default Year"
+          value={input.isDefaultYear}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.isDefaultYear}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6} className={classes.input}>
+        <Controls.RadioGroup
+          name="isClosed"
+          label="Is closed"
+          value={input.isClosed}
+          onChange={handleChange}
+          items={menuRightsItems}
+          error={errors.isClosed}
+        />
+      </Grid>
+      <div className={{ marginTop: "25px" }}>
+        <Controls.Button type="submit" text="Submit" onClick={handleSubmit} />
+        <Controls.Button text="Reset" color="default" onClick={handleReset} />
+      </div>
+    </Grid>
   );
 }
 // <StaticDatePickerLandscape

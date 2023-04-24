@@ -5,6 +5,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
 import { makeStyles, IconButton } from "@material-ui/core";
 import { format } from "date-fns";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "./arrows.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -73,28 +75,20 @@ export default function StaticDatePickerLandscape(props) {
     }
   }
 
-  function getFromattedDate(date) {
-    let formattedDate = date;
-    if (isValidDate(date)) formattedDate = format(date, "dd/MM/yyyy");
-    return formattedDate;
-  }
+  console.log(dayjs().toDate(), new Date());
   return (
     <div className="customDatePickerWidth">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          inputFormat="dd/MM/yyyy"
+          format="DD/MM/YYYY"
           className={classes.root}
           label={label}
-          value={value[name]}
+          value={dayjs(value[name])}
           onChange={(newValue) => {
-            setValue({ ...value, [name]: newValue });
+            if (newValue) setValue({ ...value, [name]: newValue.toDate() });
           }}
-          wrapperClassName="datepicker"
-          containerStyle={{ width: "100%" }}
+          sx={{ width: "100%" }}
           // pass fullWidth prop to TextField
-          renderInput={(params) => (
-            <TextField size="small" fullWidth {...params} />
-          )}
           disabled={disabled}
           {...(error && { error: true, helperText: error })}
         />

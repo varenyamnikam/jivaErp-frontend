@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Grid, makeStyles } from "@material-ui/core";
-import GetData from "../pages/Branchmaster/data";
+import GetData from "../pages/Admin/BranchMaster/initialValues";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 const useStyles = makeStyles((theme) => ({

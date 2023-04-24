@@ -31,13 +31,6 @@ export default function Input(props) {
   } = props;
   const classes = useStyles();
 
-  function getSize() {
-    if (label == "Search Role Name") {
-      return "small";
-    } else {
-      return "Normal";
-    }
-  }
   return (
     <TextField
       fullWidth

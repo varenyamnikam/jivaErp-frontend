@@ -5,16 +5,7 @@ import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import FilterPopup from "./filterPopup";
 
 export default function Filter(props) {
-  const {
-    filterIcon,
-    setFilterPopup,
-    setFilter,
-    setFilterFn,
-    setFilterIcon,
-    initialFilterValues,
-    setRefresh,
-    initialFilterFn,
-  } = props;
+  const { setFilterPopup } = props;
 
   return (
     <>

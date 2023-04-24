@@ -18,7 +18,8 @@ import DoneIcon from "@mui/icons-material/Done";
 import * as roleService from "../../../services/roleService";
 import { useNavigate } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-
+import { NotifyMsg } from "../../../components/notificationMsg";
+import Config from "../../../Utils/Config";
 const Firms = [
   "N.A.",
   "Proprietary",
@@ -36,12 +37,7 @@ export default function Adressform(props) {
     currentAdress,
     country,
     states,
-    districts,
-    talukas,
     records,
-    setRecords,
-    imitate,
-    setImitate,
     setAdresses,
     adresses,
     Index,
@@ -49,6 +45,7 @@ export default function Adressform(props) {
     setSave,
     setAdressData,
     adressData,
+    setNotify,
   } = props;
   console.log(records);
   console.log(adressData);
@@ -113,14 +110,26 @@ export default function Adressform(props) {
 
       // setAdressData([...adressData, input]);
       // setSave({ ...save, [Index]: false });
-      console.log(updatedAdresses);
-      setAdresses(updatedAdresses);
-      const updatedData = adressData.filter(
-        (item) => item.acCode !== input.acCode
-      );
-      console.log(updatedData);
-      setAdressData([...updatedData, ...updatedAdresses]);
-      roleService.insertAcAdress(input);
+      const handleRes = (response) => {
+        console.log(response);
+        setNotify(NotifyMsg(1));
+        console.log(updatedAdresses);
+        setAdresses(updatedAdresses);
+        const updatedData = adressData.filter(
+          (item) => item.acCode !== input.acCode
+        );
+        console.log(updatedData);
+        setAdressData([...updatedData, ...updatedAdresses]);
+      };
+
+      const handleErr = (error) => {
+        setNotify(NotifyMsg(4));
+        console.log(error);
+      };
+
+      const url = Config.acadress;
+      console.log(input);
+      roleService.axiosPatch(url, input, handleRes, handleErr);
       let newParty = JSON.parse(localStorage.getItem("newParty"));
       if (newParty.partyOpen) {
         newParty.partyOpen = false;
@@ -130,13 +139,6 @@ export default function Adressform(props) {
     }
   }
   //
-  function getValue(value) {
-    if (value == "NULL") {
-      return "";
-    } else {
-      return value;
-    }
-  }
   function getButton() {
     if (!save[Index]) {
       return (
@@ -224,7 +226,7 @@ export default function Adressform(props) {
           <Controls.Input
             name="pincode"
             label="Pincode"
-            value={getValue(input.pincode)}
+            value={input.pincode}
             onChange={handleChange}
             error={errors.pincode}
           />
@@ -233,7 +235,7 @@ export default function Adressform(props) {
           <Controls.Input
             name="mobileno"
             label="Mobile No"
-            value={getValue(input.mobileno)}
+            value={input.mobileno}
             onChange={handleChange}
           />
         </Grid>
@@ -241,7 +243,7 @@ export default function Adressform(props) {
           <Controls.Input
             name="contactNo"
             label="Contact No"
-            value={getValue(input.contactNo)}
+            value={input.contactNo}
             onChange={handleChange}
           />
         </Grid>

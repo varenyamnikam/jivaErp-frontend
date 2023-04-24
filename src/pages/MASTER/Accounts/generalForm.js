@@ -15,12 +15,9 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
 import Divider from "@mui/material/Divider";
-
-export default function Customersform(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
+export default function Generalform(props) {
   const {
     values,
     setValues,
@@ -75,11 +72,16 @@ export default function Customersform(props) {
     if (fieldValues[x])
       temp[x] = found ? `${found[x]} already exists at ${found[y]}` : "";
     console.log(temp);
+    const hasRight = fieldValues[y]
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues[y] ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
     setErrors({
       ...temp,
     });
-    return Object.values(temp).every((x) => x == "");
+    return Object.values(temp).every((x) => x == "") && hasRight;
   };
   function handleInputChange(e) {
     const { value, name } = e.target;
@@ -106,92 +108,48 @@ export default function Customersform(props) {
     if (validate()) {
       let x = true;
       setValues(input);
-      records.map((item, index) => {
-        if (item.acCode == input.acCode) {
+      x = records.find((item) => item.acGroupCode == input.acGroupCode);
+      const url = Config.accounts;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+      };
+
+      if (x) {
+        const handleRes = (response) => {
+          console.log("hi....", response.data.values);
+          setValues(response.data.values);
+          setRecords([...records, response.data.values]);
+          setNotify(NotifyMsg(1));
+          setSubmit(true);
+          changeTab();
+        };
+
+        roleService.axiosPut(url, input, handleRes, handleErr, () => {});
+      } else {
+        const handleRes = (response) => {
           const updatedRecords = records.map((p) =>
             p.acCode === input.acCode ? input : p
           );
           setRecords(updatedRecords);
           setValues(input);
-          x = false;
-        }
-      });
-      console.log(x);
-      if (x) {
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .put(
-            Config.accounts + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-            setValues(response.data.values);
-            setRecords([...records, response.data.values]);
-            setNotify({
-              isOpen: true,
-              message: "Account created  successfully",
-              type: "success",
-            });
-            setSubmit(true);
-            changeTab();
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
-      } else {
-        const token = AuthHandler.getLoginToken();
-        console.log("updated");
-        axios
-          .patch(
-            Config.accounts + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-            setNotify({
-              isOpen: true,
-              message: "Account updated  successfully",
-              type: "success",
-            });
-            setSubmit(true);
-            changeTab();
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-            console.log(error);
-          });
+          setNotify(NotifyMsg(2));
+          setSubmit(true);
+          changeTab();
+        };
+
+        roleService.axiosPatch(url, input, handleRes, handleErr, () => {});
       }
     }
   }
-  function getValue(value) {
-    if (value == "NULL") {
-      console.log("undefined");
-      return "";
-    } else {
-      console.log("not undefined", value);
-      return value;
-    }
-  }
+  // function getValue(value) {
+  //   if (value == "NULL") {
+  //     console.log("undefined");
+  //     return "";
+  //   } else {
+  //     console.log("not undefined", value);
+  //     return value;
+  //   }
+  // }
   if (input.acGroupName) {
     console.log("hi...");
     acGroupData.map((item) => {
@@ -227,31 +185,7 @@ export default function Customersform(props) {
   //     }
   //   });
   // }
-  function getButton() {
-    if (!submit) {
-      return (
-        <>
-          <Button
-            variant="contained"
-            // color="success"
-            onClick={(e) => {
-              handleSubmit(e);
-            }}
-          >
-            Submit
-          </Button>
-        </>
-      );
-    } else {
-      return (
-        <>
-          <Button variant="text" endIcon={<DoneIcon />}>
-            Submitted
-          </Button>
-        </>
-      );
-    }
-  }
+
   return (
     <>
       <Grid container spacing={2}>
@@ -287,7 +221,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="panNo"
             label="PAN No"
-            value={getValue(input.panNo)}
+            value={input.panNo}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -296,7 +230,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="aadharNo"
             label="Aadhar No"
-            value={getValue(input.aadharNo)}
+            value={input.aadharNo}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -305,7 +239,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="gstNo"
             label="GST Number"
-            value={getValue(input.gstNo)}
+            value={input.gstNo}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -314,7 +248,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="bankName"
             label="Bank Name"
-            value={getValue(input.bankName)}
+            value={input.bankName}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -323,7 +257,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="bankAcNo"
             label="Bank A/c No"
-            value={getValue(input.bankAcNo)}
+            value={input.bankAcNo}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -332,7 +266,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="ifscCode"
             label="IFSC Code"
-            value={getValue(input.ifscCode)}
+            value={input.ifscCode}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -363,7 +297,7 @@ export default function Customersform(props) {
           <Controls.Input
             name="seedLicenNo"
             label="Seed Licen No"
-            value={getValue(input.seedLicenNo)}
+            value={input.seedLicenNo}
             onChange={handleChange}
             // error={errors.stateCode}
           />
@@ -482,7 +416,18 @@ export default function Customersform(props) {
           sm={12}
           style={{ display: "flex", justifyContent: "flex-end" }}
         >
-          <div>{getButton()}</div>
+          <div>
+            {" "}
+            <Button
+              variant={submit ? "text" : "contained"} // color="success"
+              onClick={(e) => {
+                !submit && handleSubmit(e);
+              }}
+              endIcon={submit && <DoneIcon />}
+            >
+              {submit ? "Submitted" : "Submit"}
+            </Button>
+          </div>
         </Grid>
       </Grid>
       <Popup

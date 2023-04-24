@@ -3,56 +3,72 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
 import Reusemaster from "./reusableMaster";
-import GetData from "../../Branchmaster/data";
+import GetData from "../../Admin/BranchMaster/initialValues";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
+import Notification from "../../../components/Notification";
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "Country", label: "Country" },
-  { id: "status", label: "status", disableSorting: true },
   { id: "Edit", label: "EDIT" },
 ];
-const initialStateValues = {
+const initialCountryValues = {
   countryCode: "",
   countryName: "",
 };
 
-const Statemaster = (props) => {
-  const [records, setRecords] = useState([initialStateValues]);
-  const [location, setLocation] = useState({ country: [{}] });
-  useEffect(() => {
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .post(Config.location, body, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        if (response.data.country.length !== location.country.length) {
-          console.log("res....", response.data.country.length);
-          setLocation(response.data);
-        }
-      });
+const Countrymaster = (props) => {
+  const [records, setRecords] = useState([initialCountryValues]);
+  const [location, setLocation] = useState({ countries: [{}] });
+  const [loading, setLoading] = useState(true);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
   });
-  console.log(location);
-  console.log(location.country.length);
-  if (records[0].countryName !== location.country[0].countryName) {
-    setRecords(location.country);
-    console.log(records, records.length, location.country.length);
+
+  if (loading) {
+    const handleRes = (response) => {
+      console.log(response.data);
+      if (response.data.countries.length !== 0) {
+        console.log("res....", response.data.countries.length);
+        setLocation(response.data);
+      }
+      setLoading(false);
+    };
+
+    const url = Config.location;
+
+    const handleErr = (error) => {
+      setNotify(NotifyMsg(4));
+      setLoading(false);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
+  console.log(location);
+  console.log(location.countries.length);
+  useEffect(() => {
+    if (records[0].countryName !== location.countries[0].countryName) {
+      setRecords(location.countries);
+      console.log(records, records.length, location.countries.length);
+    }
+  }, [location]);
 
   return (
-    <Reusemaster
-      headCells={headCells}
-      initialValues={initialStateValues}
-      records={records}
-      setRecords={setRecords}
-      title={"COUNTRY"}
-      m2={"countryCode"}
-      country={location.country}
-      state={location.states}
-      District={location.districts}
-    />
+    <>
+      <Reusemaster
+        headCells={headCells}
+        initialValues={initialCountryValues}
+        records={records}
+        setRecords={setRecords}
+        title={"COUNTRY"}
+        m2={"countryCode"}
+        countries={location.countries}
+        state={location.states}
+        District={location.districts}
+      />{" "}
+      <Notification notify={notify} setNotify={setNotify} />
+    </>
   );
 };
-export default Statemaster;
+export default Countrymaster;

@@ -57,14 +57,6 @@ const Sidemenu = (props) => {
         <div className="form-inline">
           <div className="input-group" data-widget="sidebar-search">
             <MyAutocomplete data={SidebarData} />
-            <div className="input-group-append">
-              <button
-                className="btn btn-sidebar"
-                style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}
-              >
-                <i className="fas fa-search fa-fw"></i>
-              </button>
-            </div>
           </div>
         </div>
 

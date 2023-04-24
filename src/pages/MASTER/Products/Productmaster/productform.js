@@ -30,7 +30,8 @@ import { useForm, Form } from "../../../../components/useForm";
 import BasicSelect from "../../../Usermaster/basicselect";
 import UnusedAutosuggest from "../../../../components/unusedautosuggest";
 import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
+import SmartAutosuggest from "../../../../components/smartAutoSuggest";
+import { NotifyMsg } from "../../../../components/notificationMsg";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -72,12 +73,12 @@ export default function Productform(props) {
     setNotify,
     setFormPopup,
     unitNames,
-    prodCompanyNames,
-    prodTypesNames,
+    prodCompany,
+    prodType,
     setGstPopup,
   } = props;
   const [errors, setErrors] = useState(initialFilterValues);
-  console.log(input, records, input);
+  console.log(input, records, prodCompany, prodType);
   console.log(errors);
   const validate = (fieldValues = input) => {
     let temp = { ...errors };
@@ -112,8 +113,14 @@ export default function Productform(props) {
     setErrors({
       ...temp,
     });
+    const hasRight = fieldValues[y]
+      ? AuthHandler.canEdit()
+      : AuthHandler.canAdd();
+    if (!hasRight)
+      fieldValues[y] ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
-    if (fieldValues == input) return Object.values(temp).every((x) => x == "");
+    if (fieldValues == input)
+      return Object.values(temp).every((x) => x == "") && hasRight;
   };
   useEffect(() => {
     if (!Object.values(errors).every((x) => x == "")) validate();
@@ -140,88 +147,50 @@ export default function Productform(props) {
     if (validate()) {
       let x = true;
       records.map((item) => {
-        if (item.prodCode == input.prodCode && input.prodCode !== "X X X X") {
+        if (item.prodCode == input.prodCode && input.prodCode) {
           x = false;
         }
       });
+      const url = Config.prodMaster;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+        console.error(err);
+      };
+
       if (x) {
-        console.log(input);
-        setRecords([...records, input]);
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .post(
-            // Config.addUser,
-            Config.prodMaster + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            setNotify({
-              isOpen: true,
-              message: "item updated  successfully",
-              type: "success",
-            });
-            setRecords([...records, response.data.values]);
+        // delete prodTypeName&&procCompany
+
+        const handleRes = (res) => {
+          setRecords([...records, input]);
+          let newParty = JSON.parse(localStorage.getItem("newParty"));
+          if (newParty.partyOpen) {
             let newParty = JSON.parse(localStorage.getItem("newParty"));
-            if (newParty.partyOpen) {
-              let newParty = JSON.parse(localStorage.getItem("newParty"));
-              newParty.partyOpen = false;
-              localStorage.setItem("newParty", JSON.stringify(newParty));
-              history(newParty.path);
-            }
-            setFormPopup(false);
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
-          });
+            newParty.partyOpen = false;
+            localStorage.setItem("newParty", JSON.stringify(newParty));
+            history(newParty.path);
+          }
+          setFormPopup(false);
+          setNotify(NotifyMsg(1));
+        };
+        roleService.axiosPut(url, input, handleRes, handleErr, () => {});
       } else {
-        //   roleService.updateuser(input);
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .patch(
-            // Config.addUser,
-            Config.prodMaster + query,
-            { input },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            const newrecord = records.filter((item) => {
-              return item.prodCode !== input.prodCode;
-            });
-            console.log(newrecord);
-            setRecords([...newrecord, input]);
-            console.log([...newrecord, input]);
-            setNotify({
-              isOpen: true,
-              message: "item updated  successfully",
-              type: "success",
-            });
-            setFormPopup(false);
-          })
-          .catch((error) => {
-            setNotify({
-              isOpen: true,
-              message: "Unable to connect to servers",
-              type: "warning",
-            });
+        const handleRes = (res) => {
+          const newrecord = records.filter((item) => {
+            return item.prodCode !== input.prodCode;
           });
+          console.log(newrecord);
+          setRecords([...newrecord, input]);
+          console.log([...newrecord, input]);
+          setFormPopup(false);
+          setNotify(NotifyMsg(2));
+        };
+        roleService.axiosPatch(url, input, handleRes, handleErr);
       }
     }
   };
+  const prodTypeOptions = prodType.map((item) => item.prodTypeName);
+  const prodCompanyOptions = prodCompany.map((item) => item.prodCompanyName);
+
   return (
     <Grid container spacing={2}>
       <Grid item sm={6} xs={12}>
@@ -252,23 +221,33 @@ export default function Productform(props) {
         />
       </Grid>
       <Grid item sm={6} xs={12} style={{ paddingRight: "20px" }}>
-        <UnusedAutosuggest
-          name="itemType"
+        <SmartAutosuggest
+          name1="prodTypeName"
+          code1="prodTypeCode"
+          name2="prodTypeName"
+          code2="prodTypeCode"
           label="Item Type"
+          prodTypeOptions
           value={input}
           setValue={setInput}
-          options={prodTypesNames}
-          error={errors.itemType}
+          options1={prodTypeOptions}
+          options2={prodType}
+          error={errors.prodTypeCode}
         />
       </Grid>
       <Grid item sm={6} xs={12}>
-        <UnusedAutosuggest
-          name="prodCompany"
-          label="Item Group"
+        <SmartAutosuggest
+          name1="prodCompanyName"
+          code1="prodCompanyCode"
+          name2="prodCompanyName"
+          code2="prodCompanyCode"
+          label="Company"
+          prodCompanyOptions
           value={input}
           setValue={setInput}
-          options={prodCompanyNames}
-          error={errors.prodCompany}
+          options1={prodCompanyOptions}
+          options2={prodCompany}
+          error={errors.prodCompanyCode}
         />
       </Grid>
       <Grid item sm={6} xs={12}>

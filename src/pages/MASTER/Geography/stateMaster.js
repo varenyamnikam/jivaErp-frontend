@@ -3,12 +3,15 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
 import Reusemaster from "./reusableMaster";
-import GetData from "../../Branchmaster/data";
+import GetData from "../../Admin/BranchMaster/initialValues";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
+import Notification from "../../../components/Notification";
+
 const headCells = [
   { id: "Country", label: "Country" },
   { id: "Code", label: "CODE" },
   { id: "STATE", label: "STATE" },
-  { id: "status", label: "status", disableSorting: true },
   { id: "Edit", label: "EDIT" },
 ];
 const initialStateValues = {
@@ -22,22 +25,32 @@ const initialStateValues = {
 const Statemaster = (props) => {
   const [records, setRecords] = useState([initialStateValues]);
   const [location, setLocation] = useState({ states: [{}] });
-  useEffect(() => {
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .post(Config.location, body, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        if (response.data.states.length !== location.states.length) {
-          console.log("res....", response.data.states.length);
-          setLocation(response.data);
-        }
-      });
+  const [loading, setLoading] = useState(true);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
   });
+
+  if (loading) {
+    const handleRes = (response) => {
+      console.log(response.data);
+      if (response.data.states.length !== 0) {
+        console.log("res....", response.data.states.length);
+        setLocation(response.data);
+      }
+      setLoading(false);
+    };
+
+    const url = Config.location;
+
+    const handleErr = (error) => {
+      setNotify(NotifyMsg(4));
+      setLoading(false);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
+  }
+
   console.log(location);
   console.log(location.states.length);
   if (records[0].stateName !== location.states[0].stateName) {
@@ -46,20 +59,23 @@ const Statemaster = (props) => {
   }
 
   return (
-    <Reusemaster
-      headCells={headCells}
-      initialValues={initialStateValues}
-      records={records}
-      setRecords={setRecords}
-      title={"STATE"}
-      m1={"countryCode"}
-      m2={"stateCode"}
-      m3={"stateName"}
-      m4={"stateStatus"}
-      country={location.country}
-      state={location.states}
-      District={location.districts}
-    />
+    <>
+      <Reusemaster
+        headCells={headCells}
+        initialValues={initialStateValues}
+        records={records}
+        setRecords={setRecords}
+        title={"STATE"}
+        m1={"countryCode"}
+        m2={"stateCode"}
+        m3={"stateName"}
+        m4={"stateStatus"}
+        country={location.countries}
+        state={location.states}
+        District={location.districts}
+      />{" "}
+      <Notification notify={notify} setNotify={setNotify} />
+    </>
   );
 };
 export default Statemaster;

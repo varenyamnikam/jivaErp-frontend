@@ -3,7 +3,7 @@ import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
 import Reusemaster from "./reusableMaster";
-import GetData from "../../Branchmaster/data";
+import GetData from "../../Admin/BranchMaster/initialValues";
 
 const headCells = [
   { id: "Country", label: "Country" },

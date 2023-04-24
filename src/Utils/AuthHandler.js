@@ -146,10 +146,36 @@ class AuthHandler {
       return null;
     }
   }
+  static getCompany() {
+    return JSON.parse(localStorage.getItem("company"));
+  }
+
   static getQuery() {
-    return `?userCompanyCode=${localStorage.getItem(
-      "userCompanyCode"
-    )}&userCode=${localStorage.getItem("userCode")}`;
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const userCode = user.userCode;
+    const userCompanyCode = user.userCompanyCode;
+    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+    return query;
+  }
+  static getUrl() {
+    return "http://localhost:3001/";
+    // return "http://147.182.252.2:3001"
+  }
+  static canAdd() {
+    const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
+    const screenCode = localStorage.getItem("screenCode");
+    return userRights.addRight.includes(screenCode);
+  }
+  static canEdit() {
+    const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
+    const screenCode = localStorage.getItem("screenCode");
+    return userRights.editRight.includes(screenCode);
+  }
+  static canDelete() {
+    const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
+    const screenCode = localStorage.getItem("screenCode");
+    return userRights.deleteRight.includes(screenCode);
   }
 
   static logoutUser() {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
-import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
-import Controls from "../../../components/controls/Controls";
-import AdvancedSelect from "../../../components/advancedBasicSelect";
-import ControllableStates from "../../../components/selectsearchstate";
+import { Form } from "./useForm";
+import BasicSelect from "../pages/Usermaster/basicselect";
+import Controls from "./controls/Controls";
+import AdvancedSelect from "./advancedBasicSelect";
+import ControllableStates from "./selectsearchstate";
 import axios from "axios";
-import Config from "../../../Utils/Config";
-import AuthHandler from "../../../Utils/AuthHandler";
-import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import Config from "../Utils/Config";
+import AuthHandler from "../Utils/AuthHandler";
+import UnusedAutosuggest from "./unusedautosuggest";
 const OperateItems = ["CONTROL", "SUB"];
 const OperateData = [
   { operateAs: "CONTROL", glOperateAs: "C" },

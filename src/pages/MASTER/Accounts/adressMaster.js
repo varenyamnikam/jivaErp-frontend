@@ -72,11 +72,11 @@ export default function AdressMaster(props) {
     location,
     adressData,
     setAdressData,
-    getAdress,
     values,
+    setNotify,
   } = props;
   const [adresses, setAdresses] = useState([
-    { acCode: acCode, ...initialAdress },
+    { ...initialAdress, acCode: acCode },
   ]);
   const [records, setRecords] = useState([]);
   const [value, setValue] = useState("1");
@@ -86,7 +86,6 @@ export default function AdressMaster(props) {
   console.log(arr, acCode);
   if (arr.length !== 0) {
     if (arr[0].addressNo !== adresses[0].addressNo) {
-      console.log("hehe");
       setAdresses(arr);
       // setRecords(arr);
     }
@@ -101,8 +100,6 @@ export default function AdressMaster(props) {
     setValue(newValue);
     console.log(newValue);
   };
-  console.log(adressData, records);
-  console.log(arr, adresses);
   // function handleFinalSubmit() {
   //   let x = true;
   //   adresses.map((item) => {
@@ -142,15 +139,6 @@ export default function AdressMaster(props) {
   //   );
   //   setAdressData([...updatedData, input]);
   // }
-  function getValue(value) {
-    if (value == "NULL") {
-      console.log("undefined");
-      return "";
-    } else {
-      console.log("not undefined", value);
-      return value;
-    }
-  }
 
   return (
     <>
@@ -173,7 +161,7 @@ export default function AdressMaster(props) {
                 onClick={(e) => {
                   setAdresses([
                     ...adresses,
-                    { acCode: acCode, ...initialAdress },
+                    { ...initialAdress, acCode: acCode },
                   ]);
                   // setRecords([...records, initialAdress]);
                   setValue((adresses.length + 1).toString());
@@ -212,6 +200,7 @@ export default function AdressMaster(props) {
                   setSave={setSave}
                   setAdressData={setAdressData}
                   adressData={adressData}
+                  setNotify={setNotify}
                 />
               </TabPanel>
             );

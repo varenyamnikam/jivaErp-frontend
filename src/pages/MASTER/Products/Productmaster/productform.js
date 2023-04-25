@@ -161,7 +161,7 @@ export default function Productform(props) {
         // delete prodTypeName&&procCompany
 
         const handleRes = (res) => {
-          setRecords([...records, input]);
+          setRecords([...records, res.data.values]);
           let newParty = JSON.parse(localStorage.getItem("newParty"));
           if (newParty.partyOpen) {
             let newParty = JSON.parse(localStorage.getItem("newParty"));

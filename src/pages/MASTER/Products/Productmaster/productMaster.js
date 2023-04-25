@@ -205,6 +205,7 @@ export default function ProductMaster(props) {
       } else {
         setRecords(newRecord);
       }
+      setNotify(NotifyMsg(3));
     };
     roleService.axiosDelete(url, item, handleRes, handleErr);
   }

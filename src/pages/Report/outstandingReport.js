@@ -34,6 +34,8 @@ import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import CmnToolBar from "../../components/CommonToolBar";
 import Outer from "../../components/outer";
+import { NotifyMsg } from "../../components/notificationMsg";
+import * as roleService from "../../services/roleService";
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -70,7 +72,7 @@ const initialValues = {
   closingBalance: "",
 };
 
-export default function OutstandingReport() {
+export default function OutstandingReport({ title = "Outstanding Report" }) {
   const headCells = [
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
@@ -88,13 +90,18 @@ export default function OutstandingReport() {
       feild: "closingBalance",
     },
   ];
+  const filterFields = [
+    { feild: "docCode", label: "Document Code" },
+    { feild: "acName", label: "Account Name" },
+  ];
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = user.userCode;
   const userCompanyCode = user.userCompanyCode;
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
+  let query = `&date=${new Date()}&useBatch=${useBatch}`;
   const { getD } = DateCalc(user);
 
   const initialFilterValues = {
@@ -126,6 +133,13 @@ export default function OutstandingReport() {
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
+  const [accounts, setAccounts] = useState([
+    {
+      acCode: "",
+      acName: "",
+    },
+  ]);
+
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -146,36 +160,25 @@ export default function OutstandingReport() {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   if (loading) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
+    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
-    axios
-      .put(
-        Config.acReport + query,
-        {
-          body: "body",
-        },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((res) => {
-        const data = res.data.acReport;
-        console.log(data);
-        if (data.length !== 0) setRecords(data);
-        if (loading) setLoading(false);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-        console.log(error);
-      })
-      .finally(() => {});
+    const url = Config.acReport + query;
+
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.error(err);
+    };
+    const handleRes = (res) => {
+      const data = res.data.acReport;
+      const acc = res.data.accounts;
+      console.log(data);
+      if (data.length !== 0) setRecords(data);
+      if (acc.length != 0) setAccounts(acc);
+    };
+    roleService.axiosPut(url, { body: "bpody" }, handleRes, handleErr, () => {
+      loading && setLoading(false);
+    });
   }
 
   function handleFilter(e) {
@@ -192,11 +195,21 @@ export default function OutstandingReport() {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (
+            item.acCode.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.acName.toLowerCase().includes(allfields.toLowerCase())
+          )
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
         });
+        function dynamicFilterFn(feild) {
+          newRecords = newRecords.filter(
+            (item) => item[feild] == filter[feild]
+          );
+        }
+        filter.acCode && dynamicFilterFn("acCode");
+
         console.log(newRecords);
         return newRecords;
       },
@@ -204,129 +217,131 @@ export default function OutstandingReport() {
   }
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Outstanding Report"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <CmnToolBar
-                      filterIcon={filterIcon}
-                      filter={filter}
-                      handleFilter={handleFilter}
-                      setFilterPopup={setFilterPopup}
-                      setFilter={setFilter}
-                      setFilterFn={setFilterFn}
-                      setFilterIcon={setFilterIcon}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setLoading}
-                      initialFilterFn={initialFilterFn}
-                      buttonText="Export Data to Excel"
-                      TblContainer={TblContainer}
-                      TblHead={TblHead}
-                      TblPagination={TblPagination}
-                      headCells={headcells}
-                      recordsAfterSorting={recordsAfterAndSorting}
-                      headcells={headcells}
-                      setheadcells={setheadcells}
-                      initialHeadCells={headCells}
-                      selected={selected}
-                      setSelected={setSelected}
-                    />
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0] == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {typeof item[headcell.feild] == "number"
-                                      ? Math.abs(item[headcell.feild])
-                                      : item[headcell.feild]}
-                                    {headcell.feild !== "acCode" &&
-                                    headcell.feild !== "acName"
-                                      ? item[headcell.feild] == 0
-                                        ? ""
-                                        : item[headcell.feild] < 0
-                                        ? "CR"
-                                        : "DR"
-                                      : ""}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setLoading(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+              <CmnToolBar
+                filterIcon={filterIcon}
+                filter={filter}
+                handleFilter={handleFilter}
+                setFilterPopup={setFilterPopup}
+                setFilter={setFilter}
+                setFilterFn={setFilterFn}
+                initialFilterFn={initialFilterFn}
+                buttonText="Export Data to Excel"
+                headCells={headCells}
+                recordsAfterSorting={recordsAfterAndSorting}
+                headcells={headcells}
+                setheadcells={setheadcells}
+                initialHeadCells={headCells}
+                selected={selected}
+                setSelected={setSelected}
+                initialFilterValues={initialFilterValues}
+                filterFields={filterFields}
+                title={title}
+              />
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {recordsAfterPagingAndSorting().map((item) => (
+                        <TableRow>
+                          {headcells.map((headcell, i) => (
+                            <TableCell
+                              key={headcell.id}
+                              // sortDirection={orderBy === headcell.id ? order : false}
+                              style={{
+                                borderRight: "1px solid rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              {typeof item[headcell.feild] == "number"
+                                ? Math.abs(item[headcell.feild])
+                                : item[headcell.feild]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12} className={classes.input}>
+                  <SmartAutoSuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name1="acName"
+                    code1="acCode"
+                    name2="acName"
+                    code2="acCode"
+                    label="Account"
+                    value={filter}
+                    setValue={setFilter}
+                    options1={accounts.map((item) => item.acName)}
+                    options2={accounts}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Controls.Button
+                    text="Submit"
+                    onClick={() => {
+                      setLoading(true);
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                      search("");
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

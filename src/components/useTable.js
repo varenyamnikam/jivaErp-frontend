@@ -66,6 +66,8 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .MuiTableCell-root": {
       borderRight: "1px solid rgba(0,0,0,0.2)",
+      wordBreak: "break-all",
+      whiteSpace: "nowrap",
     },
     border: "1px solid rgba(0,0,0,0.2)",
   },

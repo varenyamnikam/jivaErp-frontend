@@ -5,7 +5,7 @@ export default function QT() {
   const company = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   const user = AuthHandler.getUser();
   const initialValues = {
-    vouNo: "X X X X",
+    vouNo: " ",
     branchCode: user.defaultBranchCode,
     docCode: "DC",
     finYear: user.defaultYearCode,

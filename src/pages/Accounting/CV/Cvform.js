@@ -11,8 +11,8 @@ import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@material-ui/icons/Add";
 import Calculate from "../../../components/calculate";
 import SmartAutoSuggest from "../../../components/smartAutoSuggest";
-import Divider from "@mui/material/Divider";
-import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
 
 import {
   Paper,
@@ -40,7 +40,7 @@ export default function AcForm(props) {
     setBankValues,
     initialValues,
     initialFilterValues,
-
+    setButtonPopup,
     vouItems,
     notify,
     setNotify,
@@ -70,7 +70,7 @@ export default function AcForm(props) {
   const [disabled1, setDisabled1] = useState(false);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
-      let newRecords = items.filter((item) => item.vouNo !== "X X X X");
+      let newRecords = items.filter((item) => item.vouNo);
       return newRecords;
     },
   });
@@ -144,23 +144,23 @@ export default function AcForm(props) {
   const user = AuthHandler.getUser();
   if (
     !bankValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setBankValues({
       ...bankValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   if (
     !otherValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setOtherValues({
       ...otherValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   console.log(headcells);
 
@@ -197,69 +197,59 @@ export default function AcForm(props) {
         },
       ];
 
-      const userCode = localStorage.getItem("userCode");
-      const userCompanyCode = localStorage.getItem("userCompanyCode");
-      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+        console.error(err);
+      };
+
+      const query = `?&yearStart=${user.yearStartDate}`;
+      const url = Config.accounting + query;
       if (x) {
-        axios
-          .put(
-            Config.accounting + query,
-            {
-              obj: {
-                values: bankValues,
-                itemList: Fil,
-              },
-            },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log(response.data.itemList);
-            setRecords([...records, ...response.data.itemList]);
-            setNotify({
-              isOpen: true,
-              message: "Voucher created  successfully",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        const handleRes = (res) => {
+          console.log(res.data.itemList);
+          let max = res.data.max;
+          let Fil = res.data.itemList;
+          // Fil = Fil.filter((item) => item.srNo !== 1);
+          console.log(Fil, { ...bankValues, vouNo: max });
+
+          setRecords([...records, ...Fil]);
+          setNotify(NotifyMsg(1));
+        };
+        roleService.axiosPut(
+          url,
+          {
+            values: bankValues,
+            itemList: Fil,
+          },
+          handleRes,
+          handleErr,
+          () => {
+            setButtonPopup(false);
+          }
+        );
       } else {
-        axios
-          .patch(
-            Config.accounting + query,
-            {
-              obj: {
-                bankV: bankValues,
-                itemList: Fil,
-              },
-            },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log(response.data.itemList);
-            let newArr = records.filter(
-              (item) => item.vouNo !== bankValues.vouNo
-            );
-            console.log(Fil);
-            setRecords([...newArr, ...Fil]);
-            setNotify({
-              isOpen: true,
-              message: "Voucher created  successfully",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        const handleRes = (res) => {
+          console.log(res.data.itemList);
+          let newArr = records.filter(
+            (item) => item.vouNo !== bankValues.vouNo
+          );
+          console.log(records, newArr, [...Fil, bankValues]);
+          // Fil = Fil.filter((item) => item.srNo !== 1);
+          setRecords([...newArr, ...Fil]);
+          setNotify(NotifyMsg(2));
+        };
+        roleService.axiosPatch(
+          url,
+          {
+            values: bankValues,
+            itemList: Fil,
+          },
+          handleRes,
+          handleErr,
+          () => {
+            setButtonPopup(false);
+          }
+        );
       }
     }
   };

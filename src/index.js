@@ -10,7 +10,6 @@ import Login from "./pages/Login";
 import LogoutComponent from "./pages/LogoutComponent";
 import MainComponent from "./components/MainComponent";
 import Dashboard from "./pages/dashboard";
-import Rolemaster from "./pages/Rolemaster/rolemaster";
 import Usermaster from "./pages/Admin/Usermaster/usermaster";
 import Branchmaster from "./pages/Admin/BranchMaster/branchmaster";
 import { PrivateRouteNew } from "./Utils/PrivateRouteNew";
@@ -45,7 +44,7 @@ import PVMaster from "./pages/Inventory/P.V/P.V";
 import PRMaster from "./pages/Inventory/P.R/P.R";
 import CNMaster from "./pages/Inventory/C.N/C.N";
 import DNMaster from "./pages/Inventory/D.N/D.N";
-import StockMaster from "./pages/Stock/stockMaster";
+import StockMaster from "./pages/Stock/openingStockMaster";
 import BR from "./pages/Accounting/BR/BrMaster";
 import BP from "./pages/Accounting/BP/BpMaster";
 import CR from "./pages/Accounting/CR/CrMaster";
@@ -54,14 +53,14 @@ import JV from "./pages/Accounting/JV/JvMaster";
 import CV from "./pages/Accounting/CV/CvMaster";
 import OB from "./pages/Accounting/OB/ObMaster";
 import StockReport from "./pages/Stock/report/stockReport";
-import POReport from "./pages/Report/POReport";
-import DCReport from "./pages/Report/DCReport";
-import GRNReport from "./pages/Report/GRReport";
-import SOReport from "./pages/Report/SOReport";
-import SIReport from "./pages/Report/SIReport";
-import SRReport from "./pages/Report/SRReport";
-import PVReport from "./pages/Report/PVReport";
-import PRReport from "./pages/Report/PRReport";
+import POReport from "./pages/Report/trasnsactionReports/POReport";
+import DCReport from "./pages/Report/trasnsactionReports/DCReport";
+import GRNReport from "./pages/Report/trasnsactionReports/GRReport";
+import SOReport from "./pages/Report/trasnsactionReports/SOReport";
+import SIReport from "./pages/Report/trasnsactionReports/SIReport";
+import SRReport from "./pages/Report/trasnsactionReports/SRReport";
+import PVReport from "./pages/Report/trasnsactionReports/PVReport";
+import PRReport from "./pages/Report/trasnsactionReports/PRReport";
 import AcReport from "./pages/Report/acReport";
 import JvReport from "./pages/Report/jvReport";
 import BankBook from "./pages/Report/bankBook";
@@ -73,7 +72,9 @@ import DayBook from "./pages/Report/dayBook";
 import OutstandingReport from "./pages/Report/outstandingReport";
 import ProdTypeMaster from "./pages/MASTER/Products/prodTypeMaster";
 import ProductCompanyMaster from "./pages/MASTER/Products/prodCompanyMaster";
+import StockConversionMaster from "./pages/Stock/transaction/stockConversionMaster";
 import jQuery from "jquery";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
@@ -86,10 +87,6 @@ root.render(
           exact
           path="/home"
           element={<PrivateRouteNew Page={<Dashboard />} />}
-        ></Route>
-        <Route
-          path="/Admin/RoleMaster"
-          element={<PrivateRouteNew Page={<Rolemaster />} />}
         ></Route>
         <Route
           exact
@@ -293,6 +290,11 @@ root.render(
           exact
           path="/InventoryTransaction/OpeningStock"
           element={<PrivateRouteNew Page={<StockMaster />} />}
+        />
+        <Route
+          exact
+          path="/InventoryTransaction/StockConversion"
+          element={<PrivateRouteNew Page={<StockConversionMaster />} />}
         />
         <Route
           exact

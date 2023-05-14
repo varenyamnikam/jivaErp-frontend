@@ -50,7 +50,14 @@ export function NotifyMsg(code, callback = () => {}) {
     type: "warning",
   };
 
+  const stockReducedMsg = {
+    isOpen: true,
+    message: "Out of Stock",
+    type: "warning",
+  };
   console.log(code);
+  //stockConversion
+  //transaction
   if (code === 1) return successMsg;
   else if (code === 2) return updateMsg;
   else if (code === 3) return deletedMsg;
@@ -59,5 +66,6 @@ export function NotifyMsg(code, callback = () => {}) {
   else if (code === 6) return addMsg;
   else if (code === 7) return editMsg;
   else if (code === 8) return deleteMsg;
+  else if (code === 9) return stockReducedMsg;
   else return emptyMsg;
 }

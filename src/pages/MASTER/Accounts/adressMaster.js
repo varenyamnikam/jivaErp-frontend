@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 
 import { Grid } from "@material-ui/core";
 import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
 import Controls from "../../../components/controls/Controls";
 import AdvancedSelect from "../../../components/advancedBasicSelect";
 import ControllableStates from "../../../components/selectsearchstate";

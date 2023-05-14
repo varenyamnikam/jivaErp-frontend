@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import {
   makeStyles,
@@ -11,12 +10,14 @@ import {
   Toolbar,
   InputAdornment,
   TableContainer,
-  Typography,
 } from "@material-ui/core";
 import useTable from "../../../components/useTable";
 import Controls from "../../../components/controls/Controls";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
 import { RestaurantRounded, Search } from "@material-ui/icons";
+import AddIcon from "@material-ui/icons/Add";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
+import CloseIcon from "@material-ui/icons/Close";
 import Notification from "../../../components/Notification";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import Popup from "../../../components/Popup";
@@ -27,12 +28,12 @@ import MuiSkeleton from "../../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import Excel from "../../../components/useExcel";
 import Print from "../../../components/print";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import MultipleSelectCheckmarks from "../../../components/multiSelect";
 import Filter from "../../../components/filterButton";
 import DateCalc from "../../../components/dateCalc";
 import StaticDatePickerLandscape from "../../../components/calendarLandscape";
-import StockLedger from "./stockLedger";
+import DcValues from "../../Inventory/D.C/DcValues";
+import { NotifyMsg } from "../../../components/notificationMsg";
 import * as roleService from "../../../services/roleService";
 import SmartAutosuggest from "../../../components/smartAutoSuggest";
 const useStyles = makeStyles((theme) => ({
@@ -60,15 +61,15 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-const initialValues = {
-  srNo: 0,
-  prodCode: "0",
-  openingStock: "0",
-  inward: 0,
-  outward: 0,
-  closingStock: 0,
-  reorderLevel: "0",
-};
+const {
+  initialAc,
+  vouItems,
+  initialAdress,
+  initialPayValues,
+  initialProdValues,
+  initialCommonValues,
+} = DcValues();
+
 const initialProducts = {
   prodCode: "",
   barcode: "",
@@ -85,21 +86,41 @@ const initialProducts = {
   prodStatus: "",
   userCompanyCode: "",
 };
+const initialReport = {
+  vouNo: "",
+  vouSrNo: "",
+  vouDate: null,
+  partyCode: "",
+  partyName: "",
+  prodCode: "",
+  prodName: "",
+  qty: "",
+  rate: "",
+  qr: "",
+  discount: "",
+  gst: "",
+  gstP: "",
+  deliveredQty: "",
+};
 
-export default function ExpiryReport({ title = "Expiry Report" }) {
+export default function DCReport({ docCode }) {
+  const title = `${docCode} Report`;
   const headCells = [
+    { id: `${docCode} no`, label: `${docCode} no`, feild: "vouNo" },
+    { id: "Date", label: "Date", feild: "vouDate" },
+    { id: "Party", label: "Party", feild: "partyName" },
     { id: "Product Code", label: "Product Code", feild: "prodCode" },
     { id: "Product", label: "Product", feild: "prodName" },
-    { id: "batch", label: "Batch", feild: "batchNo" },
-    { id: "UOM", label: "UOM", feild: "UOM" },
-    { id: "Expiry Date", label: "Expiry Date", feild: "batchExpDate" },
-
-    { id: "Closing", label: "Closing", feild: "closingStock" },
-    { id: "Reorder Level", label: "Reorder Level", feild: "reorderLevel" },
+    { id: "Quantity", label: "Quantity", feild: "qty" },
+    { id: "Rate", label: "Rate", feild: "rate" },
+    { id: "Discount", label: "Discount", feild: "discount" },
+    { id: "GST", label: "GST", feild: "gst" },
+    { id: "%", label: "%", feild: "gstP" },
+    { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount" },
   ];
   const filterFields = [
     { feild: "prodName", label: "Product Name" },
-    { feild: "expDateString()", label: "Expiry Date" },
+    { feild: "partyName", label: "Party Name" },
   ];
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -108,39 +129,36 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
+  let query = `&date=${new Date()}&useBatch=${useBatch}`;
   const { getD } = DateCalc(user);
 
   const initialFilterValues = {
-    ...initialValues,
+    ...initialReport,
     refNo: "",
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
-    expDate: new Date(),
-    "expDateString()": function () {
-      return roleService.date(this.expDate);
-    },
   };
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.refNo !== "") return item;
+        if (item.vouNo !== "") return item;
       });
       console.log(newRecords);
       return newRecords;
     },
   };
 
-  const [expired, setExpired] = useState(false);
+  const [values, setValues] = useState(initialReport);
+  const [buttonPopup, setButtonPopup] = useState(false);
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
   const [print, setPrint] = useState(false);
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
-  const [loading1, setLoading1] = useState(true);
-  const [refresh, setRefresh] = useState(false);
-  const [records, setRecords] = useState([initialValues]);
+  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState([initialReport]);
   const [filter, setFilter] = useState(initialFilterValues);
   const [products, setProducts] = useState([initialProducts]);
   const [notify, setNotify] = useState({
@@ -153,12 +171,8 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     Stock: "",
     subTitle: "",
   });
-  const setting = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  const initialkeepOpen = setting.keepBatchWiseStockOpen
-    ? setting.keepBatchWiseStockOpen
-    : false;
+  const [common, setCommon] = useState(initialCommonValues);
 
-  const [loading, setLoading] = useState(true);
   // const [count, setCount] = useState(records[records.length - 1].branchCode);
   const classes = useStyles();
   const {
@@ -168,78 +182,156 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
+  console.log(values, records);
+  console.log("filter=>", filter);
   console.log(Config.batch);
-  if (useBatch == "Yes") {
-    let found = headcells.find((item) => item.id == "batch");
-    if (!found) {
-      setheadcells(headCells);
-    }
-  } else {
-    let found = headcells.find((item) => item.id == "batch");
-    if (found) {
-      let arr = headCells.filter((item) => item.id !== "batch");
-      console.log(arr);
-      setheadcells(arr);
-    }
+  function getPartyName(code, arr) {
+    let name = "";
+    console.log(arr, code);
+    arr.map((item) => {
+      if (code == item.acCode) {
+        name = item.acName;
+      }
+    });
+    return name;
+  }
+  function getProdName(code, arr) {
+    let name = "";
+    console.log(arr, code);
+    arr.map((item) => {
+      if (code == item.prodCode) {
+        name = item.prodName;
+      }
+    });
+    return name;
   }
 
-  if (loading || refresh) {
-    let batchWiseStock = "NO";
-    if (useBatch == "Yes") batchWiseStock = "Yes";
-    console.log(batchWiseStock);
-    let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&useBatch=${batchWiseStock}`;
+  function rnd(no) {
+    return Number(no)
+      .toFixed(2)
+      .replace(/(\.0+|0+)$/, "");
+  }
+
+  function calc(obj) {
+    let tot = 0;
+    let totP = 0;
+    totP = rnd(Number(obj.cgstP) + Number(obj.igstP) + Number(obj.sgstP));
+    tot = rnd(Number(obj.cgst) + Number(obj.igst) + Number(obj.sgst));
+    return { tot: tot, totP: totP };
+  }
+  function getGr(arr, code) {
+    let ref = "";
+    console.log(arr, code);
+    arr.map((item) => {
+      if (item.vouNo == code) ref = item.qty;
+    });
+    return ref;
+  }
+  if (loading) {
+    const qrObj = JSON.stringify({ $in: ["SI", docCode] });
+    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
-    axios
-      .get(Config.stockReport + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        setLoading(false);
-        let data = response.data.records;
-        let stk = response.data.stock;
-        console.log(data, stk);
-        mountStockData(data, stk);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      })
-      .finally(() => {});
-  }
-  function mountStockData(data, stk) {
-    console.log(data, stk);
-    let arr = [];
+    const url = Config.both + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      setRecords([{ ...initialReport, vouNo: "" }]);
 
-    data.map((item, i) => {
-      let inward = item.currentStock.inward;
-      let outward = item.currentStock.outward;
+      console.log(err);
+    };
+    const handleRes = (res) => {
+      console.log(res.data);
+      let si = res.data.inv_voucherItems.filter((item) => item.docCode == "SI");
+      let dc = res.data.inv_voucherItems.filter(
+        (item) => item.docCode == docCode
+      );
 
-      let obj = {
-        srNo: i + 1,
-        prodCode: item.prodCode,
-        closingStock: item.openingStock + inward - outward,
-        reorderLevel: item.reorderLevel,
-        prodName: item.prodName,
-        UOM: item.UOM,
-        batchNo: item.batchNo,
-        batchExpDate: item.batchExpDate,
+      function getAccounts(arr) {
+        if (arr.length !== 0) {
+          return arr;
+        } else {
+          return [initialAc];
+        }
+      }
+      function getVouItems(arr) {
+        if (arr.length !== 0) {
+          return arr;
+        } else {
+          return [vouItems];
+        }
+      }
+      function getAdress(arr) {
+        if (arr.length !== 0) {
+          return arr;
+        } else {
+          return [initialAdress];
+        }
+      }
+      function getPayterms(arr) {
+        if (arr.length !== 0) {
+          return arr;
+        } else {
+          return [initialPayValues];
+        }
+      }
+      function getProd(arr) {
+        if (arr.length !== 0) {
+          return arr;
+        } else {
+          return [initialProdValues];
+        }
+      }
+      let cmnData = {
+        accounts: getAccounts(res.data.mst_accounts),
+        voucherItems: getVouItems(res.data.inv_voucherItems),
+        adress: getAdress(res.data.mst_acadress),
+        payTerms: getPayterms(res.data.mst_paymentTerm),
+        products: getProd(res.data.mst_prodMaster),
       };
-      obj.closingStock > 0 && arr.push(obj);
+      setCommon(cmnData);
+      let report = [];
+      console.log("DC=>", dc);
+      let siVou = res.data.inv_voucher.filter((item) => item.docCode == "SI");
 
-      console.log(arr);
+      res.data.inv_voucher
+        .filter((item) => item.docCode == docCode)
+        .map((voucher, i) => {
+          let arr = [];
+          arr = dc.filter((vouItem) => voucher.vouNo == vouItem.vouNo);
+          let deliveredGr = "";
+          siVou.map((it) => {
+            if (it.refNo == voucher.vouNo) deliveredGr = it.vouNo;
+          });
+          if (arr.length != 0) {
+            console.log(arr, voucher);
+            arr.map((item) => {
+              report.push({
+                ...item,
+                itemAmount: voucher.itemTotal,
+                prodName: getProdName(item.prodCode, cmnData.products),
+                partyCode: voucher.partyCode,
+                partyName: getPartyName(voucher.partyCode, cmnData.accounts),
+                gst: calc(item).tot,
+                gstP: calc(item).totP,
+                deliveredQty: getGr(si, deliveredGr),
+                vouDate: roleService.date(item.vouDate),
+              });
+            });
+          }
+        });
+      console.log(report);
+      if (report.length !== 0) setRecords(report);
+      else {
+        setRecords([{ ...initialReport, vouNo: "" }]);
+      }
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {
+      loading && setLoading(false);
     });
-    setRecords(arr);
-    if (refresh) setRefresh(false);
   }
+
   console.log(products);
   function handleFilter(e) {
-    console.log("hi..");
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
     search(value);
@@ -247,50 +339,44 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
 
   console.log(filter.allFields);
   function search(allfields) {
-    console.log(allfields);
+    console.log(allfields.toLowerCase());
     setFilterFn({
       fn: (items) => {
         let newRecords = items;
+        console.log(filter, allfields);
         newRecords = items.filter((item) => {
-          console.log(item, allfields);
-          if (
-            item.prodCode.includes(allfields) ||
-            item.prodName.toLowerCase().includes(allfields.toLowerCase()) ||
-            item.UOM.toLowerCase().includes(allfields.toLowerCase())
-          )
+          if (item.vouNo.toLowerCase().includes(allfields.toLowerCase()))
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
         });
-        console.log(newRecords);
-        return newRecords;
-      },
-    });
-  }
-  function handleFilterSubmit() {
-    setFilterFn({
-      fn: (items) => {
-        let newRecords = items;
-        console.log(newRecords, filter);
         function dynamicFilterFn(feild) {
           console.log(feild, filter, filter[feild]);
+          newRecords.map((item) => {
+            console.log(item, filter[feild]);
+          });
           newRecords = newRecords.filter(
             (item) => item[feild] == filter[feild]
           );
+          console.log(feild, newRecords);
         }
-        Number(filter.prodCode) && dynamicFilterFn("prodCode");
+        filter.partyCode && dynamicFilterFn("partyCode");
+        filter.prodCode && dynamicFilterFn("prodCode");
+
         console.log(newRecords);
         return newRecords;
       },
     });
   }
+  const partyOptions = common.accounts
+    .filter((item) => item.preFix == "C" || item.preFix == "S")
+    .map((item) => {
+      return item.acName;
+    });
+  const prodOptions = common.products.map((item) => {
+    return item.prodName;
+  });
 
-  const finalRecords = recordsAfterPagingAndSorting().filter(
-    (item) =>
-      new Date(item.batchExpDate).setUTCHours(0, 0, 0, 0) <=
-      new Date(filter.expDate).setUTCHours(0, 0, 0, 0)
-  );
-  console.log(filter["expDateString()"]());
   return (
     <>
       <PageHeader
@@ -302,22 +388,16 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
           <div className="card-body">
             <section className="content">
               <Toolbar>
-                <Grid
-                  container
-                  spacing={2}
-                  style={{ display: "flex", flexGrow: 1 }}
-                >
+                <Grid container style={{ display: "flex", flexGrow: 1 }}>
                   <Grid
                     item
                     xs={8}
-                    sm={5}
+                    sm={6}
                     style={{ display: "flex", alignItems: "center" }}
                   >
                     <Controls.Input
                       label="Search"
                       className={classes.searchInput}
-                      value={filter.allFields}
-                      onChange={handleFilter}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -329,7 +409,11 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                             <IconButton
                               onClick={() => {
                                 setFilter(initialFilterValues);
-                                setFilterFn(initialFilterFn);
+                                setFilterFn({
+                                  fn: (items) => {
+                                    return items;
+                                  },
+                                });
                               }}
                               style={{ boxShadow: "none" }}
                             >
@@ -338,11 +422,13 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                           </InputAdornment>
                         ),
                       }}
+                      value={filter.allFields}
+                      onChange={handleFilter}
                     />
                   </Grid>{" "}
                   <Grid
                     item
-                    sm={1}
+                    sm={2}
                     xs={4}
                     style={{
                       display: "flex",
@@ -357,13 +443,12 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                       setFilterFn={setFilterFn}
                       setFilterIcon={setFilterIcon}
                       initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
                       initialFilterFn={initialFilterFn}
                     />
                   </Grid>
                   <Grid
                     item
-                    sm={3}
+                    sm={4}
                     xs={12}
                     style={{
                       display: "flex",
@@ -372,19 +457,20 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                   >
                     <Grid container style={{ width: "100%" }}>
                       <Excel
-                        title={title}
                         buttonText="Export Data to Excel"
+                        title={title}
                         headCells={headcells}
                         recordsAfterSorting={recordsAfterAndSorting}
                         filterFields={filterFields}
+                        filter={filter}
                       />
                       <Print
                         title={title}
                         buttonText="Export Data to Excel"
                         headCells={headcells}
                         recordsAfterSorting={recordsAfterAndSorting}
-                        filter={filter}
                         filterFields={filterFields}
+                        filter={filter}
                       />
                       <MultipleSelectCheckmarks
                         headcells={headcells}
@@ -395,62 +481,41 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                       />
                     </Grid>{" "}
                   </Grid>
-                  <Grid
-                    item
-                    sm={3}
-                    xs={12}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <StaticDatePickerLandscape
-                      size="small"
-                      name="expDate"
-                      label="Expiry Before"
-                      value={filter}
-                      setValue={setFilter}
-                      style={{ top: 20 }}
-                    />
-                  </Grid>
                 </Grid>
               </Toolbar>{" "}
-              <TableContainer>
-                <TblContainer>
-                  <TblHead />
-                  {loading ? (
-                    <MuiSkeleton />
-                  ) : (
-                    <TableBody>
-                      {finalRecords.map((item, index) => (
-                        <TableRow>
-                          {headcells.map((headcell, i) => (
-                            <TableCell
-                              key={headcell.id}
-                              // sortDirection={orderBy === headcell.id ? order : false}
-                              style={{
-                                borderRight: "1px solid rgba(0,0,0,0.2)",
-                              }}
-                            >
-                              {(headcell.feild == "prodCode" || //dont repeat same
-                                headcell.feild == "prodName") && //prodName & prodCode
-                              index !== 0 //cant compare with prev element if 0
-                                ? item[headcell.feild] ==
-                                  finalRecords[index - 1][headcell.feild]
-                                  ? ""
-                                  : item[headcell.feild]
-                                : item[headcell.feild]}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  )}
-                </TblContainer>
-              </TableContainer>
+              <table className="table">
+                <TblHead />
+                {loading ? (
+                  <MuiSkeleton />
+                ) : (
+                  <TableBody>
+                    {recordsAfterPagingAndSorting().map((item) => (
+                      <TableRow>
+                        {headcells.map((headcell, i) => (
+                          <TableCell
+                            key={headcell.id}
+                            // sortDirection={orderBy === headcell.id ? order : false}
+                            style={{
+                              borderRight: "1px solid rgba(0,0,0,0.2)",
+                              wordBreak: "break-all",
+                            }}
+                          >
+                            {item[headcell.feild]}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
+              </table>
               <TblPagination />
             </section>
+            <Popup
+              title="Filter"
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+              size="md"
+            ></Popup>
 
             <Popup
               title="Filter"
@@ -476,28 +541,44 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                     value={filter}
                     setValue={setFilter}
                   />
-                </Grid>{" "}
+                </Grid>
+                <Grid item xs={6}>
+                  <SmartAutosuggest
+                    name1="partyName"
+                    code1="partyCode"
+                    label="Party"
+                    name2="acName"
+                    code2="acCode"
+                    value={filter}
+                    setValue={setFilter}
+                    options1={partyOptions}
+                    options2={common.accounts}
+                  />
+                </Grid>
                 <Grid item xs={6}>
                   <SmartAutosuggest
                     name1="prodName"
                     code1="prodCode"
+                    label="Product"
                     name2="prodName"
                     code2="prodCode"
-                    options1={[
-                      ...new Set(records.map((item) => item.prodName)),
-                    ]}
-                    options2={records}
-                    label="Product"
                     value={filter}
                     setValue={setFilter}
+                    options1={prodOptions}
+                    options2={common.products}
                   />
                 </Grid>
-                <Grid item xs={6}>
+
+                <Grid
+                  item
+                  xs={12}
+                  style={{ justifyContent: "flex-end", display: "flex" }}
+                >
                   <Controls.Button
                     text="Submit"
-                    onClick={(e) => {
-                      handleFilterSubmit(e);
-                      setRefresh(true);
+                    onClick={() => {
+                      search("");
+                      setLoading(true);
                       setFilterPopup(false);
                       setFilterIcon(false);
                     }}
@@ -514,7 +595,6 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
           </div>
         </div>
       </section>
-      \{" "}
     </>
   );
 }

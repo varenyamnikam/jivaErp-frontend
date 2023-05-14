@@ -31,8 +31,12 @@ import Excel from "../../../components/useExcel";
 import Print from "../../../components/print";
 import MultipleSelectCheckmarks from "../../../components/multiSelect";
 import Filter from "../../../components/filterButton";
-import CvForm from "./ObForm";
+import ObForm from "./ObForm";
 import DateCalc from "../../../components/dateCalc";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
+import FilterForm from "../generalFilterForm";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -57,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
     color: "goldenrod",
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
+  tableStyle: { borderRight: "1px solid rgba(0,0,0,0.2)" },
 }));
 const initialAccounts = {
   acCode: "",
@@ -98,7 +103,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
 
   const initialValues = {
     userCompanyCode: "",
-    vouNo: "X X X X",
+    vouNo: "",
     branchCode: "",
     docCode: "OB",
     finYear: "",
@@ -120,15 +125,17 @@ export default function AcMaster({ title = "Opening Balance" }) {
   };
 
   const headCells = [
-    { id: "Vou No", label: "Vou No", feild: "vouNo" },
-
-    { id: "Account", label: "Account", feild: "getName" },
-    { id: "Credit", label: "Credit", feild: "credit" },
-    { id: "Debit", label: "Debit", feild: "debit" },
-    { id: "Date", label: "Date", feild: "getDate" },
+    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
+    { id: "Account", label: "Account", feild: "acName" },
+    { id: "Date", label: "Date", feild: "vouDate" },
+    { id: "Debit", label: "Debit", feild: "debit", align: "right" },
+    { id: "Credit", label: "Credit", feild: "credit", align: "right" },
     { id: "Edit", label: "Edit", feild: "" },
   ];
-
+  const filterFields = [
+    { feild: "acName", label: "Party Name" },
+    { feild: "vouNo", label: "Voucher No" },
+  ];
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const useBatch = JSON.parse(
@@ -159,7 +166,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
   const [itemList, setItemList] = useState([initialValues]);
-  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([initialValues]);
   const [accounts, setAccounts] = useState([initialAccounts]);
   const [filter, setFilter] = useState(initialFilterValues);
@@ -182,49 +189,39 @@ export default function AcMaster({ title = "Opening Balance" }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values, records);
-  console.log("filter=>", filter);
-  console.log(Config.batch);
-  if ((records[0] && records[0].vouNo == "X X X X") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}`;
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .get(Config.accounting + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        if (response.data.mst_accounts !== 0) {
-          setAccounts(response.data.mst_accounts);
-        }
-        let temp = response.data.inv_voucher;
-        if (temp.length !== 0) {
-          temp = temp.map((item) => ({
-            ...item,
-            credit: Number(item.credit),
-            debit: Number(item.debit),
-            getName: getName(item.acCode, response.data.mst_accounts),
-            getDate: new Date(item.vouDate).toLocaleDateString(),
-          }));
-        }
-        setRecords(function () {
-          if (temp.length !== 0) {
-            return temp;
-          } else {
-            return [initialFilterValues];
-          }
-        });
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      });
+  const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
+  const url = Config.accounting + addQuery;
+  const handleErr = (err) => {
+    setNotify(NotifyMsg(4));
+    console.error(err);
+    loading && setLoading(false);
+  };
+
+  if (loading) {
+    const handleRes = (res) => {
+      // console.log(res.data);
+
+      if (res.data.mst_accounts !== 0) {
+        setAccounts(res.data.mst_accounts);
+      }
+      let temp = res.data.inv_voucher;
+      if (temp.length !== 0) {
+        temp = temp.map((item) => ({
+          ...item,
+          acName: getName(item.acCode, res.data.mst_accounts),
+          vouDate: roleService.date(item.vouDate),
+          debit: Math.abs(item.debit),
+          credit: Math.abs(item.credit),
+        }));
+        console.log(temp);
+        setRecords(temp.sort((a, b) => a.vouNo.localeCompare(b.vouNo)));
+      }
+      //filter fn only shows srNo:1 in the table ie
+      //table info
+
+      loading && setLoading(false);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
 
   function onDelete(item) {
@@ -298,16 +295,6 @@ export default function AcMaster({ title = "Opening Balance" }) {
       },
     });
   }
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
-  }
   function getName(code) {
     let name = "";
     accounts.map((item) => {
@@ -318,8 +305,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
   function edit(e, ite) {
     e.preventDefault();
     const arr = records.filter(
-      (item) =>
-        item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo !== "X X X X"
+      (item) => item.vouNo == ite.vouNo && item.srNo !== 1 && item.vouNo
     );
     setItemList(arr);
     setValues(ite);
@@ -327,57 +313,66 @@ export default function AcMaster({ title = "Opening Balance" }) {
   }
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title={title}
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                        <Grid
-                          item
-                          xs={8}
-                          sm={6}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          <Controls.Input
-                            label="Search"
-                            className={classes.searchInput}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                              endAdornment: filter.allFields && (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() => {
-                                      setFilter(initialFilterValues);
-                                      setFilterFn({
-                                        fn: (items) => {
-                                          return items;
-                                        },
-                                      });
-                                    }}
-                                    style={{ boxShadow: "none" }}
-                                  >
-                                    <ClearIcon />
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={filter.allFields}
-                            onChange={handleFilter}
-                          />
-                        </Grid>{" "}
-                        {/* <Grid
+              <Toolbar>
+                <Grid
+                  container
+                  style={{ display: "flex", flexGrow: 1 }}
+                  spacing={2}
+                >
+                  <Grid
+                    item
+                    xs={8}
+                    sm={6}
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <Controls.Input
+                      label="Search"
+                      className={classes.searchInput}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                        endAdornment: filter.allFields && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setFilter(initialFilterValues);
+                                setFilterFn(initialFilterFn);
+                              }}
+                              style={{ boxShadow: "none" }}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      value={filter.allFields}
+                      onChange={handleFilter}
+                    />
+                  </Grid>{" "}
+                  <Grid
+                    item
+                    sm={1}
+                    xs={4}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Filter setFilterPopup={setFilterPopup} />
+                  </Grid>
+                  {/* <Grid
                           item
                           sm={1}
                           xs={4}
@@ -398,118 +393,83 @@ export default function AcMaster({ title = "Opening Balance" }) {
                             initialFilterFn={initialFilterFn}
                           />
                         </Grid> */}
-                        <Grid
-                          item
-                          sm={4}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                            }}
-                          >
-                            <Excel
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headCells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <Print
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headcells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <MultipleSelectCheckmarks
-                              headcells={headcells}
-                              setheadcells={setheadcells}
-                              initialHeadCells={headCells}
-                              selected={selected}
-                              setSelected={setSelected}
-                            />
-                          </div>{" "}
-                        </Grid>
-                        <Grid
-                          item
-                          sm={2}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Controls.Button
-                            text="Add New"
-                            size="medium"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={(e) => {
-                              setButtonPopup(true);
-                              setValues({ ...initialValues, vouNo: "" });
-                              setItemList([initialValues]);
-                            }}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Toolbar>{" "}
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0] == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                <TableCell
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  {item.vouNo}
-                                </TableCell>
-                                <TableCell
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  {getName(item.acCode)}
-                                </TableCell>
-                                <TableCell
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  {item.credit}
-                                </TableCell>{" "}
-                                <TableCell
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  {item.debit}
-                                </TableCell>
-                                <TableCell
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  {new Date(item.vouDate).toLocaleDateString()}
-                                </TableCell>
-                                <TableCell
-                                  // sortDirection={orderBy === headcell.id ? order : false}
-                                  style={{
-                                    borderRight: "1px solid rgba(0,0,0,0.2)",
-                                  }}
-                                >
+                  <Grid
+                    item
+                    sm={3}
+                    xs={12}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                      }}
+                    >
+                      <Excel
+                        buttonText="Export Data to Excel"
+                        title={title}
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filterFields={filterFields}
+                        filter={filter}
+                      />
+                      <Print
+                        title={title}
+                        buttonText="Export Data to Excel"
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filterFields={filterFields}
+                        filter={filter}
+                      />
+                      <MultipleSelectCheckmarks
+                        headcells={headcells}
+                        setheadcells={setheadcells}
+                        initialHeadCells={headCells}
+                        selected={selected}
+                        setSelected={setSelected}
+                      />
+                    </div>{" "}
+                  </Grid>
+                  <Grid
+                    item
+                    sm={2}
+                    xs={12}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Controls.Button
+                      text="Add New"
+                      size="medium"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={(e) => {
+                        setButtonPopup(true);
+                        setValues({ ...initialValues, vouNo: "" });
+                        setItemList([initialValues]);
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Toolbar>{" "}
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {recordsAfterPagingAndSorting().map((item) => (
+                        <TableRow>
+                          {headcells.map((headcell) => (
+                            <TableCell className={classes.tableStyle}>
+                              {headcell.label !== "Edit" ? (
+                                item[headcell.feild]
+                              ) : (
+                                <>
                                   <Controls.LoadingActionButton
                                     value={values}
                                     color="primary"
@@ -519,73 +479,75 @@ export default function AcMaster({ title = "Opening Balance" }) {
                                   >
                                     <EditOutlinedIcon fontSize="small" />
                                   </Controls.LoadingActionButton>
-                                  <Controls.ActionButton
-                                    color="secondary"
-                                    onClick={(e) => {
-                                      e.preventDefault();
 
-                                      setConfirmDialog({
-                                        isOpen: true,
-                                        title:
-                                          "Are you sure to delete this record?",
-                                        subTitle:
-                                          "You can't undo this operation",
-                                        onConfirm: (e) => {
-                                          onDelete(item);
-                                          console.log("records:" + records);
-                                        },
-                                      });
+                                  <Controls.DeleteButton
+                                    handleConfirm={() => {
+                                      AuthHandler.canDelete()
+                                        ? onDelete(item)
+                                        : setNotify(NotifyMsg(8));
                                     }}
-                                  >
-                                    <CloseIcon fontSize="small" />
-                                  </Controls.ActionButton>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title={`${initialValues.docCode} form`}
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                    size="md"
-                  >
-                    {" "}
-                    <CvForm
-                      records={records}
-                      setRecords={setRecords}
-                      accounts={accounts}
-                      bankValues={values}
-                      setBankValues={setValues}
-                      itemList={itemList}
-                      setItemList={setItemList}
-                      initialValues={initialValues}
-                      notify={notify}
-                      setNotify={setNotify}
-                    />
-                  </Popup>
-
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  ></Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                                    setConfirmDialog={setConfirmDialog}
+                                  />
+                                </>
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}{" "}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+            <Popup
+              title={`${initialValues.docCode} form`}
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+              size="md"
+            >
+              {" "}
+              <ObForm
+                records={records}
+                setRecords={setRecords}
+                accounts={accounts}
+                bankValues={values}
+                setBankValues={setValues}
+                itemList={itemList}
+                setItemList={setItemList}
+                initialValues={initialValues}
+                notify={notify}
+                setNotify={setNotify}
+                setButtonPopup={setButtonPopup}
+              />
+            </Popup>
+            <Popup
+              title={`Filter form`}
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <FilterForm
+                filterIcon={filterIcon}
+                setFilterPopup={setFilterPopup}
+                setFilterIcon={setFilterIcon}
+                setFilter={setFilter}
+                filter={filter}
+                accounts={accounts}
+                setFilterFn={setFilterFn}
+                initialFilterValues={initialFilterValues}
+                setRefresh={setLoading}
+                values={values}
+              />
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

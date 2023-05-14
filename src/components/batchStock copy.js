@@ -62,11 +62,12 @@ const statusItems = [
   { id: "exp date", title: "exp date" },
 ];
 const initialBatch = [{ batchNo: "", qty: "" }];
+// records=[{ batchNo: "", qty: "" }]
+//formData={[batchNo]:sell}
 export default function Grouped(props) {
   // const { value, setValue, error = null, onChange, disabled, ...other } = props;
   const { values, setValues, batchList, setBatchlist, error = null } = props;
   const [popup, setPopup] = useState(false);
-  const [priority, setPriority] = useState("batch no");
   const [focus, setFocus] = useState(false);
   const [notify, setNotify] = useState({
     isOpen: false,
@@ -74,6 +75,8 @@ export default function Grouped(props) {
     type: "",
   });
   const [records, setRecords] = useState(batchList);
+  const [formData, setFormData] = useState({});
+
   const token = AuthHandler.getLoginToken();
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
@@ -159,7 +162,8 @@ export default function Grouped(props) {
         console.log(integrate(), arr, data);
         if (integrate()) {
           //!integrate
-          arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
+          console.log("hi", arr);
+          arr.length !== 0 && setRecords(arr);
         } else {
           //integrate
           console.log(batchList, records);
@@ -175,48 +179,85 @@ export default function Grouped(props) {
             });
           });
           console.log(arr);
-          arr.length == 0 ? setRecords(initialBatch) : setRecords(arr);
+          arr.length !== 0 && setRecords(arr);
           console.log(records, batchList, total, values.qty);
           // data = arr;
-          if (Number(total) !== Number(values.qty)) calcStock();
+          if (Number(total) !== Number(values.qty)) calcStock(arr);
         }
         if (y) {
           console.log(calcStock());
         }
+      })
+      .finally(() => {
+        convertRecordsToFormData();
       });
     return data;
   }
   function handleChange(e, i) {
-    const newArr = records;
+    // const newArr = records;
     // const newObj = { ...records[i], sell: e.target.value };
     // newArr[i] = newObj;
-    newArr.map((item, index) => {
-      if (index == i) {
-        newArr[i].sell = e.target.value;
-      }
+    // newArr.map((item, index) => {
+    //   if (index == i) {
+    //     newArr[i].sell = e.target.value;
+    //   }
+    // });
+    // console.log("hi", newArr);
+    // setRecords(newArr);
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    console.log("hi", newArr);
-    setRecords(newArr);
     console.log(saviour);
   }
-  function calcStock() {
-    console.log(records, batchList);
-    if (Number(values.qty) > 0 && Number(records[0].qty > 0)) {
+  console.log(formData);
+  function isFormDataEqualToRecords() {
+    let x = true;
+    records.map((item) => {
+      if (item.sell !== formData[item.batchNo]) x = false;
+    });
+    return x;
+  }
+  function convertFormDataToRecords() {
+    const updatedRecords = records.map((record) => ({
+      ...record,
+      sell: formData[record.batchNo] ?? "",
+    }));
+    setRecords(updatedRecords);
+  }
+  function convertRecordsToFormData(rcrds = records) {
+    console.log(rcrds);
+    const prevFormData = rcrds.reduce((acc, record) => {
+      acc[record.batchNo] = record.sell;
+      return acc;
+    }, {});
+    setFormData(prevFormData);
+    console.log(prevFormData);
+  }
+
+  useEffect(() => {
+    !isFormDataEqualToRecords() && convertFormDataToRecords();
+  }, [formData]);
+  function calcStock(recrds = records) {
+    //distribute values.qty among records[i].qty
+    console.log(recrds, batchList);
+    if (Number(values.qty) > 0 && Number(recrds[0].qty > 0)) {
       let final = Number(values.qty);
-      let newArr = records;
-      records.map((item, i) => {
+      let newArr = recrds;
+      recrds.map((item, i) => {
         if (final < item.qty && final !== 0) {
-          newArr[i] = { ...records[i], sell: final };
+          newArr[i] = { ...recrds[i], sell: final };
           final = 0;
         } else if (final !== 0) {
-          newArr[i] = { ...records[i], sell: item.qty };
+          newArr[i] = { ...recrds[i], sell: item.qty };
           final = final - Number(item.qty);
         } else if (final == 0) {
           newArr[i] = { ...newArr[i], sell: 0 };
         }
       });
       console.log(newArr);
-      setRecords([...newArr]);
+      setRecords(newArr);
+      convertRecordsToFormData(newArr);
       return newArr;
     } else {
       return null;
@@ -302,11 +343,11 @@ export default function Grouped(props) {
             onChange={(e) => {
               setValues({ ...values, qty: e.target.value });
             }}
-            onBlur={() => {
-              if (values.prodCode) {
-                getStock(true);
-              }
-            }}
+            // onBlur={() => {
+            //   if (values.prodCode) {
+            //     getStock(true);
+            //   }
+            // }}
           />
         </Grid>
         <Grid Item sm={6} xs={6}>
@@ -366,8 +407,8 @@ export default function Grouped(props) {
                               handleChange(e, i);
                               setFocus(i);
                             }}
-                            value={item.sell}
-                            ref={saviour[i]}
+                            value={formData[item.batchNo]}
+                            // ref={saviour[i]}
                           />
                         </TableCell>
                       </TableRow>

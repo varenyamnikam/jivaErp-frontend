@@ -100,10 +100,6 @@ function States(props) {
             ...value,
             stateCode: newValue.stateCode,
             stateName: newValue.stateName,
-            districtName: "",
-            districtCode: "",
-            talukaName: "",
-            talukaCode: "",
           });
 
           console.log("onchange" + newValue);

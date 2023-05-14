@@ -5,7 +5,7 @@ import ReuseMaster from "../reusableMaster";
 export default function QT() {
   const user = AuthHandler.getUser();
   const initialValues = {
-    vouNo: "X X X X",
+    vouNo: " ",
     branchCode: user.defaultBranchCode,
     docCode: "CN",
     finYear: user.defaultYearCode,

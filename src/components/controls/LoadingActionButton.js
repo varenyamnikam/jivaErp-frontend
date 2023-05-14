@@ -46,15 +46,18 @@ export default function ActionButton(props) {
   const { color, children, onClick, disabled, value, ...other } = props;
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (loading) setLoading(false);
-  }, [value]);
+  // useEffect(() => {
+  //   console.log(loading);
+  //   if (loading && values.vouNo.length !== 12) setLoading(false);
+  // }, [value]);
+  console.log(loading);
   return (
     <Button
       className={classes.root}
       onClick={(e) => {
-        onClick(e);
         setLoading(true);
+        onClick(e);
+        console.log("hi");
       }}
       size="small"
       disabled={disabled || false}

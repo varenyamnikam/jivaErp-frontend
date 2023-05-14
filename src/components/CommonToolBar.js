@@ -19,27 +19,21 @@ import MultipleSelectCheckmarks from "./multiSelect";
 import Filter from "./filterButton";
 import { Search } from "@material-ui/icons";
 export default function CmnToolBar({
+  title,
   filter,
   handleFilter,
-  filterIcon,
   setFilterPopup,
   setFilter,
   setFilterFn,
-  setFilterIcon,
   initialFilterValues,
-  setRefresh,
-  initialFilterFn,
   buttonText,
-  TblContainer,
-  TblHead,
-  TblPagination,
   headCells,
   recordsAfterSorting,
   headcells,
   setheadcells,
-  initialHeadCells,
   selected,
   setSelected,
+  filterFields,
   additionalComponent = () => <></>,
 }) {
   return (
@@ -93,16 +87,7 @@ export default function CmnToolBar({
               justifyContent: "center",
             }}
           >
-            <Filter
-              filterIcon={filterIcon}
-              setFilterPopup={setFilterPopup}
-              setFilter={setFilter}
-              setFilterFn={setFilterFn}
-              setFilterIcon={setFilterIcon}
-              initialFilterValues={initialFilterValues}
-              setRefresh={setRefresh}
-              initialFilterFn={initialFilterFn}
-            />
+            <Filter setFilterPopup={setFilterPopup} />
           </Grid>
           <Grid
             item
@@ -115,25 +100,25 @@ export default function CmnToolBar({
           >
             <Grid container style={{ width: "100%" }}>
               <Excel
-                buttonText={buttonText}
-                TblContainer={TblContainer}
-                TblHead={TblHead}
-                TblPagination={TblPagination}
-                headCells={headCells}
-                recordsAfterSorting={recordsAfterSorting}
-              />
-              <Print
-                buttonText={buttonText}
-                TblContainer={TblContainer}
-                TblHead={TblHead}
-                TblPagination={TblPagination}
+                buttonText="Export Data to Excel"
+                title={title}
                 headCells={headcells}
                 recordsAfterSorting={recordsAfterSorting}
+                filterFields={filterFields}
+                filter={filter}
+              />
+              <Print
+                title={title}
+                buttonText="Export Data to Excel"
+                headCells={headcells}
+                recordsAfterSorting={recordsAfterSorting}
+                filterFields={filterFields}
+                filter={filter}
               />
               <MultipleSelectCheckmarks
                 headcells={headcells}
                 setheadcells={setheadcells}
-                initialHeadCells={initialHeadCells}
+                initialHeadCells={headCells}
                 selected={selected}
                 setSelected={setSelected}
               />

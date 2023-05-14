@@ -8,8 +8,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Toolbar,
-  InputAdornment,
   TableContainer,
   Typography,
 } from "@material-ui/core";
@@ -38,6 +36,9 @@ import Outer from "../../components/outer";
 import ExportSwitch from "../../components/controls/Switch";
 import DocCodes from "../../components/docCodes";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
+import { NotifyMsg } from "../../components/notificationMsg";
+import * as roleService from "../../services/roleService";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -63,15 +64,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
 const initialValues = {
   srNo: "",
   acCode: "",
@@ -91,6 +83,7 @@ const initialAccount = {
 const cashAccGrpNo = "A1018";
 const bankAccGrpNo = "A1016";
 export default function BankBook({ docCode1, docCode2 }) {
+  const title = `${docCode1} BOOK`;
   let headCells = [
     { id: "Vou No", label: "Vou Date", feild: "vouDate" },
     { id: "Vou No", label: "Vou No", feild: "vouNo" },
@@ -105,6 +98,11 @@ export default function BankBook({ docCode1, docCode2 }) {
       feild: "currentBalance",
     },
   ];
+  const filterFields = [
+    { feild: "acName", label: "Account Name" },
+    { feild: "docCode", label: "Document Code" },
+  ];
+
   const isDayBook = docCode1 == "DAY";
 
   isDayBook && headCells.pop();
@@ -151,9 +149,8 @@ export default function BankBook({ docCode1, docCode2 }) {
   const [print, setPrint] = useState(false);
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
-  const [loading1, setLoading1] = useState(true);
   const [dayWise, setDayWise] = useState(false);
-  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([initialValues]);
   const [accounts, setAccounts] = useState([initialAccount]);
   const [notify, setNotify] = useState({
@@ -176,81 +173,74 @@ export default function BankBook({ docCode1, docCode2 }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log(Config.batch);
-  console.log(records[0], refresh);
-  if ((records[0] && records[0].srNo == "") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
+  console.log(records[0], loading);
+  if (loading) {
+    query = `
+    &startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
-    axios
-      .get(Config.bankReport + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((res) => {
-        let data = res.data.transactions;
-        let acc = res.data.mst_accounts;
-        let openingBalance = res.data.openingBalance;
-        console.log(res.data);
-        let arr = [];
-        let credit = 0;
-        let debit = 0;
-        if (filter.acCode != "" && !isDayBook)
-          arr[0] = {
+    const url = Config.bankReport + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.error(err);
+    };
+    const handleRes = (res) => {
+      let data = res.data.transactions;
+      let acc = res.data.mst_accounts;
+      let openingBalance = res.data.openingBalance;
+      console.log(res.data);
+      let arr = [];
+      let credit = 0;
+      let debit = 0;
+      if (filter.acCode != "" && !isDayBook)
+        arr[0] = {
+          ...openingObj,
+          currentBalance: openingBalance,
+        };
+      data = data.sort((a, b) => new Date(a.vouDate) - new Date(b.vouDate));
+      data.map((item, i) => {
+        credit += Number(item.debit);
+        debit += Number(item.credit);
+        if (
+          docCode1 != "DAY" &&
+          dayWise &&
+          i > 1 &&
+          data[i].vouDate &&
+          data[i].vouDate !== data[i - 1].vouDate
+        ) {
+          console.log(arr);
+          arr.push({
             ...openingObj,
-            currentBalance: openingBalance,
-          };
-        data = data.sort((a, b) => new Date(a.vouDate) - new Date(b.vouDate));
-        data.map((item, i) => {
-          credit += Number(item.debit);
-          debit += Number(item.credit);
-          if (
-            docCode1 != "DAY" &&
-            dayWise &&
-            i > 1 &&
-            data[i].vouDate &&
-            data[i].vouDate !== data[i - 1].vouDate
-          ) {
-            console.log(arr);
-            arr.push({
-              ...openingObj,
-              acName: "CLOSING",
-              currentBalance: arr[arr.length - 1].currentBalance,
-            });
-
-            arr.push({
-              ...openingObj,
-              currentBalance: arr[arr.length - 1].currentBalance,
-            });
-            console.log(arr);
-          }
+            acName: "CLOSING",
+            currentBalance: arr[arr.length - 1].currentBalance,
+          });
 
           arr.push({
-            ...item,
-            acName: getAcName(item.acCode, acc),
-            currentBalance: openingBalance + debit - credit,
-            credit: Number(item.debit),
-            debit: Number(item.credit),
-            narration: item.narration,
-            srNo: i + 2,
-            vouDate: new Date(item.vouDate).toLocaleDateString(),
-            docCode: item.docCode,
+            ...openingObj,
+            currentBalance: arr[arr.length - 1].currentBalance,
           });
+          console.log(arr);
+        }
+
+        arr.push({
+          ...item,
+          acName: getAcName(item.acCode, acc),
+          currentBalance: openingBalance + debit - credit,
+          credit: Number(item.debit),
+          debit: Number(item.credit),
+          narration: item.narration,
+          srNo: i + 2,
+          vouDate: roleService.date(item.vouDate),
+          docCode: item.docCode,
         });
-        if (acc.length != 0) setAccounts(acc);
-        console.log(arr);
-        setRecords(arr);
-        if (refresh) setRefresh(false);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-        console.log(error);
-      })
-      .finally(() => {});
+      });
+      if (acc.length != 0) setAccounts(acc);
+      console.log(arr);
+      setRecords(arr);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {
+      loading && setLoading(false);
+    });
   }
 
   console.log(accounts);
@@ -258,16 +248,6 @@ export default function BankBook({ docCode1, docCode2 }) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
     search(value);
-  }
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
   }
 
   console.log(filter);
@@ -363,7 +343,7 @@ export default function BankBook({ docCode1, docCode2 }) {
             checked={dayWise}
             onChange={() => {
               setDayWise((prev) => !prev);
-              setRefresh(true);
+              setLoading(true);
             }}
           />{" "}
           <Typography>DayWise</Typography>
@@ -375,168 +355,155 @@ export default function BankBook({ docCode1, docCode2 }) {
   }
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title={`${docCode1} BOOK`}
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <CmnToolBar
-                      filterIcon={filterIcon}
-                      filter={filter}
-                      handleFilter={handleFilter}
-                      setFilterPopup={setFilterPopup}
-                      setFilter={setFilter}
-                      setFilterFn={setFilterFn}
-                      setFilterIcon={setFilterIcon}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
-                      initialFilterFn={initialFilterFn}
-                      buttonText="Export Data to Excel"
-                      TblContainer={TblContainer}
-                      TblHead={TblHead}
-                      TblPagination={TblPagination}
-                      headCells={headcells}
-                      recordsAfterSorting={recordsAfterAndSorting}
-                      headcells={headcells}
-                      setheadcells={setheadcells}
-                      initialHeadCells={headCells}
-                      selected={selected}
-                      setSelected={setSelected}
-                      additionalComponent={Switch}
-                    />
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0] == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {display.map((item, i) => (
-                              <>
-                                <TableRow>
-                                  {headcells.map((headcell, i) => (
-                                    <TableCell
-                                      key={headcell.id}
-                                      // sortDirection={orderBy === headcell.id ? order : false}
-                                      style={{
-                                        borderRight:
-                                          "1px solid rgba(0,0,0,0.2)",
-                                      }}
-                                    >
-                                      {typeof item[headcell.feild] == "number"
-                                        ? Math.abs(
-                                            item[headcell.feild].toFixed(2)
-                                          )
-                                        : item[headcell.feild]}
-                                      {headcell.feild == "currentBalance"
-                                        ? item.currentBalance == 0
-                                          ? ""
-                                          : item.currentBalance < 0
-                                          ? "CR"
-                                          : "DR"
-                                        : ""}
-                                    </TableCell>
-                                  ))}
-                                </TableRow>
-                              </>
+              <CmnToolBar
+                filterIcon={filterIcon}
+                filter={filter}
+                handleFilter={handleFilter}
+                setFilterPopup={setFilterPopup}
+                setFilter={setFilter}
+                setFilterFn={setFilterFn}
+                initialFilterFn={initialFilterFn}
+                buttonText="Export Data to Excel"
+                headCells={headCells}
+                recordsAfterSorting={recordsAfterAndSorting}
+                headcells={headcells}
+                setheadcells={setheadcells}
+                initialHeadCells={headCells}
+                selected={selected}
+                setSelected={setSelected}
+                initialFilterValues={initialFilterValues}
+                filterFields={filterFields}
+                title={title}
+              />
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {display.map((item, i) => (
+                        <>
+                          <TableRow>
+                            {headcells.map((headcell, i) => (
+                              <TableCell
+                                key={headcell.id}
+                                // sortDirection={orderBy === headcell.id ? order : false}
+                                style={{
+                                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                {typeof item[headcell.feild] == "number"
+                                  ? Math.abs(item[headcell.feild].toFixed(2))
+                                  : item[headcell.feild]}
+                                {headcell.feild == "currentBalance"
+                                  ? item.currentBalance == 0
+                                    ? ""
+                                    : item.currentBalance < 0
+                                    ? " CR"
+                                    : " DR"
+                                  : ""}
+                              </TableCell>
                             ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sm={isDayBook ? 6 : 12}
-                        className={classes.input}
-                      >
-                        <SmartAutoSuggest
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                          name1="acName"
-                          code1="acCode"
-                          name2="acName"
-                          code2="acCode"
-                          label="Account"
-                          value={filter}
-                          setValue={setFilter}
-                          options1={accountOptions}
-                          options2={accounts}
-                        />
-                      </Grid>
-                      {isDayBook && (
-                        <Grid item xs={12} sm={6} className={classes.input}>
-                          <UnusedAutosuggest
-                            value={filter}
-                            setValue={setFilter}
-                            options={docCodeOptions}
-                            name="docCode"
-                            label="Doc code"
-                          />
-                        </Grid>
-                      )}
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setRefresh(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                            searchFilter();
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                          </TableRow>
+                        </>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={isDayBook ? 6 : 12}
+                  className={classes.input}
+                >
+                  <SmartAutoSuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name1="acName"
+                    code1="acCode"
+                    name2="acName"
+                    code2="acCode"
+                    label="Account"
+                    value={filter}
+                    setValue={setFilter}
+                    options1={accountOptions}
+                    options2={accounts}
+                  />
+                </Grid>
+                {isDayBook && (
+                  <Grid item xs={12} sm={6} className={classes.input}>
+                    <UnusedAutosuggest
+                      value={filter}
+                      setValue={setFilter}
+                      options={docCodeOptions}
+                      name="docCode"
+                      label="Doc code"
+                    />
+                  </Grid>
+                )}
+                <Grid item xs={6}>
+                  <Controls.Button
+                    text="Submit"
+                    onClick={() => {
+                      setLoading(true);
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                      searchFilter();
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

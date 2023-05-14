@@ -19,7 +19,6 @@ import PeopleOutlineTwoTone from "@material-ui/icons/PeopleOutlineTwoTone";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
 import { RestaurantRounded, Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
-import Usermasterpopup from "../../../components/userMasterPopup";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
 import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
@@ -27,8 +26,6 @@ import Notification from "../../../components/Notification";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import Popup from "../../../components/Popup";
 import { Grid } from "@material-ui/core";
-import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@material-ui/core/IconButton";
 import "../../../components/public.css";
@@ -444,7 +441,7 @@ export default function AccountMaster() {
                   <Controls.Input
                     name="acCode"
                     label="Code"
-                    value={values.acCode}
+                    value={values.acCode ? values.acCode : "N E W"}
                     onChange={handleInputChange}
                     disabled={true}
                   />

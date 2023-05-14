@@ -89,10 +89,6 @@ export default function Countries(props) {
             countryName: newValue.countryName,
             stateName: "",
             stateCode: "",
-            districtName: "",
-            districtCode: "",
-            talukaName: "",
-            talukaCode: "",
           });
           console.log(
             "onchange" + newValue,

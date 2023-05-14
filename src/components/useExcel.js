@@ -13,14 +13,7 @@ import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
-import TableFooter from "@mui/material/TableFooter";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import Pagination from "@mui/material/Pagination";
+import * as roleService from "../services/roleService";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import { AiFillFileExcel } from "react-icons/ai";
 import { reactLocalStorage } from "reactjs-localstorage";
@@ -71,14 +64,41 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Excel(props) {
   const {
-    TblContainer,
-    TblHead,
-    TblPagination,
+    title,
     recordsAfterSorting,
     headCells,
+    filter = {},
+    filterFields = [],
   } = props;
+  const user = JSON.parse(localStorage.getItem("user"));
   console.log(recordsAfterSorting());
   const classes = useStyles();
+
+  function produceDateString(date1, date2) {
+    //helper
+    // console.log(typeof date1, new Date(date1), isNaN(new Date(date1)), date2);
+    return `From ${roleService.date(date1)} to ${roleService.date(date2)}`;
+  }
+
+  function GetTimePeriod() {
+    if ("startDate" in filter && "endDate" in filter) {
+      return produceDateString(filter.startDate, filter.endDate);
+    } else return produceDateString(user.defaultYearStart, new Date());
+  }
+  function filterInfoText() {
+    const filterLabelArr = filterFields
+      .filter((item) => filter[item.feild])
+      .map((item) => ({
+        filterText: item.label,
+        filterValues: filter[item.feild],
+      }));
+    console.log(filterLabelArr);
+    if (filterLabelArr.length)
+      return filterLabelArr
+        .map((item) => `${item.filterText}: ${item.filterValues}`)
+        .join(", ");
+    else return "";
+  }
 
   let company = JSON.parse(reactLocalStorage.get("company"));
   return (
@@ -93,34 +113,80 @@ export default function Excel(props) {
       />
       <table className="table" id="print" style={{ display: "none" }}>
         <TableContainer id="print">
-          <TblContainer>
-            <TableHead>
-              <TableRow
-                style={{
-                  fontWeight: "600",
-                  fontSize: "25px",
-                  color: "blue",
-                  backgroundColor: "#e2e9f3",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                {" "}
+          <TableHead>
+            <TableRow
+              style={{
+                fontWeight: "600",
+                fontSize: "25px",
+                color: "blue",
+                backgroundColor: "#e2e9f3",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <TableCell>
                 <h1>{company.companyName}</h1>
-              </TableRow>
-              <TableRow
-                style={{
-                  fontWeight: "600",
-                  fontSize: "25px",
-                  color: "blue",
-                  backgroundColor: "#e2e9f3",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
+              </TableCell>
+            </TableRow>{" "}
+          </TableHead>
+
+          <TableRow
+            style={{
+              fontWeight: "600",
+              fontSize: "20px",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <TableCell>
+              <h1>{title}</h1>
+            </TableCell>{" "}
+          </TableRow>
+          <TableRow
+            style={{
+              fontWeight: "600",
+              fontSize: "20px",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <TableCell
+              item
+              sm={6}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {GetTimePeriod()}
+            </TableCell>{" "}
+          </TableRow>
+
+          {filterInfoText() && (
+            <TableRow>
+              <TableCell
+                item
+                sm={12}
+                style={{ display: "flex", alignItems: "center" }}
               >
-                filter: x y z
-              </TableRow>
-              <TableRow>
+                <typography> {filterInfoText()}</typography>
+              </TableCell>
+            </TableRow>
+          )}
+          <TableHead>
+            <TableRow>
+              {headCells.map((headCell) => (
+                <TableCell
+                  key={headCell.id}
+                  style={{
+                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                  }}
+                >
+                  {headCell.label == "Edit" ? "" : headCell.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {recordsAfterSorting().map((item) => (
+              <TableRow key={item._id}>
                 {headCells.map((headCell) => (
                   <TableCell
                     key={headCell.id}
@@ -128,28 +194,12 @@ export default function Excel(props) {
                       borderRight: "1px solid rgba(0,0,0,0.2)",
                     }}
                   >
-                    {headCell.label == "Edit" ? "" : headCell.label}
+                    {headCell.feild in item ? item[headCell.feild] : ""}
                   </TableCell>
-                ))}
+                ))}{" "}
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {recordsAfterSorting().map((item) => (
-                <TableRow key={item._id}>
-                  {headCells.map((headCell) => (
-                    <TableCell
-                      key={headCell.id}
-                      style={{
-                        borderRight: "1px solid rgba(0,0,0,0.2)",
-                      }}
-                    >
-                      {headCell.feild in item ? item[headCell.feild] : ""}
-                    </TableCell>
-                  ))}{" "}
-                </TableRow>
-              ))}
-            </TableBody>
-          </TblContainer>
+            ))}
+          </TableBody>
         </TableContainer>
       </table>
     </>

@@ -35,6 +35,9 @@ import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import CmnToolBar from "../../components/CommonToolBar";
 import Outer from "../../components/outer";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
+import { NotifyMsg } from "../../components/notificationMsg";
+import * as roleService from "../../services/roleService";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -84,7 +87,7 @@ const initialAccount = {
   acName: "",
 };
 
-export default function JvReport() {
+export default function JvReport({ title = "J.V Report" }) {
   const headCells = [
     { id: "Vou No", label: "Vou No", feild: "vouNo" },
     { id: "Vou Date", label: "Vou Date", feild: "vouDate" },
@@ -97,6 +100,8 @@ export default function JvReport() {
       feild: "narration",
     },
   ];
+  const filterFields = [{ feild: "docCode", label: "Document Code" }];
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = user.userCode;
   const userCompanyCode = user.userCompanyCode;
@@ -147,7 +152,7 @@ export default function JvReport() {
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
   const [loading1, setLoading1] = useState(true);
-  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([initialValues]);
   const [accounts, setAccounts] = useState([initialAccount]);
   const [docCodes, setDocCodes] = useState([]);
@@ -172,46 +177,42 @@ export default function JvReport() {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log(Config.batch);
-  if ((records[0] && records[0].vouNo == "") || refresh) {
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
+  if (loading) {
+    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
+    const url = Config.acReport + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.error(err);
+    };
 
-    axios
-      .patch(
-        Config.acReport + query,
-        {
-          docCodes: filter.docCode ? filter.docCode : initialDocCodes,
-        },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((res) => {
-        let data = res.data.acLedger;
-        let acc = res.data.mst_accounts;
-        let mountData = data.map((item) => ({
-          ...item,
-          acName: getAcName(item.acCode, acc),
-        }));
-        if (acc.length != 0) setAccounts(acc);
-        console.log(acc, mountData);
-        mountData.length != 0
-          ? setRecords(mountData)
-          : setRecords([{ ...initialValues, vouNo: "X X X X" }]);
-        if (refresh) setRefresh(false);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-        console.log(error);
-      })
-      .finally(() => {});
+    const handleRes = (res) => {
+      let data = res.data.acLedger;
+      let acc = res.data.mst_accounts;
+      let mountData = data.map((item) => ({
+        ...item,
+        vouDate: roleService.date(item.vouDate),
+        acName: getAcName(item.acCode, acc),
+      }));
+      if (acc.length != 0) setAccounts(acc);
+      console.log(acc, mountData);
+      mountData.length != 0
+        ? setRecords(mountData)
+        : setRecords([{ ...initialValues, vouNo: "X X X X" }]);
+    };
+
+    roleService.axiosPatch(
+      url,
+      {
+        docCodes: filter.docCode ? filter.docCode : initialDocCodes,
+      },
+      handleRes,
+      handleErr,
+      () => {
+        loading && setLoading(false);
+      }
+    );
   }
 
   console.log(accounts);
@@ -229,7 +230,11 @@ export default function JvReport() {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (
+            item.vouNo.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.acName.toLowerCase().includes(allfields.toLowerCase()) ||
+            item.narration.toLowerCase().includes(allfields.toLowerCase())
+          )
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -249,136 +254,126 @@ export default function JvReport() {
   const accountOptions = accounts.map((item) => item.acName);
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="J.V Report"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <CmnToolBar
-                      filterIcon={filterIcon}
-                      filter={filter}
-                      handleFilter={handleFilter}
-                      setFilterPopup={setFilterPopup}
-                      setFilter={setFilter}
-                      setFilterFn={setFilterFn}
-                      setFilterIcon={setFilterIcon}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
-                      initialFilterFn={initialFilterFn}
-                      buttonText="Export Data to Excel"
-                      TblContainer={TblContainer}
-                      TblHead={TblHead}
-                      TblPagination={TblPagination}
-                      headCells={headcells}
-                      recordsAfterSorting={recordsAfterAndSorting}
-                      headcells={headcells}
-                      setheadcells={setheadcells}
-                      initialHeadCells={headCells}
-                      selected={selected}
-                      setSelected={setSelected}
-                    />
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {records[0] == "X X X X" ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {headcell.id == "Debit" ||
-                                    headcell.id == "Credit"
-                                      ? Math.abs(Number(item[headcell.feild]))
-                                      : item[headcell.feild]}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} className={classes.input}>
-                        <UnusedAutosuggest
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                          name="docCode"
-                          label="Doc Code"
-                          value={filter}
-                          setValue={setFilter}
-                          options={initialDocCodes}
-                        />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setRefresh(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+              <CmnToolBar
+                filterIcon={filterIcon}
+                filter={filter}
+                handleFilter={handleFilter}
+                setFilterPopup={setFilterPopup}
+                setFilter={setFilter}
+                setFilterFn={setFilterFn}
+                initialFilterFn={initialFilterFn}
+                buttonText="Export Data to Excel"
+                headCells={headCells}
+                recordsAfterSorting={recordsAfterAndSorting}
+                headcells={headcells}
+                setheadcells={setheadcells}
+                initialHeadCells={headCells}
+                selected={selected}
+                setSelected={setSelected}
+                initialFilterValues={initialFilterValues}
+                filterFields={filterFields}
+                title={title}
+              />
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {recordsAfterPagingAndSorting().map((item) => (
+                        <TableRow>
+                          {headcells.map((headcell, i) => (
+                            <TableCell
+                              key={headcell.id}
+                              // sortDirection={orderBy === headcell.id ? order : false}
+                              style={{
+                                borderRight: "1px solid rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              {headcell.id == "Debit" || headcell.id == "Credit"
+                                ? Math.abs(Number(item[headcell.feild]))
+                                : item[headcell.feild]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12} className={classes.input}>
+                  <UnusedAutosuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name="docCode"
+                    label="Doc Code"
+                    value={filter}
+                    setValue={setFilter}
+                    options={initialDocCodes}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Controls.Button
+                    text="Submit"
+                    onClick={() => {
+                      setLoading(true);
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

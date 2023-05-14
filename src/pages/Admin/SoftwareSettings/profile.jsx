@@ -18,8 +18,6 @@ const Profile = ({setNotify}) => {
   const recentImageDataUrl = localStorage.getItem("recent-image");
   let company = JSON.parse(reactLocalStorage.get("company"));
   const userCode = localStorage.getItem("userCode");
-  const query = `?userCompanyCode=${company.companyCode}&userCode=${userCode}`;
-  const userCompanyName = reactLocalStorage.get("userCompanyName");
   const [values, setValues] = useState(company);
   const [errors, setErrors] = useState({});
   const [location, setLocation] = useState({
@@ -49,7 +47,7 @@ const Profile = ({setNotify}) => {
     setErrors({
       ...temp,
     });
-
+   console.log(temp)
     return Object.values(temp).every((x) => x == "") && hasRight;
   };
 
@@ -60,7 +58,7 @@ const Profile = ({setNotify}) => {
     setValues({ ...values, [name]: value });
     // !save && setSave(true);
   }
-  const url = Config.location;
+  const url = Config.register;
   
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
@@ -69,12 +67,16 @@ const Profile = ({setNotify}) => {
 
     if (loading) {
       const handleRes = (response) => {
+       let company= response.data.company
+       let location= response.data.location
+
         console.log(response.data);
-          setLocation(response.data);
-        setLoading(false);
+        if(location) setLocation(location);
+          if(company) {setValues(company);localStorage.setItem("company",JSON.stringify(company))}
       };
   
-      roleService.axiosGet(url, handleRes, handleErr, () => {});
+      roleService.axiosGet(url, handleRes, handleErr, () => {setLoading(false);
+      });
     }
   function getImage() {
     if (recentImageDataUrl) {
@@ -86,16 +88,15 @@ const Profile = ({setNotify}) => {
     if(validate()){
     setButtonLoading(true);
     setSave(false);
-
+console.log("hi")
     reactLocalStorage.set("company", JSON.stringify(values));
     const url = Config.register ;
       const handleRes = (response) => {
         setButtonLoading(false);
         setValues(values);
       };
-  
       roleService.axiosPatch(url,values, handleRes, handleErr, () => {});
-}
+    }
   };
   useEffect(() => {
     !save && setSave(true);

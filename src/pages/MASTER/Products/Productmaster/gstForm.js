@@ -53,7 +53,6 @@ export default function GstForm(props) {
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const validate = (fieldValues = input) => {
     let temp = { ...errors };
     function check(key) {
@@ -111,7 +110,7 @@ export default function GstForm(props) {
         if (item.prodCode == values.prodCode) x = false;
         return item.prodCode == values.prodCode ? newValue : item;
       });
-      if (!x) newrecord.push(newValue);
+      if (x) newrecord.push(newValue);
       console.log(newrecord, arr, newValue);
       setGstTable(updatedTable);
       const msg = {
@@ -144,7 +143,7 @@ export default function GstForm(props) {
   };
   function updateGstInDb(input, newrecord, msg) {
     const token = AuthHandler.getLoginToken();
-    if (values.prodCode == "X X X X") {
+    if (!values.prodCode) {
       console.log(input, newrecord);
       setValues(input);
       setRecords(newrecord);
@@ -153,8 +152,8 @@ export default function GstForm(props) {
       axios
         .patch(
           // Config.addUser,
-          Config.prodMaster + query,
-          { input },
+          Config.prodMaster,
+          input,
           {
             headers: {
               authorization: "Bearer" + token,

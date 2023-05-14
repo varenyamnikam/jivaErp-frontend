@@ -122,18 +122,13 @@ const initialFilterValues = {
   allFields: "",
 };
 export default function ProductMaster(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const newParty = JSON.parse(localStorage.getItem("newParty"));
   const openOnRender = newParty.partyOpen;
 
   const [records, setRecords] = useState([initialValues]);
-  const [unitNames, setUnitNames] = useState(["unable to get units"]);
-  const [prodCompany, setProdCompany] = useState([
-    "unable to get prodCompanyCode",
-  ]);
-  const [prodType, setProdTypes] = useState(["unable to get prodType"]);
+  const [unitNames, setUnitNames] = useState([]);
+  const [prodCompany, setProdCompany] = useState([]);
+  const [prodType, setProdTypes] = useState([]);
   const [filterPopup, setFilterPopup] = useState(false);
   const [filterIcon, setFilterIcon] = useState(true);
   const [filter, setFilter] = useState(initialFilterValues);
@@ -360,7 +355,9 @@ export default function ProductMaster(props) {
                               aria-label="Example"
                               onClick={() => {
                                 setValues(item);
-                                setPopup(true);
+                                AuthHandler.canEdit()
+                                  ? setPopup(true)
+                                  : setNotify(NotifyMsg(7));
                               }}
                             >
                               G.S.T

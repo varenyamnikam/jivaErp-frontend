@@ -13,7 +13,7 @@ import Calculate from "../../components/calculate";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import Popup from "../../components/Popup";
 import Percent from "../../components/percentageNew";
-import Grouped from "../../components/grouped";
+import Grouped from "../../components/batchStock";
 import Notification from "../../components/Notification";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Lottie from "react-lottie";
@@ -38,6 +38,8 @@ import {
   getVouNo,
 } from "@material-ui/core";
 import Validate from "./validateItem";
+import * as roleService from "../../services/roleService";
+import { NotifyMsg } from "../../components/notificationMsg";
 
 let initialHeadCells = [
   { id: "Product", label: "Product" },
@@ -89,7 +91,7 @@ export default function GeneralItemForm(props) {
     localStorage.getItem("adm_softwareSettings")
   );
   const company = JSON.parse(localStorage.getItem("company"));
-
+  const [batchList, setBatchlist] = useState(getBatchlist());
   const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(initialHeadCells);
   const [disabled1, setDisabled1] = useState(false);
@@ -113,9 +115,11 @@ export default function GeneralItemForm(props) {
     },
   });
   const [popup, setPopup] = useState(false);
-  const useBatch = JSON.parse(
+  let useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
+  if (input.docCode == "PR") useBatch = "NO";
+  //no batch while purchasing
   const pause = {
     loop: false,
     autoplay: true,
@@ -148,8 +152,9 @@ export default function GeneralItemForm(props) {
     "cess"
   );
   const token = AuthHandler.getLoginToken();
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const query = `&prodCode=${item.prodCode}&vouNo=${item.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
+  const url = Config.batch + query;
   console.log(totalBeforeDs(), totalAfterDs());
   if (totalBeforeDs()) {
     console.log(item, totalBeforeDs());
@@ -165,16 +170,7 @@ export default function GeneralItemForm(props) {
   const generalAccName = common.accounts
     .filter((item) => item.preFix == "G")
     .map((item) => item.acName);
-  function getDisable(vouNo) {
-    let x = true;
-    records.map((items) => {
-      if (items.vouNo == vouNo) {
-        console.log(items);
-        x = false;
-      }
-    });
-    return x;
-  }
+  const newNo = Number(itemList[itemList.length - 1].vouSrNo) + 1;
   let y = "";
   products.map((item) => {
     if (item.prodCode == item.prodCode) {
@@ -209,7 +205,21 @@ export default function GeneralItemForm(props) {
       return [{ batchNo: 0, qty: 0, sell: 0 }];
     }
   }
-  const [batchList, setBatchlist] = useState(getBatchlist());
+  function checkDuplicateItem() {
+    let isEditing = true;
+    let found = itemList.find((x) => x.prodCode == item.prodCode);
+    if (found) {
+      isEditing = item.vouSrNo == found.vouSrNo;
+
+      !isEditing &&
+        setNotify({
+          isOpen: true,
+          message: "Product Already exists",
+          type: "warning",
+        });
+    }
+    return !found || isEditing;
+  }
   let x = 0;
   itemList.map((item) => {
     x = Number(x) + Number(item.itemAmount);
@@ -301,59 +311,92 @@ export default function GeneralItemForm(props) {
         x = false;
       }
     });
-    const newNo = Number(itemList[itemList.length - 1].vouSrNo) + 1;
     console.log(item, itemList, newNo, x);
+    const promise = new Promise((resolve, reject) => {
+      let stockNotReduced = true;
+      const vouItem = {
+        ...item,
+        vouSrNo: newNo,
+        vouNo: input.vouNo,
+        batchList: batchList,
+      };
+      console.log(vouItem);
+      if (
+        (settings.saleStockUpdateUsing == "DC"
+          ? input.docCode == "DC"
+          : input.docCode == "SI") ||
+        input.docCode == "PR"
+      )
+        roleService.axiosPost(
+          url,
+          [vouItem], //array contains only 1 item
+          (res) => {
+            console.log(res.data);
+            const vouItem = res.data.itemList[0];
+            stockNotReduced = !vouItem.hasStockReduced;
+            if (stockNotReduced) {
+              resolve(stockNotReduced);
+            } else {
+              resolve(false);
+              useBatch == "Yes"
+                ? setNotify(NotifyMsg(9))
+                : setNotify({
+                    isOpen: true,
+                    message: `Not enough Stock for ${vouItem.prodName} available qty: ${vouItem.availableStock}`,
+                    type: "warning",
+                  });
 
-    if (x) {
-      setItemList([
-        ...itemList,
-        { ...item, vouSrNo: newNo, vouNo: input.vouNo, batchList: batchList },
-      ]);
-      console.log({ ...item, vouSrNo: newNo, vouNo: input.vouNo }, itemList);
-      // setItem({
-      //   ...initialVouItem,
-      //   vouNo: "",
-      // });
-    } else {
-      const updatedRecords = itemList.map((ite) =>
-        ite.vouSrNo == item.vouSrNo ? { ...item, batchList: batchList } : ite
-      );
-      setItemList(updatedRecords);
-      // setItem({
-      //   ...initialVouItem,
-      //   vouNo: "",
-      // });
-    }
-  };
-  function getStock(e) {
-    let y = true;
-    let Data = 0;
-
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${item.prodCode}&vouNo=${item.vouNo}&useBatch=${useBatch}`;
-    axios
-      .get(Config.batch + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
+              //notify insufficient stock
+            }
+          },
+          (err) => {
+            console.log(err);
+            setNotify(NotifyMsg(4));
+            reject(err);
+          }
+        );
+      else resolve(true);
+    });
+    promise
+      .then((stockNotReduced) => {
+        console.log(stockNotReduced);
+        if (stockNotReduced)
+          if (x) {
+            setItemList([
+              ...itemList,
+              {
+                ...item,
+                vouSrNo: newNo,
+                vouNo: input.vouNo,
+                batchList: batchList,
+              },
+            ]);
+            console.log(
+              { ...item, vouSrNo: newNo, vouNo: input.vouNo },
+              itemList
+            );
+            setItem({
+              ...initialVouItem,
+              vouNo: input.vouNo,
+            });
+          } else {
+            const updatedRecords = itemList.map((ite) =>
+              ite.vouSrNo == item.vouSrNo
+                ? { ...item, batchList: batchList }
+                : ite
+            );
+            setItemList(updatedRecords);
+            setItem({
+              ...initialVouItem,
+              vouNo: input.vouNo,
+            });
+          }
       })
       .catch((err) => {
         console.log(err);
-      })
-      .then((res) => {
-        Data = res.data.stock;
-        if (Data < Number(item.qty)) {
-          setNotify({
-            isOpen: true,
-            message: `not enough stock only ${Data} quantity available`,
-            type: "warning",
-          });
-          y = false;
-        }
-        if (y) handleItemSubmit(e);
-        console.log(Data, y);
+        setNotify(NotifyMsg(4));
       });
-    return y;
-  }
+  };
   console.log(item);
   const classesContainer = useStylesContainer();
   return (
@@ -448,6 +491,7 @@ export default function GeneralItemForm(props) {
           </Grid>
         )}
         {input.docCode !== "DC" &&
+          input.docCode !== "SO" &&
           input.docCode !== "SI" &&
           settings.userBatchNo == "Yes" && (
             <>
@@ -481,7 +525,9 @@ export default function GeneralItemForm(props) {
             />
           </Grid>
         )}
-        {(input.docCode == "DC" || input.docCode == "SI") &&
+        {(input.docCode == "DC" ||
+          input.docCode == "SI" ||
+          input.docCode == "SO") &&
         settings.userBatchNo == "Yes" ? (
           <Grid item xs={12} sm={2} className={classes.input}>
             <Grouped
@@ -649,14 +695,15 @@ export default function GeneralItemForm(props) {
               alignItems: "center",
             }}
             onClick={(e) => {
-              if (Validate(item, errors, setErrors, settings, input)) {
-                if (useBatch == "NO" && item.prodCode) {
-                  console.log("hi");
-                  getStock(e);
-                } else {
-                  console.log("hi else");
-                  handleItemSubmit(e);
-                }
+              console.log(
+                Validate(item, errors, setErrors, settings, input),
+                checkDuplicateItem()
+              );
+              if (
+                Validate(item, errors, setErrors, settings, input) &&
+                checkDuplicateItem()
+              ) {
+                handleItemSubmit(e);
               }
             }}
           />
@@ -709,7 +756,7 @@ export default function GeneralItemForm(props) {
                             setPopup(true);
                             if (useBatch == "Yes") {
                               setBatchlist(item.batchList);
-                              console.log("hii");
+                              console.log("hii", item);
                             }
                           }}
                         >
@@ -866,6 +913,7 @@ export default function GeneralItemForm(props) {
             class="buttonSave"
             onClick={() => {
               setTabValue("1");
+
               handleSubmit(input, itemList);
             }}
             style={{

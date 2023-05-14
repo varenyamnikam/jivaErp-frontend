@@ -15,6 +15,7 @@ export default function Validate(
   if (
     input.docCode !== "DC" &&
     input.docCode !== "SI" &&
+    input.docCode !== "SO" &&
     settings.userBatchNo == "Yes"
   ) {
     check("batchNo");

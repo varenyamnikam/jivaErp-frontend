@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Controls from "./Controls";
 import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
-export default function DeleteButton({ setConfirmDialog, handleConfirm }) {
+export default function DeleteButton({
+  setConfirmDialog = () => {},
+  handleConfirm = () => {},
+  directDelete = () => {},
+}) {
   return (
     <Controls.ActionButton
       color="secondary"
@@ -15,6 +19,7 @@ export default function DeleteButton({ setConfirmDialog, handleConfirm }) {
             e.preventDefault();
           },
         });
+        directDelete();
       }}
     >
       <DeleteIconOutline

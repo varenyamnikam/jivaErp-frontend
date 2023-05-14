@@ -6,7 +6,7 @@ export default function SI() {
 
   const user = AuthHandler.getUser();
   const initialValues = {
-    vouNo: "X X X X",
+    vouNo: "",
     branchCode: user.defaultBranchCode,
     docCode: "SI",
     finYear: user.defaultYearCode,

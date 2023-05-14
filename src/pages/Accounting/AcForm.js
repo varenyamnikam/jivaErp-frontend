@@ -24,6 +24,8 @@ import {
   InputAdornment,
   TableContainer,
 } from "@material-ui/core";
+import { NotifyMsg } from "../../components/notificationMsg";
+import * as roleService from "../../services/roleService";
 
 const useStyles = makeStyles((theme) => ({
   // bankValues: { minWidth: "200px", flexGrow: 1 },
@@ -52,13 +54,10 @@ export default function AcForm(props) {
   const [errors, setErrors] = useState(initialFilterValues);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
-      let newRecords = items.filter(
-        (item) => item.vouNo !== "X X X X" && item.srNo
-      );
+      let newRecords = items.filter((item) => item.vouNo && item.srNo);
       return newRecords;
     },
   });
-  const [popup, setPopup] = useState(false);
   const [otherValues, setOtherValues] = useState(initialValues);
 
   let headcells = [
@@ -67,10 +66,6 @@ export default function AcForm(props) {
     { id: "Credit", label: "Credit" },
     { id: "Edit", label: "Edit" },
   ];
-
-  const [headCells, setHeadCells] = useState(headcells);
-
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   console.log(initialValues);
   const {
     TblContainer,
@@ -79,20 +74,18 @@ export default function AcForm(props) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(itemList, headcells, filterFn);
+  console.log(accounts);
 
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  const banks = accounts.filter((item) => item.preFix == "G");
+  const banks = accounts.filter(
+    (item) =>
+      item.acGroupCode === (bankValues.docCode[0] == "B" ? "A1016" : "A1018")
+  );
   const others = accounts.filter((item) => item.preFix !== "G");
 
   const bankOptions = banks.map((item) => item.acName);
-
   const otherOptions = others.map((item) => item.acName);
-  console.log(bankValues, otherValues);
-  const token = AuthHandler.getLoginToken();
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  console.log(others, otherOptions);
+
   let y = true;
   records.map((item) => {
     if (item.vouNo == bankValues.vouNo) {
@@ -102,11 +95,7 @@ export default function AcForm(props) {
   });
 
   function getVouNo() {
-    if (y) {
-      return " NEW ";
-    } else {
-      return bankValues.vouNo;
-    }
+    return y ? " NEW " : bankValues.vouNo;
   }
 
   const handleChange = (e) => {
@@ -131,26 +120,29 @@ export default function AcForm(props) {
   //for new vouNo
   if (
     !bankValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setBankValues({
       ...bankValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   if (
     !otherValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setOtherValues({
       ...otherValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   console.log(errors);
   console.log(initialValues);
+  const query = `?&yearStart=${user.yearStartDate}`;
+
+  const url = Config.accounting + query;
 
   function finalCalc(obj) {
     let temp = 0;
@@ -172,18 +164,20 @@ export default function AcForm(props) {
   }
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (Validate(bankValues, errors, setErrors, true)) {
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.error(err);
+    };
+    if (Validate(bankValues, errors, setErrors, true, setNotify)) {
       setButtonPopup(false);
       let x = true;
       records.map((ite) => {
-        if (ite.vouNo == bankValues.vouNo) {
+        if (ite.vouNo == bankValues.vouNo && ite.vouNo) {
           console.log(ite, bankValues);
           x = false;
         }
       });
-      let Fil = itemList.filter(
-        (item) => item.vouNo !== "X X X X" && item.srNo
-      );
+      let Fil = itemList.filter((item) => item.vouNo && item.srNo);
       if (bankValues.docCode !== "JV") {
         console.log(Fil);
         Fil = Fil.map((item, i) => {
@@ -199,77 +193,47 @@ export default function AcForm(props) {
           return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
         });
       }
-      console.log(Fil);
-      const userCode = localStorage.getItem("userCode");
-      const userCompanyCode = localStorage.getItem("userCompanyCode");
       const user = JSON.parse(localStorage.getItem("user"));
-      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearStart=${user.yearStartDate}`;
       if (x) {
-        axios
-          .put(
-            Config.accounting + query,
-            {
-              obj: {
-                values: bankValues,
-                itemList: Fil,
-              },
-            },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log(response.data.itemList);
-            let max = response.data.max;
-            let Fil = response.data.itemList;
-            // Fil = Fil.filter((item) => item.srNo !== 1);
-            console.log(Fil, { ...bankValues, vouNo: max });
+        const handleRes = (res) => {
+          console.log(res.data.itemList);
+          let max = res.data.max;
+          let Fil = res.data.itemList;
+          // Fil = Fil.filter((item) => item.srNo !== 1);
+          console.log(Fil, { ...bankValues, vouNo: max });
 
-            setRecords([...records, ...Fil]);
-            setNotify({
-              isOpen: true,
-              message: "Voucher created  successfully",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+          setRecords([...records, ...Fil]);
+          setNotify(NotifyMsg(1));
+        };
+        roleService.axiosPut(
+          url,
+          {
+            values: bankValues,
+            itemList: Fil,
+          },
+          handleRes,
+          handleErr
+        );
       } else {
-        axios
-          .patch(
-            Config.accounting + query,
-            {
-              obj: {
-                values: bankValues,
-                itemList: Fil,
-              },
-            },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log(response.data.itemList);
-            let newArr = records.filter(
-              (item) => item.vouNo !== bankValues.vouNo
-            );
-            console.log(records, newArr, [...Fil, bankValues]);
-            // Fil = Fil.filter((item) => item.srNo !== 1);
-            setRecords([...newArr, ...Fil]);
-            setNotify({
-              isOpen: true,
-              message: "Voucher created  successfully",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        const handleRes = (res) => {
+          console.log(res.data.itemList);
+          let newArr = records.filter(
+            (item) => item.vouNo !== bankValues.vouNo
+          );
+          console.log(records, newArr, [...Fil, bankValues]);
+          // Fil = Fil.filter((item) => item.srNo !== 1);
+          setRecords([...newArr, ...Fil]);
+          setNotify(NotifyMsg(2));
+        };
+        roleService.axiosPatch(
+          url,
+          {
+            values: bankValues,
+            itemList: Fil,
+          },
+          handleRes,
+          handleErr
+        );
       }
       console.log(initialFilterValues);
       setErrors(initialFilterValues);
@@ -302,8 +266,10 @@ export default function AcForm(props) {
   const handleAdd = () => {
     console.log(otherValues);
 
-    console.log(Validate(otherValues, otherErrors, setOtherErrors, false));
-    if (Validate(otherValues, otherErrors, setOtherErrors, false)) {
+    console.log(
+      Validate(otherValues, otherErrors, setOtherErrors, false, setNotify)
+    );
+    if (Validate(otherValues, otherErrors, setOtherErrors, false, setNotify)) {
       let x = true;
       itemList.map((ite) => {
         if (ite.srNo == otherValues.srNo && ite.vouNo == otherValues.vouNo) {
@@ -402,7 +368,7 @@ export default function AcForm(props) {
                 code1="acCode"
                 name2="acName"
                 code2="acCode"
-                label="Bank"
+                label={bankValues.docCode[0] == "B" ? "Bank" : "Cash"}
                 value={bankValues}
                 setValue={setBankValues}
                 options1={bankOptions}
@@ -494,17 +460,13 @@ export default function AcForm(props) {
                       <TableCell>{Number(item.credit)}</TableCell>
 
                       <TableCell>
-                        <Controls.ActionButton
-                          color="primary"
-                          onClick={() => {
+                        <Controls.EditButton
+                          handleClick={() => {
                             setOtherValues(item);
                           }}
-                        >
-                          <EditOutlinedIcon fontSize="small" />
-                        </Controls.ActionButton>
-                        <Controls.ActionButton
-                          color="secondary"
-                          onClick={() => {
+                        />
+                        <Controls.DeleteButton
+                          directDelete={() => {
                             const arr = itemList.filter(
                               (ite) => ite.srNo !== item.srNo
                             );
@@ -514,9 +476,7 @@ export default function AcForm(props) {
                               setItemList([initialValues]);
                             }
                           }}
-                        >
-                          <DeleteIconOutline fontSize="small" />
-                        </Controls.ActionButton>
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

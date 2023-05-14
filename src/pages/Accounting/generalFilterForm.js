@@ -11,26 +11,29 @@ export default function FilterForm(props) {
     setFilterPopup,
     setFilterIcon,
     setFilterFn,
-    filter = [],
+    filter,
     setFilter,
-    label,
     accounts,
-    products,
-    voucherItems,
     setRefresh,
     initialFilterValues,
+    values,
   } = props;
-  const partyOptions = accounts
-    .filter((item) => item.preFix == "C")
-    .map((item) => {
-      return item.acName;
-    });
-  const prodOptions = products.map((item) => item.prodName);
+  const partyOptions = accounts.map((item) => {
+    return item.acName;
+  });
+  const banks = accounts.filter(
+    (item) =>
+      item.acGroupCode === (values.docCode[0] == "B" ? "A1016" : "A1018")
+  );
+  const others = accounts.filter((item) => item.preFix !== "G");
+
+  const bankOptions = banks.map((item) => item.acName);
+  const otherOptions = others.map((item) => item.acName);
+
   function searchFilter() {
     setFilterFn({
       fn: (items) => {
         let newRecords = items;
-
         function dynamicFilterFn(feild) {
           console.log(feild, filter, filter[feild]);
           newRecords.map((item) => {
@@ -41,21 +44,9 @@ export default function FilterForm(props) {
           );
           console.log(feild, newRecords);
         }
-        // filterFields.map((obj) => {
-        //   console.log("hi", filter[obj.feild], obj.feild);
-        //   if (filter[obj.feild] && obj.feild !== "prodName")
-        //     dynamicFilterFn(obj.feild);
-        // });
-
-        // if (filter.vouNo) {
-        //   console.log("vouNo", filter.vouNo);
-        //   newRecords = newRecords.filter((item) => {
-        //     if (item.vouNo == filter.vouNo) return item;
-        //   });
-        // }
+        filter.acCode && dynamicFilterFn("acCode");
         filter.vouNo && dynamicFilterFn("vouNo");
-        filter.partyCode && dynamicFilterFn("partyCode");
-        filter.manualNo && dynamicFilterFn("manualNo");
+
         if (filter.startDate && filter.endDate) {
           newRecords = newRecords.filter((item) => {
             if (
@@ -68,36 +59,17 @@ export default function FilterForm(props) {
           });
           console.log(newRecords);
         }
-        if (filter.prodCode) {
-          console.log(newRecords);
-          let vouNos = voucherItems
-            .filter((item) => item.prodCode == filter.prodCode)
-            .map((item) => item.vouNo);
-          console.log(vouNos, new Set(vouNos));
-          let arr = [...new Set(vouNos)];
-          console.log(arr);
-          let hi = [];
-          arr.map((i) => {
-            newRecords.map((item) => {
-              if (i == item.vouNo) {
-                hi.push(item);
-              }
-            });
-          });
-          newRecords = hi;
-          console.log(newRecords);
-        }
-        // if (filter.partyCode) {
-        //   newRecords = newRecords.filter((item) => {
-        //     if (item.partyCode == filter.partyCode) return item;
-        //   });
-        //   console.log(newRecords, filter.partyCode);
-        // }
-        // if (filter.manualNo) {
-        //   newRecords = newRecords.filter((item) => {
-        //     if (item.manualNo == filter.manualNo) return item;
-        //   });
-        // }
+        newRecords = newRecords.filter((item) => {
+          if (values.docCode !== "JV" && item.vouNo && !item.srNo) {
+            return item;
+          } else if (
+            values.docCode == "JV" &&
+            item.vouNo &&
+            Number(item.srNo) == 1
+          ) {
+            return item;
+          }
+        });
         console.log(newRecords);
 
         return newRecords;
@@ -105,7 +77,7 @@ export default function FilterForm(props) {
     });
     setRefresh(true);
   }
-
+  console.log(filter);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
@@ -138,25 +110,12 @@ export default function FilterForm(props) {
           }}
         />
       </Grid>
-      <Grid item xs={6} style={{ flexGrow: 1 }}>
-        <Controls.Input
-          name="manualNo"
-          label={"Manual No"}
-          value={filter.manualNo}
-          setValue={setFilter}
-          onChange={(e) => {
-            console.log("hi");
-            console.log(e.target);
-            setFilter({ ...filter, manualNo: e.target.value });
-          }}
-        />
-      </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid item xs={12} sm={6}>
         <SmartAutoSuggest
           style={{ width: "100%" }}
-          name1="partyName"
-          code1="partyCode"
-          label="Party"
+          name1="acName"
+          code1="acCode"
+          label="Bank"
           name2="acName"
           code2="acCode"
           value={filter}
@@ -165,19 +124,6 @@ export default function FilterForm(props) {
           options2={accounts}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <SmartAutoSuggest
-          name1="prodName"
-          code1="prodCode"
-          name2="prodName"
-          code2="prodCode"
-          label="Product"
-          value={filter}
-          setValue={setFilter}
-          options1={prodOptions}
-          options2={products}
-        />
-      </Grid>{" "}
       <Grid item xs={3}>
         <Controls.Button
           text="Reset"

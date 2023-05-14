@@ -11,8 +11,8 @@ import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@material-ui/icons/Add";
 import Calculate from "../../../components/calculate";
 import SmartAutoSuggest from "../../../components/smartAutoSuggest";
-import Divider from "@mui/material/Divider";
-import UnusedAutosuggest from "../../../components/unusedautosuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
+import * as roleService from "../../../services/roleService";
 
 import {
   Paper,
@@ -39,6 +39,8 @@ export default function AcForm(props) {
     bankValues,
     setBankValues,
     initialValues,
+    setButtonPopup,
+
     vouItems,
     notify,
     setNotify,
@@ -67,7 +69,7 @@ export default function AcForm(props) {
 
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
-      let newRecords = items.filter((item) => item.vouNo !== "X X X X");
+      let newRecords = items.filter((item) => item.vouNo);
       return newRecords;
     },
   });
@@ -81,19 +83,13 @@ export default function AcForm(props) {
     recordsAfterAndSorting,
   } = useTable(itemList, headcells, filterFn);
 
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
   const banks = accounts.filter((item) => item.preFix !== "G");
   const others = accounts.filter((item) => item.preFix !== "G");
 
   const bankOptions = accounts.map((item) => item.acName);
 
-  const otherOptions = others.map((item) => item.acName);
   console.log(bankValues, otherValues);
   const token = AuthHandler.getLoginToken();
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
   let y = true;
   records.map((item) => {
     if (item.vouNo == bankValues.vouNo) {
@@ -130,23 +126,23 @@ export default function AcForm(props) {
   const user = AuthHandler.getUser();
   if (
     !bankValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setBankValues({
       ...bankValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   if (
     !otherValues.vouNo.includes(
-      user.defaultBranchCode + initialValues.docCode + user.defaultYearCode
+      user.currentBranchCode + initialValues.docCode + user.defaultYearCode
     )
   )
     setOtherValues({
       ...otherValues,
       vouNo:
-        user.defaultBranchCode + initialValues.docCode + user.defaultYearCode,
+        user.currentBranchCode + initialValues.docCode + user.defaultYearCode,
     });
   console.log(headcells);
 
@@ -166,69 +162,61 @@ export default function AcForm(props) {
       },
     ];
 
-    const userCode = localStorage.getItem("userCode");
-    const userCompanyCode = localStorage.getItem("userCompanyCode");
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.error(err);
+    };
+
+    const query = `?&yearStart=${user.yearStartDate}`;
+    const url = Config.accounting + query;
     if (x) {
-      axios
-        .put(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          setRecords([...records, ...response.data.itemList]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const handleRes = (res) => {
+        console.log(res.data.itemList);
+        let max = res.data.max;
+        let Fil = res.data.itemList;
+        // Fil = Fil.filter((item) => item.srNo !== 1);
+        console.log(Fil, { ...bankValues, vouNo: max });
+
+        setRecords([...records, ...Fil]);
+        setNotify(NotifyMsg(1));
+      };
+      roleService.axiosPut(
+        url,
+        {
+          values: bankValues,
+          itemList: Fil,
+        },
+        handleRes,
+        handleErr,
+        () => {
+          setButtonPopup(false);
+        }
+      );
     } else {
-      axios
-        .patch(
-          Config.accounting + query,
-          {
-            obj: {
-              values: bankValues,
-              itemList: Fil,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data.itemList);
-          let newArr = records.filter(
-            (item) => item.vouNo !== bankValues.vouNo
-          );
-          console.log(Fil);
-          setRecords([...newArr, ...Fil]);
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const handleRes = (res) => {
+        console.log(res.data.itemList);
+        let newArr = records.filter((item) => item.vouNo !== bankValues.vouNo);
+        console.log(records, newArr, [...Fil, bankValues]);
+        // Fil = Fil.filter((item) => item.srNo !== 1);
+        const updatedArr = [...newArr, ...Fil].sort((a, b) =>
+          a.vouNo.localeCompare(b.vouNo)
+        );
+        console.log(updatedArr);
+        setRecords(updatedArr);
+        setNotify(NotifyMsg(2));
+      };
+      roleService.axiosPatch(
+        url,
+        {
+          values: bankValues,
+          itemList: Fil,
+        },
+        handleRes,
+        handleErr,
+        () => {
+          setButtonPopup(false);
+        }
+      );
     }
   };
 
@@ -250,7 +238,7 @@ export default function AcForm(props) {
               setValue={setBankValues}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={8}>
             <SmartAutoSuggest
               name1="acName"
               code1="acCode"
@@ -287,7 +275,7 @@ export default function AcForm(props) {
 
           <Grid
             item
-            sm={12}
+            sm={6}
             xs={12}
             style={{
               display: "flex",

@@ -159,8 +159,8 @@ class AuthHandler {
     return query;
   }
   static getUrl() {
-    return "http://localhost:3001/";
-    // return "http://147.182.252.2:3001"
+    // return "http://localhost:3001/";
+    return "http://147.182.252.2:3001";
   }
   static canAdd() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));

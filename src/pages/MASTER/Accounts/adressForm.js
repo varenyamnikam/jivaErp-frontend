@@ -2,18 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import { Grid } from "@material-ui/core";
 import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
 import Controls from "../../../components/controls/Controls";
-import AdvancedSelect from "../../../components/advancedBasicSelect";
-import ControllableStates from "../../../components/selectsearchstate";
-import PopupMarketingArea from "./popupTreeView";
-import Popup from "../../../components/Popup";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Countries from "../../../components/countrySelect";
 import States from "../../../components/statesSelect";
-import Districts from "../../../components/districtSelect";
-import Talukas from "../../../components/talukaSelect";
 import DoneIcon from "@mui/icons-material/Done";
 import * as roleService from "../../../services/roleService";
 import { useNavigate } from "react-router-dom";
@@ -171,7 +163,7 @@ export default function Adressform(props) {
           <Controls.Input
             name="acCode"
             label="Code"
-            value={acCode}
+            value={input.acCode ? input.acCode : "N E W"}
             onChange={() => {}}
             disabled={true}
           />

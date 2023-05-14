@@ -1,10 +1,6 @@
 import React from "react";
 import Headerpart from "./headerpart";
-import Footer from "./footer";
 import Sidemenu from "./sidemenu";
-import jQuery from "jquery";
-import StockMaster from "../pages/Stock/stockMaster";
-import Dashboard from "../pages/dashboard";
 function MainComponent({ page }) {
   console.log(page);
   return (

@@ -29,7 +29,6 @@ import ConfirmDialog from "../../../components/ConfirmDialog";
 import Popup from "../../../components/Popup";
 import { Grid } from "@material-ui/core";
 import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
 import UnusedAutosuggest from "../../../components/unusedautosuggest";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@material-ui/core/IconButton";
@@ -149,7 +148,6 @@ export default function ProdTypeMaster() {
     setNotify(NotifyMsg(4));
     console.error(err);
     loading && setLoading(false);
-
   };
 
   if (loading) {

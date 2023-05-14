@@ -6,7 +6,7 @@ export default function JV() {
   const user = AuthHandler.getUser();
   const initialValues = {
     userCompanyCode: "",
-    vouNo: "X X X X",
+    vouNo: "",
     branchCode: "",
     docCode: "JV",
     finYear: "",

@@ -13,7 +13,7 @@ import AnimatedSmartAutoSuggest from "../../components/animatedSmartAutoSuggest"
 import Calendar from "../../components/calendar";
 import NotSmartAutoSuggest from "../../components/haha";
 import Divider from "@mui/material/Divider";
-import ItemForm from "./itemDesign";
+import ItemForm from "./itemForm";
 import Popup from "../../components/Popup";
 import Percent from "../../components/percentageNew";
 import Lottie from "react-lottie";
@@ -30,7 +30,7 @@ import icon1 from "../../components/lotties/7031-colourfull-number-1.json";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import PersonIcon from "@mui/icons-material/Person";
-import CustomerForm from "./customerDesign";
+import PartyForm from "./partyForm";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 const cash = [
@@ -66,17 +66,9 @@ export default function GeneralForm(props) {
     setItemList,
     reference,
     handleSubmit,
+    errors,
+    setErrors,
   } = props;
-  const validateValues = {
-    ...initialValues,
-    vouNo: "",
-    docCode: "",
-    finYear: "",
-    branchCode: "",
-    vouDate: "",
-    partyBillDate: "",
-    partyChallanDate: "",
-  };
   const [input, setInput] = useState(values); //for customer form
   const [item, setItem] = useState(initialVouItem); //for product form
 
@@ -111,16 +103,12 @@ export default function GeneralForm(props) {
       <TabContext value={tabValue}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}></Box>
         <TabPanel value="1" sx={{ height: "90%" }}>
-          <CustomerForm
-            records={records}
+          <PartyForm
             values={values}
             initialValues={initialValues}
             accounts={accounts}
             adressData={adress}
             payTerms={payTerms}
-            products={products}
-            setCommon={setCommon}
-            initialVouItem={initialVouItem}
             common={common}
             itemList={itemList}
             setItemList={setItemList}
@@ -130,6 +118,8 @@ export default function GeneralForm(props) {
             setTabValue={setTabValue}
             getVouNo={getVouNo}
             setItem={setItem}
+            errors={errors}
+            setErrors={setErrors}
           />
         </TabPanel>{" "}
         <TabPanel value="2" style={{ paddingBottom: "10px" }}>

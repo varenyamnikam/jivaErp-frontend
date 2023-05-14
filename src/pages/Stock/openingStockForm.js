@@ -9,6 +9,8 @@ import { useForm, Form } from "../../components/useForm";
 import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
+import { NotifyMsg } from "../../components/notificationMsg";
+
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -32,9 +34,10 @@ export default function GeneralForm(props) {
     records,
     values,
     initialFilterValues,
-    adress,
+    setNotify,
     products,
     handleSubmit,
+    initialValues,
   } = props;
   const [input, setInput] = useState(values);
   const [errors, setErrors] = useState(initialFilterValues);
@@ -59,8 +62,13 @@ export default function GeneralForm(props) {
     setErrors({
       ...temp,
     });
+    const entryExists = records.find((item) => item.refNo == fieldValues.refNo);
+    const hasRight = entryExists ? AuthHandler.canEdit() : AuthHandler.canAdd();
+    if (!hasRight)
+      entryExists ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
-    if (fieldValues == input) return Object.values(temp).every((x) => x == "");
+    if (fieldValues == input)
+      return Object.values(temp).every((x) => x == "") && hasRight;
   };
   console.log(input, prodOptions);
   const classes = useStyles();
@@ -130,6 +138,10 @@ export default function GeneralForm(props) {
             options={["AJ", "OP"]}
             disabled={getVouNo() !== " NEW "}
             error={errors.refType}
+            callback={(value) => {
+              console.log("hi");
+              setInput({ ...initialValues, refType: value });
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={3} className={classes.input}>

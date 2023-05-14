@@ -112,9 +112,57 @@ const TreeNode = ({ node }) => {
               <AccountBalanceIcon fontSize="small" />
             ) : node.screenName == "Report" ? (
               <ListAltIcon fontSize="small" />
+            ) : node.screenName == "Purchase Report" ? (
+              <ShoppingCartIcon
+                fontSize="small"
+                style={{
+                  border: "1px solid black",
+                  borderRadius: "4px",
+                  padding: "4px",
+                  display: "inline-block",
+                  borderColor: "white",
+                }}
+              />
+            ) : node.screenName == "Sale Report" ? (
+              <CurrencyRupeeIcon
+                fontSize="small"
+                style={{
+                  border: "1px solid black",
+                  borderRadius: "4px",
+                  padding: "4px",
+                  display: "inline-block",
+                  borderColor: "white",
+                }}
+              />
+            ) : node.screenName == "Accounting Report" ? (
+              <AccountBalanceIcon
+                fontSize="small"
+                style={{
+                  border: "1px solid black",
+                  borderRadius: "4px",
+                  padding: "4px",
+                  display: "inline-block",
+                  borderColor: "white",
+                }}
+              />
+            ) : node.screenName == "Inventory Report" ? (
+              <FontAwesomeIcon
+                icon="fas fa-cubes"
+                fontSize="small"
+                style={{
+                  border: "1px solid black",
+                  borderRadius: "4px",
+                  padding: "2px",
+                  display: "inline-block",
+                  borderColor: "white",
+                }}
+              />
+            ) : node.screenName == "Inventory Transaction" ? (
+              <FontAwesomeIcon icon="fas fa-exchange-alt" />
             ) : (
               ""
             )}
+            {/*<i class="fa fa-exchange" aria-hidden="true"></i> */}
             <span className="glow" style={{ marginLeft: "10px" }}>
               {node.screenName}
             </span>

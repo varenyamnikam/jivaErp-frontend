@@ -1,4 +1,12 @@
-export default function Validate(fieldValues, errors, setErrors, flag) {
+import AuthHandler from "../../Utils/AuthHandler";
+import { NotifyMsg } from "../../components/notificationMsg";
+export default function Validate(
+  fieldValues,
+  errors,
+  setErrors,
+  flag,
+  setNotify
+) {
   console.log(fieldValues);
   let temp = { ...errors };
   function check(key) {
@@ -60,6 +68,11 @@ export default function Validate(fieldValues, errors, setErrors, flag) {
   });
   delete temp.startDate;
   delete temp.endDate;
+  const hasRight = fieldValues.acCode
+    ? AuthHandler.canEdit()
+    : AuthHandler.canAdd();
+  if (!hasRight)
+    fieldValues.acCode ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 
-  return Object.values(temp).every((x) => x == "");
+  return Object.values(temp).every((x) => x == "") && hasRight;
 }

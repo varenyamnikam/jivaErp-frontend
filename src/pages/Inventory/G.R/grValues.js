@@ -3,7 +3,7 @@ import AuthHandler from "../../../Utils/AuthHandler";
 export default function DcValues() {
   const user = AuthHandler.getUser();
   const initialValues = {
-    vouNo: "X X X X",
+    vouNo: " ",
     branchCode: user.defaultBranchCode,
     docCode: "GR",
     finYear: user.defaultYearCode,

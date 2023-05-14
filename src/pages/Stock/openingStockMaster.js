@@ -15,7 +15,7 @@ import {
 import useTable from "../../components/useTable";
 import Controls from "../../components/controls/Controls";
 import PeopleOutlineTwoToneIcon from "@material-ui/icons/PeopleOutlineTwoTone";
-import { Edit, RestaurantRounded, Search } from "@material-ui/icons";
+import { RestaurantRounded, Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
@@ -27,17 +27,16 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
+import StockForm from "./openingStockForm";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
 import Filter from "../../components/filterButton";
-import AcForm from "./AcForm";
-import PrintAcc from "../../components/prinAcc";
-import { getTime } from "date-fns";
-import DateCalc from "../../components/dateCalc";
-import { NotifyMsg } from "../../components/notificationMsg";
 import * as roleService from "../../services/roleService";
-import FilterForm from "./generalFilterForm";
+import { NotifyMsg } from "../../components/notificationMsg";
+import SmartAutoSuggest from "../../components/smartAutoSuggest";
+import StaticDatePickerLandscape from "../../components/calendarLandscape";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -62,76 +61,70 @@ const useStyles = makeStyles((theme) => ({
     color: "goldenrod",
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
-  tableStyle: { borderRight: "1px solid rgba(0,0,0,0.2)" },
 }));
-const initialAccounts = {
-  acCode: "",
-  acc: "",
-  preFix: "",
-  acGroupCode: "",
-  acGroupName: "",
-  acType: "",
-  acName: "",
-  fatherName: "",
-  propritorName: "",
-  tradeName: "",
-  creditDays: "",
-  creditAmount: "",
-  panNo: "",
-  aadharNo: "",
-  gstNo: "",
-  seedLicenNo: "",
-  bankName: "",
-  ifscCode: "",
-  bankAcNo: "",
-  acRegMob: "",
-  mktArea: "",
-  mktAreaCode: "",
-  parentAreaCode: "",
-  prdAreaCode: "",
-  acStatus: "",
+function getD() {
+  return new Date(user.defaultYearStart);
+}
+const user = JSON.parse(localStorage.getItem("user"));
+const initialValues = {
+  userCompanyCode: "",
+  prodCode: "",
+  prodName: "",
+  batchNo: "",
+  inwardQty: "",
+  outwardQty: "",
+  rate: "",
+  refType: "",
+  refNo: "",
+  vouDate: new Date(),
+  entryBy: "",
+  entryOn: "",
+  expDate: new Date(),
+};
+const initialProducts = {
+  prodCode: "",
+  barcode: "",
+  itemType: "",
+  prodCompany: "",
+  prodName: "",
+  prodDesc: "",
+  UOM: "",
+  MRP: "",
+  HSNNo: "",
+  reorderLevel: "",
+  maintainStock: "",
+  useBatchNo: "",
+  prodStatus: "",
   userCompanyCode: "",
 };
-export default function AcMaster(props) {
-  const { title, initialValues } = props;
-  const user = JSON.parse(localStorage.getItem("user"));
-  const { getD } = DateCalc(user);
-  initialValues.narration = "";
-  console.log(initialValues);
-
+export default function StockMaster({ title = "Opening Stock" }) {
   const headCells = [
-    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
-    { id: "Account", label: "Account", feild: "acName" },
-    { id: "Date", label: "Date", feild: "vouDate" },
-    { id: "Debit", label: "Debit", feild: "debit", align: "right" },
-    { id: "Credit", label: "Credit", feild: "credit", align: "right" },
+    { id: "VOUCHER NO", label: "VOUCHER NO", feild: "refNo" },
+    { id: "Product", label: "Product", feild: "prodCode" },
+    { id: "DATE", label: "DATE", feild: "getDate" },
     { id: "Edit", label: "Edit", feild: "" },
   ];
   const filterFields = [
-    { feild: "acName", label: "Party Name" },
+    { feild: "prodName", label: "Product Name" },
     { feild: "vouNo", label: "Voucher No" },
   ];
+
+  const userCode = localStorage.getItem("userCode");
+  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const useBatch = JSON.parse(
+    localStorage.getItem("adm_softwareSettings")
+  ).userBatchNo;
+  let query = `&date=${new Date()}&useBatch=${useBatch}`;
   const initialFilterValues = {
     ...initialValues,
-    vouNo: "",
     allFields: "",
     startDate: getD(),
     endDate: new Date(),
-    vouDate: "",
-    docCode: "",
   };
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (initialValues.docCode !== "JV" && item.vouNo && !item.srNo) {
-          return item;
-        } else if (
-          initialValues.docCode == "JV" &&
-          item.vouNo &&
-          Number(item.srNo) == 1
-        ) {
-          return item;
-        }
+        if (item.refNo !== "") return item;
       });
       console.log(newRecords);
       return newRecords;
@@ -141,17 +134,14 @@ export default function AcMaster(props) {
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(false);
   const [filterPopup, setFilterPopup] = useState(false);
-  const [filterIcon, setFilterIcon] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [print, setPrint] = useState(false);
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
-  const [itemList, setItemList] = useState([initialValues]);
-  const [refresh, setRefresh] = useState(false);
   const [records, setRecords] = useState([initialValues]);
-  const [accounts, setAccounts] = useState([initialAccounts]);
   const [filter, setFilter] = useState(initialFilterValues);
-  const [loading, setLoading] = useState(true);
-
+  const [products, setProducts] = useState([initialProducts]);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -171,12 +161,13 @@ export default function AcMaster(props) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values, recordsAfterAndSorting());
+  console.log(values, recordsAfterAndSorting);
   console.log("filter=>", filter);
   console.log(Config.batch);
-  const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
-  const url = Config.accounting + addQuery;
-  console.log(url);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  query = `&prodCode=0&useBatch=idk&vouN=${values.refNo}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
+  const url = Config.batch + query;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);
@@ -185,26 +176,28 @@ export default function AcMaster(props) {
 
   if (loading) {
     const handleRes = (res) => {
-      // console.log(res.data);
-
-      if (res.data.mst_accounts !== 0) {
-        setAccounts(res.data.mst_accounts);
+      console.log(res.data);
+      if (res.data.raw.length !== 0) {
+        let arr = res.data.raw.map((item) => {
+          return {
+            ...item,
+            getDate: roleService.date(item.vouDate),
+          };
+        });
+        console.log(arr);
+        setRecords(arr);
+      } else {
+        setRecords([
+          {
+            ...initialValues,
+            getDate: null,
+          },
+        ]);
       }
-      let temp = res.data.inv_voucher;
-      if (temp.length !== 0) {
-        temp = temp.map((item) => ({
-          ...item,
-          acName: getName(item.acCode, res.data.mst_accounts),
-          vouDate: roleService.date(item.vouDate),
-          debit: Math.abs(item.debit),
-          credit: Math.abs(item.credit),
-        }));
-        console.log(temp);
-        setRecords(temp);
-      }
-      //filter fn only shows srNo:1 in the table ie
-      //table info
 
+      if (res.data.prod.length !== 0) {
+        setProducts(res.data.prod);
+      }
       loading && setLoading(false);
     };
     roleService.axiosGet(url, handleRes, handleErr, () => {});
@@ -212,15 +205,15 @@ export default function AcMaster(props) {
 
   function onDelete(item) {
     // roleService.deleteBranch(item);
+
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
     const handleRes = (res) => {
-      setNotify(NotifyMsg(3));
       let newRecord = [];
       newRecord = records.filter((record) => {
-        return record.vouNo !== item.vouNo;
+        return record.refNo !== item.refNo;
       });
       if (newRecord.length == 0) {
         setRecords([initialFilterValues]);
@@ -231,13 +224,12 @@ export default function AcMaster(props) {
     roleService.axiosDelete(url, item, handleRes, handleErr);
   }
 
+  console.log(products);
   function handleFilter(e) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
     search(value);
   }
-
-  console.log(filter.allFields);
   function search(allfields) {
     console.log(allfields);
     setFilterFn({
@@ -245,7 +237,7 @@ export default function AcMaster(props) {
         let newRecords = items;
         newRecords = items.filter((item) => {
           console.log(item, allfields);
-          if (item.vouNo.toLowerCase().includes(allfields.toLowerCase()))
+          if (item.refNo.toLowerCase().includes(allfields.toLowerCase()))
             return item;
           // item.talukaName == filter.allfields ||
           // item.branchName == filter.allfields
@@ -255,22 +247,81 @@ export default function AcMaster(props) {
       },
     });
   }
-  function getName(code, arr) {
-    let name = arr.find((item) => item.acCode == code);
-    name = name ? name.acName : "";
-    return name;
-  }
-  function edit(e, ite) {
-    e.preventDefault();
-    const arr = records.filter((item) => item.vouNo == ite.vouNo && item.vouNo);
-    //filter fn  shows everything except srNo:1 in the grid ie
-    //grid info (in the form)
 
-    setItemList(arr);
-    setValues(ite);
-    setButtonPopup(true);
+  const handleSubmit = (input) => {
+    let x = true;
+    records.map((item) => {
+      if (item.refNo == input.refNo) {
+        x = false;
+      }
+    });
+
+    const token = AuthHandler.getLoginToken();
+    setButtonPopup(false);
+    if (x) {
+      const handleRes = (response) => {
+        const res = response.data.values;
+        console.log(response.data);
+        setRecords([
+          ...records,
+          {
+            ...res,
+            getDate: roleService.date(res.vouDate),
+          },
+        ]);
+        setNotify(NotifyMsg(1));
+      };
+
+      roleService.axiosPut(url, input, handleRes, handleErr);
+    } else {
+      const handleRes = (response) => {
+        const res = response.data.values;
+        const updatedRecords = records.map((item) => {
+          if (item.refNo === res.refNo) {
+            return {
+              ...item,
+              ...res,
+              getDate: roleService.date(res.vouDate),
+            };
+          } else return item;
+        });
+        setRecords(updatedRecords);
+        setNotify(NotifyMsg(2));
+      };
+      roleService.axiosPatch(url, input, handleRes, handleErr);
+    }
+  };
+  function handleFilterSubmit() {
+    console.log(filter);
+    setFilterFn({
+      fn: (items) => {
+        let newRecords = items;
+        if (filter.startDate && filter.endDate) {
+          newRecords = newRecords.filter((item) => {
+            console.log(new Date(item.vouDate).setUTCHours(0, 0, 0, 0));
+            if (
+              new Date(item.vouDate).setUTCHours(0, 0, 0, 0) >=
+                new Date(filter.startDate).setUTCHours(0, 0, 0, 0) &&
+              new Date(item.vouDate).setUTCHours(0, 0, 0, 0) <=
+                new Date(filter.endDate).setUTCHours(0, 0, 0, 0)
+            )
+              return item;
+          });
+          console.log(newRecords);
+        }
+        if (filter.prodCode) {
+          newRecords = newRecords.filter(
+            (item) => item.prodCode == filter.prodCode
+          );
+          console.log(newRecords, filter.prodCode);
+        }
+        return newRecords;
+      },
+    });
+    // setLoading(true);
   }
-  console.log(headcells);
+  const prodOptions = products.map((item) => item.prodName);
+  console.log(records);
   return (
     <>
       <PageHeader
@@ -282,10 +333,10 @@ export default function AcMaster(props) {
           <div className="card-body">
             <section className="content">
               <Toolbar>
-                <Grid container spacing={2}>
+                <Grid container style={{ display: "flex", flexGrow: 1 }}>
                   <Grid
                     item
-                    xs={12}
+                    xs={8}
                     sm={6}
                     style={{ display: "flex", alignItems: "center" }}
                   >
@@ -303,7 +354,11 @@ export default function AcMaster(props) {
                             <IconButton
                               onClick={() => {
                                 setFilter(initialFilterValues);
-                                setFilterFn(initialFilterFn);
+                                setFilterFn({
+                                  fn: (items) => {
+                                    return items;
+                                  },
+                                });
                               }}
                               style={{ boxShadow: "none" }}
                             >
@@ -326,22 +381,24 @@ export default function AcMaster(props) {
                       justifyContent: "center",
                     }}
                   >
-                    <Filter setFilterPopup={setFilterPopup} />
+                    <Filter
+                      setFilterPopup={setFilterPopup}
+                      setFilter={setFilter}
+                      setFilterFn={setFilterFn}
+                      initialFilterValues={initialFilterValues}
+                      initialFilterFn={initialFilterFn}
+                    />
                   </Grid>
                   <Grid
                     item
                     sm={3}
-                    xs={8}
+                    xs={12}
                     style={{
                       display: "flex",
                       justifyContent: "center",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                      }}
-                    >
+                    <Grid container style={{ width: "100%" }}>
                       <Excel
                         buttonText="Export Data to Excel"
                         title={title}
@@ -365,7 +422,7 @@ export default function AcMaster(props) {
                         selected={selected}
                         setSelected={setSelected}
                       />
-                    </div>{" "}
+                    </Grid>{" "}
                   </Grid>
                   <Grid
                     item
@@ -384,7 +441,6 @@ export default function AcMaster(props) {
                       onClick={(e) => {
                         setButtonPopup(true);
                         setValues(initialValues);
-                        setItemList([initialValues]);
                       }}
                     />
                   </Grid>
@@ -399,22 +455,22 @@ export default function AcMaster(props) {
                     <TableBody>
                       {recordsAfterPagingAndSorting().map((item) => (
                         <TableRow>
-                          {headcells.map((headcell) => (
-                            <TableCell className={classes.tableStyle}>
-                              {headcell.label !== "Edit" ? (
-                                item[headcell.feild]
-                              ) : (
+                          {headcells.map((headcell, i) => (
+                            <TableCell
+                              key={headcell.id}
+                              // sortDirection={orderBy === headcell.id ? order : false}
+                              style={{
+                                borderRight: "1px solid rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              {headcell.label == "Edit" ? (
                                 <>
-                                  <Controls.LoadingActionButton
-                                    value={values}
-                                    color="primary"
-                                    onClick={(e) => {
-                                      edit(e, item);
+                                  <Controls.EditButton
+                                    handleClick={() => {
+                                      setValues(item);
+                                      setButtonPopup(true);
                                     }}
-                                  >
-                                    <EditOutlinedIcon fontSize="small" />
-                                  </Controls.LoadingActionButton>
-
+                                  />
                                   <Controls.DeleteButton
                                     handleConfirm={() => {
                                       AuthHandler.canDelete()
@@ -423,16 +479,9 @@ export default function AcMaster(props) {
                                     }}
                                     setConfirmDialog={setConfirmDialog}
                                   />
-                                  <Controls.ActionButton>
-                                    <PrintAcc
-                                      values={item}
-                                      accounts={accounts}
-                                      itemList={itemList}
-                                      records={records}
-                                      title={title}
-                                    />
-                                  </Controls.ActionButton>
                                 </>
+                              ) : (
+                                item[headcell.feild]
                               )}
                             </TableCell>
                           ))}
@@ -445,45 +494,90 @@ export default function AcMaster(props) {
               <TblPagination />
             </section>
             <Popup
-              title={`${title} form`}
+              title="Filter"
               openPopup={buttonPopup}
               setOpenPopup={setButtonPopup}
               size="md"
             >
-              {" "}
-              <AcForm
+              <StockForm
                 records={records}
                 setRecords={setRecords}
-                accounts={accounts}
-                bankValues={values}
-                setBankValues={setValues}
-                itemList={itemList}
-                setItemList={setItemList}
+                values={values}
+                setValues={setValues}
                 initialValues={initialValues}
-                notify={notify}
-                setNotify={setNotify}
-                setButtonPopup={setButtonPopup}
                 initialFilterValues={initialFilterValues}
+                setButtonPopup={setButtonPopup}
+                setNotify={setNotify}
+                openPopup={buttonPopup}
+                products={products}
+                handleSubmit={handleSubmit}
               />
-            </Popup>{" "}
+            </Popup>
+
             <Popup
-              title={`Filter form`}
+              title="Filter"
               openPopup={filterPopup}
               setOpenPopup={setFilterPopup}
             >
-              <FilterForm
-                filterIcon={filterIcon}
-                setFilterPopup={setFilterPopup}
-                setFilterIcon={setFilterIcon}
-                setFilter={setFilter}
-                filter={filter}
-                accounts={accounts}
-                setFilterFn={setFilterFn}
-                initialFilterValues={initialFilterValues}
-                setRefresh={setLoading}
-                values={values}
-              />
+              {" "}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <SmartAutoSuggest
+                    name1="prodName"
+                    code1="prodCode"
+                    name2="prodName"
+                    code2="prodCode"
+                    label="Product"
+                    value={filter}
+                    setValue={setFilter}
+                    options1={prodOptions}
+                    options2={products}
+                  />
+                </Grid>{" "}
+                <Grid item xs={3}>
+                  <Controls.Button
+                    text="Reset"
+                    color="inherit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFilter(initialFilterValues);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Controls.Button
+                    type="submit"
+                    text="Apply"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // searchFilter();
+                      handleFilterSubmit();
+                      setFilterPopup(false);
+                    }}
+                  />
+                </Grid>
+              </Grid>
             </Popup>
+
             <Notification notify={notify} setNotify={setNotify} />
             <ConfirmDialog
               confirmDialog={confirmDialog}

@@ -6,7 +6,7 @@ export default function QT() {
 
   const user = AuthHandler.getUser();
   const initialValues = {
-    vouNo: "X X X X",
+    vouNo: "",
     branchCode: user.defaultBranchCode,
     docCode: "PV",
     finYear: user.defaultYearCode,

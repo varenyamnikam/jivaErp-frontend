@@ -9,7 +9,7 @@ const KEYS = {
   roleitems: "roleitems",
   roleId: "roleId",
 };
-
+//trailbalance excluded
 export function axiosGet(url, responseFn, errFn, finalFn = () => {}) {
   const token = AuthHandler.getLoginToken();
   console.log(token);
@@ -114,6 +114,15 @@ export function axiosDelete(url, data, responseFn, errFn, finalFn = () => {}) {
       finalFn();
     });
 }
+export function date(dateString) {
+  const x = new Date(dateString);
+  console.log(x, new Date(dateString));
+  return x instanceof Date && x && !isNaN(x)
+    ? new Intl.DateTimeFormat("en-GB").format(new Date(dateString))
+    : "Invalid Date";
+  // return "";
+}
+
 export function GetAllRoles() {
   const token = AuthHandler.getLoginToken();
   console.log(token);

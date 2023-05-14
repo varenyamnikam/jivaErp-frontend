@@ -27,7 +27,6 @@ import ConfirmDialog from "../../../../components/ConfirmDialog";
 import Input from "../../../../components/controls/Input";
 import { Grid } from "@material-ui/core";
 import { useForm, Form } from "../../../../components/useForm";
-import BasicSelect from "../../../Usermaster/basicselect";
 import UnusedAutosuggest from "../../../../components/unusedautosuggest";
 import { useNavigate } from "react-router-dom";
 import SmartAutosuggest from "../../../../components/smartAutoSuggest";
@@ -197,7 +196,7 @@ export default function Productform(props) {
         <Controls.Input
           name="prodCode"
           label="Product Code"
-          value={input.prodCode}
+          value={input.prodCode ? input.prodCode : "N E W"}
           disabled={true}
           onChange={handleChange}
         />
@@ -242,7 +241,6 @@ export default function Productform(props) {
           name2="prodCompanyName"
           code2="prodCompanyCode"
           label="Company"
-          prodCompanyOptions
           value={input}
           setValue={setInput}
           options1={prodCompanyOptions}

@@ -2,16 +2,10 @@ import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import Controls from "../../components/controls/Controls";
 import { Grid, InputAdornment } from "@material-ui/core";
-import { useForm, Form } from "../../components/useForm";
 import StaticDatePickerLandscape from "../../components/calendarLandscape";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import SmartAutoSuggest from "../../components/smartAutoSuggest";
 import AnimatedSmartAutoSuggest from "../../components/animatedSmartAutoSuggest";
-import NotSmartAutoSuggest from "../../components/haha";
-import Divider from "@mui/material/Divider";
-import ItemForm from "./generalItems";
-import Popup from "../../components/Popup";
-import Percent from "../../components/percentageNew";
 import Lottie from "react-lottie";
 import rupee from "../../components/lotties/105335-rupee-coin.json";
 import delivery from "../../components/lotties/31531-truck-shipping.json";
@@ -19,9 +13,6 @@ import bill from "../../components/lotties/66365-my-bills.json";
 import cashIcon from "../../components/lotties/g5mYcVtWJ1.json";
 import CustomerAutoSuggest from "../../components/customerAutoSuggest.js";
 import "../../components/reverse-arrow.css";
-import SaveIcon from "@mui/icons-material/Save";
-import MenuPopupState from "../../components/checkBoxMenu";
-import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import Accordion from "../../components/accordions";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -47,46 +38,23 @@ export default function CustomerForm(props) {
   const userCompanyCode = localStorage.getItem("userCompanyCode");
   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
-    records,
-    setRecords,
     values,
-    setValues,
     initialValues,
-    initialFilterValues,
-    setButtonPopup,
-    setNotify,
     accounts,
     adressData,
     payTerms,
-    products,
-    voucherItems,
-    setCommon,
-    openPopup,
-    setOpenPopup,
-    handleSubmit,
-    initialVouItem,
     common,
     itemList,
     setItemList,
-    title,
     reference,
     input,
     setInput,
     setTabValue,
     getVouNo,
     setItem,
+    errors,
+    setErrors,
   } = props;
-  const validateValues = {
-    ...initialValues,
-    vouNo: "",
-    docCode: "",
-    finYear: "",
-    branchCode: "",
-    vouDate: "",
-    partyBillDate: "",
-    partyChallanDate: "",
-  };
-  const [errors, setErrors] = useState(validateValues);
   const [isPaused, setIsPaused] = useState({
     rate: true,
     itemAmount: true,
@@ -104,27 +72,6 @@ export default function CustomerForm(props) {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  function Validate(fieldValues = input) {
-    console.log(fieldValues);
-    let temp = { ...errors };
-    function check(key) {
-      if (key in fieldValues)
-        temp[key] = fieldValues[key] ? "" : "This field is required.";
-    }
-    function check0(key) {
-      if (key in fieldValues)
-        temp[key] =
-          Number(fieldValues[key]) > 0 ? "" : "This should be more than 0";
-    }
-
-    check("partyCode");
-    check0("itemTotal");
-    setErrors({
-      ...temp,
-    });
-    console.log(temp);
-    return Object.values(temp).every((x) => x == "");
-  }
   let adress = adressData.filter((item) => item.acCode == input.partyCode);
   console.log(adress, reference);
   const refOptions = reference
@@ -272,7 +219,7 @@ export default function CustomerForm(props) {
       return ["PO"];
     }
     if (initialValues.docCode == "SI") {
-      return ["DC", "QT"];
+      return ["DC", "QT", "SO"];
     }
     if (initialValues.docCode == "DC") {
       return ["QT", "SO"];

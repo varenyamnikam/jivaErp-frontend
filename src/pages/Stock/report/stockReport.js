@@ -34,6 +34,9 @@ import DateCalc from "../../../components/dateCalc";
 import StaticDatePickerLandscape from "../../../components/calendarLandscape";
 import StockLedger from "./stockLedger";
 import ExportSwitch from "../../../components/controls/Switch";
+import SmartAutosuggest from "../../../components/smartAutoSuggest";
+import * as roleService from "../../../services/roleService";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -59,15 +62,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
+
 const initialValues = {
   srNo: 0,
   prodCode: "0",
@@ -115,7 +110,7 @@ const initialLedgerValues = {
   prodName: "",
 };
 
-export default function StockMaster() {
+export default function StockMaster({ title = "Stock Report" }) {
   const headCells = [
     { id: "Product Code", label: "Product Code", feild: "prodCode" },
     { id: "Product", label: "Product", feild: "prodName" },
@@ -128,6 +123,8 @@ export default function StockMaster() {
     { id: "Reorder Level", label: "Reorder Level", feild: "reorderLevel" },
     { id: "Ledger", label: "Ledger", feild: "reorderLevel" },
   ];
+  const filterFields = [{ feild: "prodName", label: "Product Name" }];
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
@@ -289,18 +286,7 @@ export default function StockMaster() {
     };
     localStorage.setItem("adm_softwareSettings", JSON.stringify(newSetting));
   }
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
-  }
-
-  console.log(filter.allFields);
+  console.log(filter);
   function search(allfields) {
     console.log(allfields);
     setFilterFn({
@@ -363,7 +349,7 @@ export default function StockMaster() {
           cumStock: entry.openingStock + totIn - totOut,
           prodCode: entry.prodCode,
           prodName: entry.prodName,
-          vouDate: getDate(item.vouDate),
+          vouDate: roleService.date(item.vouDate),
           batchNo: item.batchNo,
         };
 
@@ -428,268 +414,290 @@ export default function StockMaster() {
       return [initialLedgerValues];
     }
   }
+  function handleFilterSubmit() {
+    setFilterFn({
+      fn: (items) => {
+        let newRecords = items;
+        function dynamicFilterFn(feild) {
+          console.log(feild, filter, filter[feild]);
+          newRecords = newRecords.filter(
+            (item) => item[feild] == filter[feild]
+          );
+        }
+        Number(filter.prodCode) && dynamicFilterFn("prodCode");
+        return newRecords;
+      },
+    });
+  }
   const finalRecords = recordsAfterPagingAndSorting();
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Stock Report"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Grid
-                        container
-                        spacing={2}
-                        style={{ display: "flex", flexGrow: 1 }}
-                      >
-                        <Grid
-                          item
-                          xs={8}
-                          sm={5}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          <Controls.Input
-                            label="Search"
-                            className={classes.searchInput}
-                            value={filter.allFields}
-                            onChange={handleFilter}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                              endAdornment: filter.allFields && (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() => {
-                                      setFilter(initialFilterValues);
-                                      setFilterFn({
-                                        fn: (items) => {
-                                          return items;
-                                        },
-                                      });
-                                    }}
-                                    style={{ boxShadow: "none" }}
-                                  >
-                                    <ClearIcon />
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Grid>{" "}
-                        <Grid
-                          item
-                          sm={1}
-                          xs={4}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Filter
-                            filterIcon={filterIcon}
-                            setFilterPopup={setFilterPopup}
-                            setFilter={setFilter}
-                            setFilterFn={setFilterFn}
-                            setFilterIcon={setFilterIcon}
-                            initialFilterValues={initialFilterValues}
-                            setRefresh={setRefresh}
-                            initialFilterFn={initialFilterFn}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          sm={3}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Grid container style={{ width: "100%" }}>
-                            <Excel
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headCells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <Print
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headcells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <MultipleSelectCheckmarks
-                              headcells={headcells}
-                              setheadcells={setheadcells}
-                              initialHeadCells={headCells}
-                              selected={selected}
-                              setSelected={setSelected}
-                            />
-                          </Grid>{" "}
-                        </Grid>
-                        {useBatch == "Yes" && (
-                          <Grid
-                            item
-                            sm={3}
-                            xs={12}
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <ExportSwitch
-                              checked={batchWise}
-                              setChecked={setBatchWise}
-                              onChange={handleSwitchChange}
-                            />{" "}
-                            <Typography>Batch Wise Stock</Typography>
-                          </Grid>
-                        )}
-                      </Grid>
-                    </Toolbar>{" "}
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {loading ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {finalRecords.map((item, index) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {headcell.label == "Ledger" ? (
-                                      <>
-                                        <Controls.LoadingActionButton
-                                          color="primary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            if (
-                                              Number(item.inward) == 0 &&
-                                              Number(item.outward) == 0
-                                            ) {
-                                              setNotify({
-                                                isOpen: true,
-                                                message: "No change in stock",
-                                                type: "warning",
-                                              });
-                                            } else {
-                                              getEntry(item);
-                                              setButtonPopup(true);
-                                              console.log(item);
-                                            }
-                                          }}
-                                        >
-                                          <VisibilityIcon fontSize="small" />
-                                        </Controls.LoadingActionButton>
-                                      </>
-                                    ) : (headcell.feild == "prodCode" || //dont repeat same
-                                        headcell.feild == "prodName") && //prodName & prodCode
-                                      index !== 0 ? ( //cant compare with prev element if 0
-                                      item[headcell.feild] ==
-                                      finalRecords[index - 1][
-                                        headcell.feild
-                                      ] ? (
-                                        ""
-                                      ) : (
-                                        item[headcell.feild]
-                                      )
-                                    ) : (
-                                      item[headcell.feild]
-                                    )}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title={`Stock of ${ledger[0].prodName} (${
-                      ledger[0].prodCode
-                    }) from ${getDate(filter.startDate)} - to ${getDate(
-                      filter.endDate
-                    )}`}
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                    size="md"
+              <Toolbar>
+                <Grid
+                  container
+                  spacing={2}
+                  style={{ display: "flex", flexGrow: 1 }}
+                >
+                  <Grid
+                    item
+                    xs={8}
+                    sm={5}
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    <StockLedger records={ledger} />
-                  </Popup>
-
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
+                    <Controls.Input
+                      label="Search"
+                      className={classes.searchInput}
+                      value={filter.allFields}
+                      onChange={handleFilter}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                        endAdornment: filter.allFields && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setFilter(initialFilterValues);
+                                setFilterFn({
+                                  fn: (items) => {
+                                    return items;
+                                  },
+                                });
+                              }}
+                              style={{ boxShadow: "none" }}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>{" "}
+                  <Grid
+                    item
+                    sm={1}
+                    xs={4}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setRefresh(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>
+                    <Filter
+                      filterIcon={filterIcon}
+                      setFilterPopup={setFilterPopup}
+                      setFilter={setFilter}
+                      setFilterFn={setFilterFn}
+                      setFilterIcon={setFilterIcon}
+                      initialFilterValues={initialFilterValues}
+                      setRefresh={setRefresh}
+                      initialFilterFn={initialFilterFn}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    sm={3}
+                    xs={12}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Grid container style={{ width: "100%" }}>
+                      <Excel
+                        title={title}
+                        buttonText="Export Data to Excel"
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filterFields={filterFields}
+                      />
+                      <Print
+                        title={title}
+                        buttonText="Export Data to Excel"
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filter={filter}
+                        filterFields={filterFields}
+                      />
+                      <MultipleSelectCheckmarks
+                        headcells={headcells}
+                        setheadcells={setheadcells}
+                        initialHeadCells={headCells}
+                        selected={selected}
+                        setSelected={setSelected}
+                      />
+                    </Grid>{" "}
+                  </Grid>
+                  {useBatch == "Yes" && (
+                    <Grid
+                      item
+                      sm={3}
+                      xs={12}
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ExportSwitch
+                        checked={batchWise}
+                        setChecked={setBatchWise}
+                        onChange={handleSwitchChange}
+                      />{" "}
+                      <Typography>Batch Wise Stock</Typography>
                     </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                  )}
+                </Grid>
+              </Toolbar>{" "}
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {finalRecords.map((item, index) => (
+                        <TableRow>
+                          {headcells.map((headcell, i) => (
+                            <TableCell
+                              key={headcell.id}
+                              // sortDirection={orderBy === headcell.id ? order : false}
+                              style={{
+                                borderRight: "1px solid rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              {headcell.label == "Ledger" ? (
+                                <>
+                                  <Controls.LoadingActionButton
+                                    color="primary"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (
+                                        Number(item.inward) == 0 &&
+                                        Number(item.outward) == 0
+                                      ) {
+                                        setNotify({
+                                          isOpen: true,
+                                          message: "No change in stock",
+                                          type: "warning",
+                                        });
+                                      } else {
+                                        getEntry(item);
+                                        setButtonPopup(true);
+                                        console.log(item);
+                                      }
+                                    }}
+                                  >
+                                    <VisibilityIcon fontSize="small" />
+                                  </Controls.LoadingActionButton>
+                                </>
+                              ) : (headcell.feild == "prodCode" || //dont repeat same
+                                  headcell.feild == "prodName") && //prodName & prodCode
+                                index !== 0 ? ( //cant compare with prev element if 0
+                                item[headcell.feild] ==
+                                finalRecords[index - 1][headcell.feild] ? (
+                                  ""
+                                ) : (
+                                  item[headcell.feild]
+                                )
+                              ) : (
+                                item[headcell.feild]
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+            <Popup
+              title={`Stock of ${ledger[0].prodName} (${
+                ledger[0].prodCode
+              }) from ${roleService.date(
+                filter.startDate
+              )} - to ${roleService.date(filter.endDate)}`}
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+              size="md"
+            >
+              <StockLedger records={ledger} />
+            </Popup>
+
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <SmartAutosuggest
+                    name1="prodName"
+                    code1="prodCode"
+                    name2="prodName"
+                    code2="prodCode"
+                    options1={[
+                      ...new Set(records.map((item) => item.prodName)),
+                    ]}
+                    options2={records}
+                    label="Product"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Controls.Button
+                    text="Submit"
+                    onClick={() => {
+                      handleFilterSubmit();
+                      setRefresh(true);
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

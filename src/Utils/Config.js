@@ -8,8 +8,8 @@ const user = JSON.parse(localStorage.getItem("user"));
 const userCode = user.userCode;
 const userCompanyCode = user.userCompanyCode;
 const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-// const url = `http://localhost:${PORT}`;
-const url = `http://147.182.252.2:${PORT}`;
+const url = `http://localhost:${PORT}`;
+// const url = `http://147.182.252.2:${PORT}`;
 
 // console.log(userCompanyCode, userCode);
 class Config {
@@ -64,7 +64,9 @@ class Config {
   static bankReport = url + "/api/bankReport" + query;
   static mktArea = url + "/api/mst_mktArea" + query;
   static none = url + "/api/inv_none" + query;
-  static trialBalance = url + "/api/trialBalance";
+  static trialBalance = url + "/api/trialBalance" + query;
+  static stockConversion = url + "/api/inv_stockConversion" + query;
+
   // static loginUrl = "http://147.182.252.2:3001/api/login";
   // static registerUrl = "http://147.182.252.2:3001/api/register";
   // static homeUrl = "http://147.182.252.2:3001/api/home";

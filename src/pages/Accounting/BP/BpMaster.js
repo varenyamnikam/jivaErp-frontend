@@ -6,7 +6,7 @@ export default function BR() {
   const user = AuthHandler.getUser();
   const initialValues = {
     userCompanyCode: "",
-    vouNo: "X X X X",
+    vouNo: "",
     branchCode: "",
     docCode: "BP",
     finYear: "",

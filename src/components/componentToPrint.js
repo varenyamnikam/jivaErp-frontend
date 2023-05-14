@@ -10,6 +10,7 @@ import {
   TableBody,
   TablePagination,
   TableSortLabel,
+  Typography,
 } from "@material-ui/core";
 import Controls from "./controls/Controls";
 import PrintIcon from "@mui/icons-material/Print";
@@ -20,14 +21,15 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     "& thead th": {
       // fontWeight: "600",
+      border: "2px solid rgba(0,0,0,0.2)",
     },
     "& tbody td": {
       fontSize: "16px",
-      //padding: "3px",
+      padding: "3px",
       // "&:nth-of-type(odd)": {
       //   backgroundColor: "red",
       // },
-      //border: "1px solid rgba(0,0,0,0.2)",
+      //
     },
     "& tbody tr": {
       "&:nth-of-type(even)": {
@@ -40,9 +42,9 @@ const useStyles = makeStyles((theme) => ({
       cursor: "pointer",
     },
     "& .MuiTableCell-root": {
-      borderRight: "1px solid rgba(0,0,0,0.2)",
+      borderRight: "2px solid rgba(0,0,0,0.2)",
     },
-    border: "1px solid rgba(0,0,0,0.2)",
+    border: "2px solid rgba(0,0,0,0.2)",
   },
   footer: {
     padding: "1rem",
@@ -63,12 +65,20 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   const ad = adress.filter((item) => item.acCode == values.partyCode);
   console.log(ad, adress, values);
   function getAd(values) {
-    const adressObj = adress.filter(
+    const adressObj = adress.find(
       (item) =>
         item.acCode == values.partyCode &&
         Number(item.addressNo) == Number(values.billingAdressCode)
     );
-    return adressObj[0];
+    console.log(adressObj);
+    if (adressObj) return adressObj;
+    else
+      return {
+        districtName: "",
+        talukaName: "",
+        countryName: "",
+        stateName: "",
+      };
   }
   function getParty(values) {
     const party = accounts.filter((item) => item.acCode == values.partyCode);
@@ -209,261 +219,243 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
       .toFixed(2)
       .replace(/(\.0+|0+)$/, "");
   }
+  console.log(getTax(values));
+  const borderObj = { border: "2px solid #dee2e6" };
   return (
     <>
       <div
         ref={ref}
         style={{ height: geth(getItems(values)), padding: "20px" }}
       >
-        <table style={{ padding: "20px" }}>
-          <TableHead style={{ border: 0 }} sx={{ "& td": { border: 0 } }}>
-            <TableRow>
-              <TableCell colSpan={10}>
-                <Grid container>
-                  <Grid Item xs={3} sm={3}>
-                    <h2>{getImage()}</h2>
-                  </Grid>
-                  <Grid
-                    Item
-                    sm={6}
-                    xs={6}
-                    style={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <h2>
-                      {values.docCode} No.: <strong>{values.vouNo}</strong>
-                    </h2>
-                  </Grid>
-                  <Grid
-                    Item
-                    sm={3}
-                    xs={3}
-                    style={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <h2> Date: {getDate(new Date())}</h2>
-                  </Grid>
-                </Grid>
-
-                <Grid container style={{ color: "black" }}>
-                  <Grid Item xs={4} sm={4}>
-                    <Grid
-                      Item
-                      sm={9}
-                      xs={9}
-                      style={{ backgroundColor: getTheme() }}
-                    >
-                      <h5> From</h5>
-                    </Grid>
-                    <h4>{company.companyName}</h4>
-                    <span>{company.adressLine1}</span>
-                    <br></br>
-                    <span>Phone: {company.contactNo}</span>
-                    <br></br>
-                    <span>Email: {company.email}</span>
-                    <br></br>
-                    <span>GST In: {company.gstInNo}</span>
-                  </Grid>
-                  <Grid Item sm={4} xs={4}>
-                    <Grid
-                      Item
-                      sm={9}
-                      xs={9}
-                      style={{ backgroundColor: getTheme() }}
-                    >
-                      <h5>Bill To</h5>
-                    </Grid>
-                    <h4>{getParty(values) && getParty(values).acName}</h4>
-                    {getAd(values) && (
-                      <>
-                        <span>Country: {getAd(values).countryName} </span>
-                        <span> State: {getAd(values).stateName}</span>
-                        <br />
-                        <span>District: {getAd(values).districtName} </span>
-                        <span> Taluka: {getAd(values).talukaName}</span>
-                      </>
-                    )}
-                  </Grid>
-                  <Grid Item sm={4} xs={4}>
-                    <Grid
-                      Item
-                      sm={9}
-                      xs={9}
-                      style={{ backgroundColor: getTheme() }}
-                    >
-                      <h5> Ship To</h5>
-                    </Grid>
-                    <h4>{getParty(values) && getParty(values).acName}</h4>
-                    {getAd(values) && (
-                      <>
-                        <span>Country: {getAd(values).countryName} </span>
-                        <span> State: {getAd(values).stateName}</span>
-                        <br />
-                        <span>District: {getAd(values).districtName} </span>
-                        <span> Taluka: {getAd(values).talukaName}</span>
-                      </>
-                    )}
-                  </Grid>
-                </Grid>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableHead style={{ backgroundColor: getTheme() }}>
-            <TableRow style={{ backgroundColor: getTheme() }}>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                  width: "20%",
-                }}
-              >
-                Product
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                  width: "5%",
-                }}
-              >
-                Quantity
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                }}
-              >
-                Rate
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                }}
-              >
-                Amount
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                }}
-              >
-                Discount
-              </TableCell>
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-                }}
-              >
-                G.S.T
-              </TableCell>
-              {settings.useCessitem == "Yes" && (
-                <TableCell
-                  align="right"
-                  style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
-                  }}
-                >
-                  cess
-                </TableCell>
-              )}
-              <TableCell
-                align="right"
-                style={{
-                  border: "1px solid rgba(0,0,0,0.2)",
-
-                  width: "10%",
-                }}
-              >
-                Item Total
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody
-            style={{
-              border: "1px solid rgba(0,0,0,0.2)",
-            }}
+        {" "}
+        <Grid container spacing={1}>
+          <Grid Item xs={3} sm={3}>
+            <h2>{getImage()}</h2>
+          </Grid>
+          <Grid
+            Item
+            sm={6}
+            xs={6}
+            style={{ display: "flex", justifyContent: "center" }}
           >
-            {getItems(values).map((item) => (
-              <TableRow>
+            <h2>
+              {values.docCode} No.: <strong>{values.vouNo}</strong>
+            </h2>
+          </Grid>
+          <Grid
+            Item
+            sm={3}
+            xs={3}
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <h2> Date: {getDate(new Date())}</h2>
+          </Grid>
+          <Grid Item xs={4} sm={4}>
+            <Grid
+              Item
+              sm={9}
+              xs={9}
+              style={{ backgroundColor: getTheme(), paddingLeft: "10px" }}
+            >
+              <h5> From</h5>
+            </Grid>
+            <h4>{company.companyName}</h4>
+            <span>{company.adressLine1}</span>
+            <br></br>
+            <span>Phone: {company.contactNo}</span>
+            <br></br>
+            <span>Email: {company.email}</span>
+            <br></br>
+            <span>GST In: {company.gstInNo}</span>
+          </Grid>
+          <Grid Item sm={4} xs={4}>
+            <Grid
+              Item
+              sm={9}
+              xs={9}
+              style={{ backgroundColor: getTheme(), paddingLeft: "10px" }}
+            >
+              <h5>Bill To</h5>
+            </Grid>
+            <h4>{getParty(values) && getParty(values).acName}</h4>
+            {getAd(values) && (
+              <>
+                <span>Country: {getAd(values).countryName} </span>
+                <span> State: {getAd(values).stateName}</span>
+                <br />
+                <span>District: {getAd(values).districtName} </span>
+                <span> Taluka: {getAd(values).talukaName}</span>
+              </>
+            )}
+          </Grid>
+          <Grid Item sm={4} xs={4}>
+            <Grid
+              Item
+              sm={9}
+              xs={9}
+              style={{ backgroundColor: getTheme(), paddingLeft: "10px" }}
+            >
+              <h5> Ship To</h5>
+            </Grid>
+            <h4>{getParty(values) && getParty(values).acName}</h4>
+            {getAd(values) && (
+              <>
+                <span>Country: {getAd(values).countryName} </span>
+                <span> State: {getAd(values).stateName}</span>
+                <br />
+                <span>District: {getAd(values).districtName} </span>
+                <span> Taluka: {getAd(values).talukaName}</span>
+              </>
+            )}
+          </Grid>
+          <Grid Item sm={12} xs={12}>
+            <Table style={{ padding: "20px" }} className={classes.table}>
+              <TableRow className={classes.table}>
                 <TableCell
-                  align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    width: "20%",
+                    backgroundColor: "white",
                   }}
                 >
-                  {getProdName(item.prodCode)}
+                  Product
                 </TableCell>
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
+
+                    width: "5%",
                   }}
                 >
-                  {item.qty}
+                  Quantity
                 </TableCell>
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
                   }}
                 >
-                  {Number(item.rate)}
+                  Rate
                 </TableCell>
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
                   }}
                 >
-                  {Number(item.qr)}
+                  Amount
                 </TableCell>
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
                   }}
                 >
-                  {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
+                  Discount
                 </TableCell>
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
                   }}
                 >
-                  {rnd(
-                    Number(item.cgst) + Number(item.sgst) + Number(item.igst)
-                  )}
-                  (
-                  {rnd(
-                    Number(item.cgstP) + Number(item.sgstP) + Number(item.igstP)
-                  )}
-                  %)
+                  G.S.T
                 </TableCell>
                 {settings.useCessitem == "Yes" && (
                   <TableCell
+                    className={classes.table}
                     align="right"
                     style={{
-                      border: "1px solid rgba(0,0,0,0.2)",
+                      backgroundColor: "white",
                     }}
                   >
-                    {rnd(item.cess)} ({rnd(item.cessP)}%)
+                    cess
                   </TableCell>
                 )}
                 <TableCell
                   align="right"
                   style={{
-                    border: "1px solid rgba(0,0,0,0.2)",
+                    backgroundColor: "white",
+                    width: "10%",
                   }}
                 >
-                  {Number(item.itemAmount)}
+                  Item Total
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </table>
+              <TableBody>
+                {getItems(values).map((item) => (
+                  <TableRow className={classes.table}>
+                    <TableCell className={classes.table} style={{}}>
+                      {getProdName(item.prodCode)}
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {item.qty}
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {Number(item.rate)}
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {Number(item.qr)}
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {rnd(
+                        Number(item.cgst) +
+                          Number(item.sgst) +
+                          Number(item.igst)
+                      )}
+                      (
+                      {rnd(
+                        Number(item.cgstP) +
+                          Number(item.sgstP) +
+                          Number(item.igstP)
+                      )}
+                      %)
+                    </TableCell>
+                    {settings.useCessitem == "Yes" && (
+                      <TableCell
+                        className={classes.table}
+                        align="right"
+                        style={{}}
+                      >
+                        {rnd(item.cess)} ({rnd(item.cessP)}%)
+                      </TableCell>
+                    )}
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      style={{}}
+                    >
+                      {Number(item.itemAmount)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Grid>{" "}
+        </Grid>
         <Grid container className={classes.footer}>
           <Grid
             Item
@@ -474,7 +466,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
           >
             <h3> Payment term: {getPay(values.paymentTermsCode)}</h3>
           </Grid>
-
           <Grid
             Item
             xs={6}
@@ -484,54 +475,66 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               paddingRight: "20px",
             }}
           >
-            <table className={classes.table}>
+            <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>cgst</TableCell>
+                  <TableCell className={classes.table}>cgst</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {getTax(values).c.map((item) => (
                   <TableRow>
-                    <TableCell align="right" variant="body">
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      variant="body"
+                    >
                       {Number(item.cgstP)}% - {rnd(Number(item.cgst))}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-            </table>
-            <table className={classes.table}>
+            </Table>
+            <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>cgst</TableCell>
+                  <TableCell className={classes.table}>sgst</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {getTax(values).s.map((item) => (
                   <TableRow>
-                    <TableCell align="right" variant="body">
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      variant="body"
+                    >
                       {Number(item.sgstP)}% - {rnd(Number(item.sgst))}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-            </table>
-            <table className={classes.table}>
+            </Table>
+            <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>cgst</TableCell>
+                  <TableCell className={classes.table}>igst</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {getTax(values).i.map((item) => (
                   <TableRow>
-                    <TableCell align="right" variant="body">
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                      variant="body"
+                    >
                       {Number(item.igstP)}% - {rnd(Number(item.igst))}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-            </table>
+            </Table>
           </Grid>
           <Grid
             Item
@@ -542,37 +545,98 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               paddingLeft: "20px",
             }}
           >
-            <table className={classes.table}>
+            <Table className={classes.table}>
               <TableRow>
-                <TableCell align="right">Subtotal </TableCell>
+                <TableCell className={classes.table} align="right">
+                  Subtotal{" "}
+                </TableCell>
 
-                <TableCell align="right"> {values.itemTotal}</TableCell>
+                <TableCell className={classes.table} align="right">
+                  {" "}
+                  {values.itemTotal}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right">
+                <TableCell className={classes.table} align="right">
                   Discount ({Number(values.billDisPer)})
                 </TableCell>
 
-                <TableCell align="right">
+                <TableCell className={classes.table} align="right">
                   {rnd(Number(values.billDis))}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right">TCS </TableCell>
+                <TableCell className={classes.table} align="right">
+                  TCS{" "}
+                </TableCell>
 
-                <TableCell align="right"> </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {" "}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right">Roundoff </TableCell>
+                <TableCell className={classes.table} align="right">
+                  Roundoff{" "}
+                </TableCell>
 
-                <TableCell align="right"> {Number(values.roundOff)} </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {" "}
+                  {Number(values.roundOff)}{" "}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right">Net Amount </TableCell>
+                <TableCell className={classes.table} align="right">
+                  Net Amount{" "}
+                </TableCell>
 
-                <TableCell align="right"> {Number(values.netAmount)}</TableCell>
+                <TableCell className={classes.table} align="right">
+                  {" "}
+                  {Number(values.netAmount)}
+                </TableCell>
               </TableRow>
-            </table>
+            </Table>
+          </Grid>{" "}
+          <Grid
+            Item
+            xs={12}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              fontWeight: 700,
+              margin: "20px",
+            }}
+          >
+            <h5>For {company.companyName}</h5>
+          </Grid>
+          <Grid
+            Item
+            xs={6}
+            sm={6}
+            sx={{
+              fontWeight: 600,
+            }}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              fontWeight: 700,
+              margin: "20px",
+            }}
+          >
+            {" "}
+            {/* <h5 
+              sx={{
+                fontWeight: 600,
+              }}
+            >
+              Subject To {company.district} Jurisdiction hi
+            </h5  >{" "} */}
+            <h5
+              sx={{
+                fontWeight: 600,
+              }}
+            >
+              Authorized Signatory
+            </h5>
           </Grid>
         </Grid>
       </div>

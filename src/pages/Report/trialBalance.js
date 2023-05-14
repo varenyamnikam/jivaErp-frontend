@@ -40,6 +40,7 @@ import DcValues from "../Inventory/D.C/DcValues";
 import TbLedger from "./tbForm";
 import ExportSwitch from "../../components/controls/Switch";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
+import { NotifyMsg } from "../../components/notificationMsg";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -91,7 +92,7 @@ const initialAccount = {
 };
 const groupTypeOptions = ["Asset", "Laibality", "Income"];
 
-export default function TrialBalance() {
+export default function TrialBalance({ title = "Trial Balance" }) {
   const headCells = [
     { id: "Grp Code", label: "Grp Code", feild: "acGroupCode" },
     { id: "Grp Name", label: "Grp Name", feild: "acGroupName" },
@@ -99,6 +100,8 @@ export default function TrialBalance() {
     { id: "Current", label: "Current", feild: "monthlyBalance" },
     { id: "Closing", label: "Closing", feild: "closingBalance" },
   ];
+  const filterFields = [{ feild: "groupType", label: "Account Group Type" }];
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = user.userCode;
   const userCompanyCode = user.userCompanyCode;
@@ -134,7 +137,7 @@ export default function TrialBalance() {
   const [headcells, setheadcells] = useState(headCells);
   const [selected, setSelected] = React.useState([]);
   const [loading1, setLoading1] = useState(true);
-  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([initialValues]);
   const [accounts, setAccounts] = useState([initialAccount]);
   const [vouchers, setVouchers] = useState([initialVouValues]);
@@ -160,7 +163,7 @@ export default function TrialBalance() {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log(Config.batch);
-  if ((records[0] && records[0].acGroupCode == "X X X X") || refresh) {
+  if (loading) {
     const filterByGrpType = filter.groupType
       ? [filter.groupType]
       : groupTypeOptions;
@@ -185,15 +188,13 @@ export default function TrialBalance() {
         data.length !== 0
           ? setRecords(data)
           : setRecords([{ ...initialValues, acGroupCode: "" }]);
-        refresh && setRefresh(false);
       })
       .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
+        setNotify(NotifyMsg(4));
         console.log(error);
+      })
+      .finally(() => {
+        loading && setLoading(false);
       });
   }
 
@@ -202,16 +203,6 @@ export default function TrialBalance() {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
     search(value);
-  }
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
   }
 
   console.log(filter);
@@ -234,13 +225,6 @@ export default function TrialBalance() {
         return newRecords;
       },
     });
-  }
-  function getAcName(code) {
-    let name = "";
-    accounts.map((item) => {
-      if (item.acCode == code) name = item.acName;
-    });
-    return name;
   }
   function displayTblRow(obj, feild, space) {
     let item = obj;
@@ -298,6 +282,7 @@ export default function TrialBalance() {
                   style={{
                     borderRight: "1px solid rgba(0,0,0,0.2)",
                   }}
+                  align="right"
                 >
                   0
                 </TableCell>
@@ -308,6 +293,7 @@ export default function TrialBalance() {
                     display: "flex",
                     justifyContent: "space-between",
                   }}
+                  align="right"
                 >
                   {typeof item[headcell.feild] == "number"
                     ? Math.abs(item[headcell.feild].toFixed(2))
@@ -323,6 +309,7 @@ export default function TrialBalance() {
                   style={{
                     borderRight: "1px solid rgba(0,0,0,0.2)",
                   }}
+                  align="right"
                 >
                   {typeof item[headcell.feild] == "number"
                     ? Math.abs(item[headcell.feild].toFixed(2))
@@ -335,6 +322,7 @@ export default function TrialBalance() {
                     display: "flex",
                     justifyContent: "space-between",
                   }}
+                  align="right"
                 >
                   0{headcell.feild == "closingBalance"}
                 </TableCell>
@@ -381,6 +369,7 @@ export default function TrialBalance() {
           checked={showAcc}
           onChange={() => {
             setShowAcc((prev) => !prev);
+            setLoading(true);
           }}
           label="Details"
         />{" "}
@@ -391,180 +380,168 @@ export default function TrialBalance() {
 
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title="Trial Balance"
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <CmnToolBar
-                      filterIcon={filterIcon}
-                      filter={filter}
-                      handleFilter={handleFilter}
-                      setFilterPopup={setFilterPopup}
-                      setFilter={setFilter}
-                      setFilterFn={setFilterFn}
-                      setFilterIcon={setFilterIcon}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
-                      initialFilterFn={initialFilterFn}
-                      buttonText="Export Data to Excel"
-                      TblContainer={TblContainer}
-                      TblHead={TblHead}
-                      TblPagination={TblPagination}
-                      headCells={headcells}
-                      recordsAfterSorting={recordsAfterAndSorting}
-                      headcells={headcells}
-                      setheadcells={setheadcells}
-                      initialHeadCells={headCells}
-                      selected={selected}
-                      setSelected={setSelected}
-                      additionalComponent={additionalComponent}
-                    />{" "}
-                    <TblContainer>
-                      <TableHead>
+              <CmnToolBar
+                filterIcon={filterIcon}
+                filter={filter}
+                handleFilter={handleFilter}
+                setFilterPopup={setFilterPopup}
+                setFilter={setFilter}
+                setFilterFn={setFilterFn}
+                initialFilterFn={initialFilterFn}
+                buttonText="Export Data to Excel"
+                headCells={headCells}
+                recordsAfterSorting={recordsAfterAndSorting}
+                headcells={headcells}
+                setheadcells={setheadcells}
+                initialHeadCells={headCells}
+                selected={selected}
+                setSelected={setSelected}
+                initialFilterValues={initialFilterValues}
+                filterFields={filterFields}
+                title={title}
+                additionalComponent={additionalComponent}
+              />
+              <TblContainer>
+                <TableHead>
+                  {" "}
+                  <TableRow
+                    style={{
+                      borderBottom: "1px solid rgba(0,0,0,0.2)",
+                      position: "sticky",
+                    }}
+                    stickyHeader
+                  >
+                    {headcells.map((headCell) => (
+                      <TableCell
+                        key={headCell.id}
+                        // sortDirection={orderBy === headCell.id ? order : false}
+                        style={{
+                          borderRight: "1px solid rgba(0,0,0,0.2)",
+                          borderBottom: "1px solid rgba(0,0,0,0.2)",
+                        }}
+                        colSpan={
+                          headCell.label == "Grp Code" ||
+                          headCell.label == "Grp Name"
+                            ? 1
+                            : 2
+                        }
+                      >
+                        {headCell.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  <TableRow stickyHeader>
+                    <TableCell />
+                    <TableCell />
+
+                    {[...Array(3)].map((e, i) => (
+                      <>
                         {" "}
-                        <TableRow
+                        <TableCell
                           style={{
-                            borderBottom: "1px solid rgba(0,0,0,0.2)",
-                            position: "sticky",
+                            borderRight: "1px solid rgba(0,0,0,0.2)",
                           }}
-                          stickyHeader
                         >
-                          {headcells.map((headCell) => (
-                            <TableCell
-                              key={headCell.id}
-                              // sortDirection={orderBy === headCell.id ? order : false}
-                              style={{
-                                borderRight: "1px solid rgba(0,0,0,0.2)",
-                                borderBottom: "1px solid rgba(0,0,0,0.2)",
-                              }}
-                              colSpan={
-                                headCell.label == "Grp Code" ||
-                                headCell.label == "Grp Name"
-                                  ? 1
-                                  : 2
-                              }
-                            >
-                              {headCell.label}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                        <TableRow stickyHeader>
-                          <TableCell />
-                          <TableCell />
-
-                          {[...Array(3)].map((e, i) => (
-                            <>
-                              {" "}
-                              <TableCell
-                                style={{
-                                  borderRight: "1px solid rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                Debit
-                              </TableCell>
-                              <TableCell
-                                style={{
-                                  borderRight: "1px solid rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                Credit
-                              </TableCell>
-                            </>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-
-                      {records[0] == "X X X X" || refresh ? (
-                        <MuiSkeleton />
-                      ) : (
-                        <TableBody>
-                          {recursivelyCallArr(recordsAfterPagingAndSorting())}
-                        </TableBody>
-                      )}
-                    </TblContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    title="Detail"
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                  >
-                    <TbLedger
-                      records={vouchers}
-                      openingClosing={openingClosing}
-                    />
-                  </Popup>
-                  <Popup
-                    title="Filter"
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="startDate"
-                          label=" From-"
-                          value={filter}
-                          setValue={setFilter}
-                          style={{ top: 20 }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <StaticDatePickerLandscape
-                          size="small"
-                          name="endDate"
-                          label="To-"
-                          value={filter}
-                          setValue={setFilter}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} className={classes.input}>
-                        <UnusedAutosuggest
+                          Debit
+                        </TableCell>
+                        <TableCell
                           style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-end",
+                            borderRight: "1px solid rgba(0,0,0,0.2)",
                           }}
-                          name="groupType"
-                          label="Group Type"
-                          value={filter}
-                          setValue={setFilter}
-                          options={["Asset", "Laibality", "Income"]}
-                        />
-                      </Grid>
+                        >
+                          Credit
+                        </TableCell>
+                      </>
+                    ))}
+                  </TableRow>
+                </TableHead>
 
-                      <Grid item xs={6}>
-                        <Controls.Button
-                          text="Submit"
-                          onClick={() => {
-                            setRefresh(true);
-                            setFilterPopup(false);
-                            setFilterIcon(false);
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                {loading ? (
+                  <MuiSkeleton />
+                ) : (
+                  <TableBody>
+                    {recursivelyCallArr(recordsAfterPagingAndSorting())}
+                  </TableBody>
+                )}
+              </TblContainer>
+              <TblPagination />
             </section>
+            <Popup
+              title="Detail"
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+            >
+              <TbLedger records={vouchers} openingClosing={openingClosing} />
+            </Popup>
+            <Popup
+              title="Filter"
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="startDate"
+                    label=" From-"
+                    value={filter}
+                    setValue={setFilter}
+                    style={{ top: 20 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <StaticDatePickerLandscape
+                    size="small"
+                    name="endDate"
+                    label="To-"
+                    value={filter}
+                    setValue={setFilter}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12} className={classes.input}>
+                  <UnusedAutosuggest
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                    name="groupType"
+                    label="Group Type"
+                    value={filter}
+                    setValue={setFilter}
+                    options={["Asset", "Laibality", "Income"]}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Controls.Button
+                    text="Submit"
+                    onClick={() => {
+                      setLoading(true);
+                      setFilterPopup(false);
+                      setFilterIcon(false);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

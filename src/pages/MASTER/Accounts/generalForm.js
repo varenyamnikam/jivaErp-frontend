@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
-import { Form } from "../../../components/useForm";
-import BasicSelect from "../../Usermaster/basicselect";
 import Controls from "../../../components/controls/Controls";
-import AdvancedSelect from "../../../components/advancedBasicSelect";
-import ControllableStates from "../../../components/selectsearchstate";
 import PopupMarketingArea from "./popupTreeView";
 import Popup from "../../../components/Popup";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DoneIcon from "@mui/icons-material/Done";
 import UnusedAutosuggest from "../../../components/unusedautosuggest";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import Divider from "@mui/material/Divider";
 import { NotifyMsg } from "../../../components/notificationMsg";
@@ -106,7 +100,7 @@ export default function Generalform(props) {
   function handleSubmit(e) {
     e.preventDefault();
     if (validate()) {
-      let x = true;
+      let x;
       setValues(input);
       x = records.find((item) => item.acGroupCode == input.acGroupCode);
       const url = Config.accounts;
@@ -114,7 +108,7 @@ export default function Generalform(props) {
         setNotify(NotifyMsg(4));
       };
 
-      if (x) {
+      if (!x) {
         const handleRes = (response) => {
           console.log("hi....", response.data.values);
           setValues(response.data.values);
@@ -193,7 +187,7 @@ export default function Generalform(props) {
           <Controls.Input
             name="acCode"
             label="Code"
-            value={input.acCode}
+            value={input.acCode ? values.acCode : "N E W"}
             onChange={handleInputChange}
             disabled={true}
             // error={errors.stateCode}

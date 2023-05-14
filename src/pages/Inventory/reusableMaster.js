@@ -40,7 +40,7 @@ import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import DcFilterForm from "./D.C/dcFilterForm";
-import DcForm from "./design";
+import GeneralForm from "./reusableForm";
 import DcValues from "./D.C/DcValues";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
@@ -48,7 +48,8 @@ import PrintOne from "../../components/newPrintOne";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
 import FilterForm from "./generalFilterForm";
 import Filter from "../../components/filterButton";
-
+import { NotifyMsg } from "../../components/notificationMsg";
+import validateParty from "./validateParty";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -86,7 +87,7 @@ function getD() {
 
 export default function ReuseMaster(props) {
   const { docCode, title, initialValues, route } = props;
-  const headCells = [
+  const headCellsData = [
     {
       id: `${initialValues.docCode} NO`,
       label: `${initialValues.docCode} NO`,
@@ -95,16 +96,22 @@ export default function ReuseMaster(props) {
     { id: "MANUAL NO", label: "MANUAL NO", feild: "manualNo" },
     { id: "DATE", label: "DATE", feild: "getDate" },
     { id: "PARTY", label: "PARTY", feild: "getName" },
-    { id: "AMOUNT", label: "AMOUNT", feild: "netAmount" },
+    { id: "AMOUNT", label: "AMOUNT", feild: "netAmount", align: "right" },
     { id: "Edit", label: "Edit" },
   ];
+  const filterFields = [
+    { feild: "prodName", label: "Product Name" },
+    { feild: "partyName", label: "Party Name" },
+    { feild: "manualNo", label: "Manual No." },
+    { feild: "vouNo", label: "Voucher No" },
+  ];
   const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
+  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  let useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}&yearStart=${
+
+  let query = `&date=${new Date()}&useBatch=${useBatch}&yearStart=${
     user.yearStartDate
   }`;
   const {
@@ -124,6 +131,16 @@ export default function ReuseMaster(props) {
     startDate: getD(),
     endDate: new Date(),
   };
+  const validateValues = {
+    ...initialValues,
+    vouNo: "",
+    docCode: "",
+    finYear: "",
+    branchCode: "",
+    vouDate: "",
+    partyBillDate: "",
+    partyChallanDate: "",
+  };
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
@@ -133,9 +150,15 @@ export default function ReuseMaster(props) {
       return newRecords;
     },
   };
+  const url = Config[route] + query;
+  const handleErr = (err) => {
+    setNotify(NotifyMsg(4));
+    console.error(err);
+    loading && setLoading(false);
+  };
+
   const newParty = JSON.parse(localStorage.getItem("newParty"));
   const openOnRender = newParty.transactnOpen;
-
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(
     openOnRender ? openOnRender : false
@@ -144,14 +167,14 @@ export default function ReuseMaster(props) {
   const [filterIcon, setFilterIcon] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [print, setPrint] = useState(false);
-  const [headcells, setheadcells] = useState(headCells);
+  const [headcells, setheadcells] = useState(headCellsData);
   const [selected, setSelected] = React.useState([]);
   const [loading1, setLoading1] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const [common, setCommon] = useState(initialCommonValues);
   const [records, setRecords] = useState([initialValues]);
   const [reference, setReference] = useState([initialValues]);
-
   const [filter, setFilter] = useState(initialFilterValues);
   const [itemList, setItemList] = useState([initialVouItem]);
   const [notify, setNotify] = useState({
@@ -164,7 +187,8 @@ export default function ReuseMaster(props) {
     title: "",
     subTitle: "",
   });
-  // const [count, setCount] = useState(records[records.length - 1].branchCode);
+  const [errors, setErrors] = useState(validateValues);
+
   const classes = useStyles();
   const {
     TblContainer,
@@ -175,6 +199,10 @@ export default function ReuseMaster(props) {
   } = useTable(records, headcells, filterFn);
   console.log(values);
   console.log("filter=>", filter);
+  if (values.docCode == "PR") useBatch = "NO";
+  //no batch while purchasing
+  //doing this only for PR coz we are verifying that we have enough stock
+  // using axiosPOst before submiting PR only as it causes reduction in stock
 
   function getName(code, arr = common) {
     let name = "";
@@ -186,16 +214,19 @@ export default function ReuseMaster(props) {
     });
     return name;
   }
-  if (records[0].vouNo == "X X X X") {
+  if (!records[0].vouNo) {
     let temp = "MANUAL NO";
-    let arr = headCells.filter((item) => !temp.includes(item.label));
+    let arr = headCellsData.filter((item) => !temp.includes(item.label));
     console.log(temp, arr);
     if (arr.length !== headcells.length) {
       setSelected(["MANUAL NO"]);
       setheadcells(arr);
     }
   }
-  console.log(Config[route]);
+  function getProdName(code) {
+    const name = common.products.find((item) => item.prodCode == code);
+    return name ? name.prodName : `prodCode ${code}`;
+  }
   if (loading1 || refresh) {
     let qry = initialValues.docCode;
     if (initialValues.docCode == "PV") {
@@ -211,125 +242,75 @@ export default function ReuseMaster(props) {
     if (initialValues.docCode == "DC") {
       qry = JSON.stringify({ $in: ["DC", "QT", "SO"] });
     }
+    const queryForGet = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}`;
+    const url = Config[route] + queryForGet;
 
-    query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}`;
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .get(Config[route] + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-        data: initialValues,
-      })
-      .then((response) => {
-        console.log(response.data);
-        if (loading1) setLoading1(false);
-        if (refresh) setRefresh(false);
-
-        function getAccounts(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialAc];
-          }
-        }
-        function getVouItems(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialVouItem];
-          }
-        }
-        function getAdress(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialAdress];
-          }
-        }
-        function getPayterms(arr) {
-          if (arr.length !== 0) {
-            return arr;
-          } else {
-            return [initialPayValues];
-          }
-        }
-        const prodData = response.data.mst_prodMaster;
-        const collectiveData = {
-          accounts: getAccounts(response.data.mst_accounts),
-          voucherItems: getVouItems(response.data.inv_voucherItems),
-          adress: getAdress(response.data.mst_acadress),
-          payTerms: getPayterms(response.data.mst_paymentTerm),
-          products: prodData.length == 0 ? [initialProdValues] : prodData,
-        };
-        setCommon(collectiveData);
-        const po = response.data.inv_voucher.filter(
-          (item) => item.docCode !== docCode
-        );
-        if (po.length !== 0) {
-          setReference(po);
-        }
-        const gr = response.data.inv_voucher
-          .filter((item) => item.docCode == docCode)
-          .map((item) => {
-            return {
-              ...item,
-              getDate: getDate(item.vouDate),
-              getName: getName(item.partyCode, collectiveData),
-            };
-          });
-
-        if (gr.length !== 0) {
-          setRecords(gr);
-        } else {
-          setRecords([{ ...initialValues, vouNo: "" }]);
-        }
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
+    const handleRes = (res) => {
+      console.log(res.data);
+      loading1 && setLoading1(false);
+      refresh && setRefresh(false);
+      const acc = res.data.mst_accounts;
+      const items = res.data.inv_voucherItems;
+      const adress = res.data.mst_acadress;
+      const payTerms = res.data.mst_paymentTerm;
+      const prodData = res.data.mst_prodMaster;
+      const vouchers = res.data.inv_voucher;
+      const collectiveData = {
+        accounts: acc.length !== 0 ? acc : [initialAc],
+        voucherItems: items.length !== 0 ? items : [initialVouItem],
+        adress: adress.length !== 0 ? adress : [initialVouItem],
+        payTerms: payTerms.length !== 0 ? payTerms : [initialVouItem],
+        products: prodData.length !== 0 ? prodData : [initialProdValues],
+      };
+      setCommon(collectiveData);
+      const po = vouchers.filter((item) => item.docCode !== docCode);
+      if (po.length !== 0) {
+        setReference(po);
+      }
+      const gr = vouchers
+        .filter((item) => item.docCode == docCode)
+        .map((item) => {
+          return {
+            ...item,
+            getDate: roleService.date(item.vouDate),
+            getName: getName(item.partyCode, collectiveData),
+          };
         });
-      })
-      .finally(() => {});
-  }
 
+      gr.length !== 0
+        ? setRecords(gr)
+        : setRecords([{ ...initialValues, vouNo: "" }]);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {});
+  }
+  console.log(query);
   console.log(records, common);
   function onDelete(item) {
     // roleService.deleteBranch(item);
-    let newRecord = [];
-    newRecord = records.filter((record) => {
-      return record.vouNo !== item.vouNo;
-    });
-    if (newRecord.length == 0) {
-      setRecords([initialFilterValues]);
-    } else {
-      setRecords(newRecord);
-    }
 
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
-    const token = AuthHandler.getLoginToken();
-    axios
-      .delete(Config[route] + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-        data: item,
-      })
-      .catch((err) => {
-        console.log(err);
+    const handleRes = () => {
+      let newRecord = [];
+      newRecord = records.filter((record) => {
+        return record.vouNo !== item.vouNo;
       });
+      newRecord.length == 0
+        ? setRecords([initialFilterValues])
+        : setRecords(newRecord);
+      setNotify(NotifyMsg(3));
+    };
+    console.log(url);
+    roleService.axiosDelete(url, item, handleRes, handleErr);
   }
 
   // console.log(count);
   function handleFilter(e) {
     const value = e.target.value;
     setFilter({ ...filter, allFields: value });
+    console.log(e.target.label);
     search(value);
   }
   // function getDate(code) {
@@ -342,15 +323,6 @@ export default function ReuseMaster(props) {
   //     String(date.getFullYear()).slice(-2)
   //   );
   // }
-  function getDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear().toString().slice(-2);
-    return `${day.toString().padStart(2, "0")}/${month
-      .toString()
-      .padStart(2, "0")}/${year}`;
-  }
 
   console.log(filter.allFields);
   function search(allfields) {
@@ -363,7 +335,7 @@ export default function ReuseMaster(props) {
           if (
             item.vouNo.toLowerCase().includes(allfields.toLowerCase()) ||
             item.manualNo.toLowerCase().includes(allfields.toLowerCase()) ||
-            getDate(item.vouDate).includes(allfields.toLowerCase())
+            roleService.date(item.vouDate).includes(allfields.toLowerCase())
           )
             return item;
           // item.talukaName == filter.allfields ||
@@ -375,162 +347,175 @@ export default function ReuseMaster(props) {
     });
   }
 
-  const handleSubmit = (input, itemList) => {
-    let x = true;
-    records.map((item) => {
-      if (item.vouNo == input.vouNo) {
-        x = false;
-      }
-    });
-    setButtonPopup(false);
-    console.log(input, itemList, new Date(input.vouDate), x);
-    const token = AuthHandler.getLoginToken();
-    // setButtonPopup(false);
-    let finalItemList = itemList;
-    //removing batch from batchlist whose sell ==0
-    if (useBatch == "Yes")
-      itemList.map((item, i) => {
-        if ("batchList" in item) {
-          let finalBatchList = item.batchList.filter(
-            (b) => Number(b.sell) !== 0
-          );
-          finalItemList[i].batchList = finalBatchList;
-        }
-      });
-    console.log(finalItemList);
-    if (x) {
-      axios
-        .put(
-          // Config.addUser,
-          Config[route] + query,
-          {
-            obj: {
-              input: input,
-              itemList: finalItemList,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
+  const handleSubmit = async (input, itemList) => {
+    let vouExists = records.find((item) => item.vouNo == input.vouNo);
+
+    if (validateParty(input, errors, setErrors, setNotify, vouExists)) {
+      console.log("before");
+      const batchQuery = `&vouNo=${input.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
+      const batchUrl = Config.batch + batchQuery;
+      const promise = new Promise((resolve, reject) => {
+        let stockNotReduced = true;
+        if (
+          (settings.saleStockUpdateUsing == "DC"
+            ? input.docCode == "DC"
+            : input.docCode == "SI") ||
+          input.docCode == "PR"
         )
-        .then((response) => {
-          console.log(response.data);
-          const res = response.data.values;
-          setRecords([
-            ...records,
-            {
-              ...res,
-              getDate: getDate(res.vouDate),
-              getName: getName(res.partyCode),
+          roleService.axiosPost(
+            batchUrl,
+            itemList,
+            (batchRes) => {
+              console.log(batchRes.data);
+              stockNotReduced = batchRes.data.itemList.every(
+                (item) => !item.hasStockReduced
+              );
+              // all vouItems have field hasStockReduced that should be false
+              //for all vouItems i e stock has not reduced
+              console.log(stockNotReduced);
+              console.log(batchRes.data);
+              const outOfStockProds = [];
+              batchRes.data.itemList.map((item) => {
+                if (item.hasStockReduced)
+                  outOfStockProds.push(getProdName(item.prodCode));
+              });
+              const outOfStockProdsString = outOfStockProds.join(", ");
+              if (!stockNotReduced)
+                //stock is reduced
+                setNotify({
+                  isOpen: true,
+                  message: `Not enough Stock for ${outOfStockProdsString}`,
+                  type: "warning",
+                });
+              resolve(stockNotReduced); // resolve the Promise
             },
-          ]);
-          // setVoucherItems([...voucherItems, ...response.data.items]);
-          setCommon({
-            ...common,
-            voucherItems: [...common.voucherItems, ...response.data.items],
-          });
-          setNotify({
-            isOpen: true,
-            message: "Voucher created  successfully",
-            type: "success",
-          });
+            (err) => {
+              handleErr(err);
+              reject(err); // reject the Promise
+            }
+          );
+        else resolve(true);
+      });
+
+      promise
+        .then((stockNotReduced) => {
+          if (stockNotReduced) {
+            setButtonPopup(false);
+            console.log(input, itemList, new Date(input.vouDate), vouExists);
+            let finalItemList = itemList;
+            //removing batch from batchlist whose sell ==0
+            if (useBatch == "Yes")
+              itemList.map((item, i) => {
+                if ("batchList" in item) {
+                  let finalBatchList = item.batchList.filter(
+                    (b) => Number(b.sell) !== 0
+                  );
+                  finalItemList[i].batchList = finalBatchList;
+                }
+              });
+            console.log(finalItemList);
+            //every item.hasStockReduced should be false
+
+            if (!vouExists) {
+              const handleRes = (response) => {
+                console.log(response.data);
+                const res = response.data.values;
+                setRecords([
+                  ...records,
+                  {
+                    ...res,
+                    getDate: roleService.date(res.vouDate),
+                    getName: getName(res.partyCode),
+                  },
+                ]);
+                setCommon({
+                  ...common,
+                  voucherItems: [
+                    ...common.voucherItems,
+                    ...response.data.items,
+                  ],
+                });
+                setNotify(NotifyMsg(1));
+              };
+              const obj = {
+                input: input,
+                itemList: finalItemList,
+              };
+              console.log(url);
+              roleService.axiosPut(url, obj, handleRes, handleErr);
+            } else {
+              const handleRes = (response) => {
+                let updatedEntry = response.data.values;
+                console.log(updatedEntry);
+                updatedEntry = {
+                  ...updatedEntry,
+                  getName: getName(updatedEntry.partyCode),
+                  getDate: roleService.date(updatedEntry.vouDate),
+                };
+                const updatedRecords = records.map((item) =>
+                  item.vouNo == input.vouNo ? updatedEntry : item
+                );
+                setRecords(updatedRecords);
+                const newVouItems = common.voucherItems.filter(
+                  (item) => item.vouNo !== input.vouNo
+                );
+                setCommon({
+                  ...common,
+                  voucherItems: [...newVouItems, ...itemList],
+                });
+                setNotify(NotifyMsg(2));
+              };
+
+              const obj = {
+                input: input,
+                itemList: finalItemList,
+              };
+              console.log(url);
+              roleService.axiosPatch(url, obj, handleRes, handleErr);
+            }
+          }
         })
         .catch((err) => {
           console.log(err);
-        });
-    } else {
-      axios
-        .patch(
-          // Config.addUser,
-          Config[route] + query,
-          {
-            obj: {
-              input: input,
-              itemList: finalItemList,
-            },
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          let updatedEntry = response.data.values;
-          console.log(updatedEntry);
-          updatedEntry = {
-            ...updatedEntry,
-            getName: getName(updatedEntry.partyCode),
-            getDate: getDate(updatedEntry.vouDate),
-          };
-          const updatedRecords = records.map((item) =>
-            item.vouNo == input.vouNo ? updatedEntry : item
-          );
-          setRecords(updatedRecords);
-          const newVouItems = common.voucherItems.filter(
-            (item) => item.vouNo !== input.vouNo
-          );
-          setCommon({
-            ...common,
-            voucherItems: [...newVouItems, ...itemList],
-          });
-
-          setNotify({
-            isOpen: true,
-            message: "Voucher updated  successfully",
-            type: "success",
-          });
+          setNotify(NotifyMsg(4));
         });
     }
   };
-  function getEntry(code, signal, type) {
-    const token = AuthHandler.getLoginToken();
+  async function getEntry(code, signal, type) {
     let newValue = values;
-    axios
-      .post(
-        // Config.addUser,
-        Config[route] + query,
-        { code: code, type: "entry" },
-        {
-          headers: {
-            authorization: "Bearer" + token,
-          },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setValues(response.data.values);
-        let restOfVouItems = common.voucherItems.filter(
-          (item) => item.vouNo != code
-        );
-        setCommon({
-          ...common,
-          voucherItems: [...restOfVouItems, ...response.data.itemList],
-        });
-        newValue = response.data.values;
-        setLatestVouItems(code, response.data.itemList);
-      })
-      .catch((err) => {
-        console.log(err);
-        setNotify({
-          isOpen: true,
-          message: "unable to fetch entry",
-          type: "warn",
-        });
-      })
-      .finally(() => {
-        if (signal == "v") {
-          setButtonPopup(true);
-          // setLoading("X X X X");
-        } else {
-          setPrint(true);
-        }
+
+    const final = () => {
+      setErrors(validateValues);
+      if (signal == "v") {
+        setButtonPopup(true);
+      } else {
+        setPrint(true);
+      }
+    };
+
+    const handleRes = (res) => {
+      console.log(res.data);
+      setValues(res.data.values);
+      let restOfVouItems = common.voucherItems.filter(
+        (item) => item.vouNo != code
+      );
+      setCommon({
+        ...common,
+        voucherItems: [...restOfVouItems, ...res.data.itemList],
       });
-    return newValue;
+      newValue = res.data.values;
+      setLatestVouItems(code, res.data.itemList);
+      return Promise.resolve(newValue);
+    };
+
+    await roleService.axiosPost(
+      url,
+      { code: code, type: "entry" },
+      handleRes,
+      handleErr,
+      final
+    );
   }
-  let componentRef = React.useRef();
   function setLatestVouItems(voucherNumber, latestData) {
     let arr = [];
     arr = latestData.filter((item) => item.vouNo == voucherNumber);
@@ -541,279 +526,257 @@ export default function ReuseMaster(props) {
       setItemList([initialVouItem]);
     }
   }
+  //this is for details of Filter Apllied in printing all vouchers
+  //u can seein table
+
   return (
     <>
-      <div className="hold-transition sidebar-mini">
-        <div className="wrapper">
-          <div className="content-wrapper">
-            <PageHeader
-              title={title}
-              icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
-            />
+      <PageHeader
+        title={title}
+        icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
+      />
+      <section className="content">
+        <div className="card">
+          <div className="card-body">
             <section className="content">
-              <div className="card">
-                <div className="card-body">
-                  <section className="content">
-                    <Toolbar>
-                      <Grid container style={{ display: "flex", flexGrow: 1 }}>
-                        <Grid
-                          item
-                          xs={8}
-                          sm={6}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          <Controls.Input
-                            label="Search"
-                            className={classes.searchInput}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                              endAdornment: filter.allFields && (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() => {
-                                      setFilter(initialFilterValues);
-                                      setFilterFn(initialFilterFn);
-                                    }}
-                                    style={{ boxShadow: "none" }}
-                                  >
-                                    <ClearIcon />
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={filter.allFields}
-                            onChange={handleFilter}
-                          />
-                        </Grid>{" "}
-                        <Grid
-                          item
-                          sm={1}
-                          xs={4}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Filter
-                            filterIcon={filterIcon}
-                            setFilterPopup={setFilterPopup}
-                            setFilter={setFilter}
-                            setFilterFn={setFilterFn}
-                            setFilterIcon={setFilterIcon}
-                            initialFilterValues={initialFilterValues}
-                            setRefresh={setRefresh}
-                            initialFilterFn={initialFilterFn}
-                          />
-                        </Grid>
-                        <Grid
-                          item
-                          sm={3}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Grid container style={{ width: "100%" }}>
-                            <Excel
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headCells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <Print
-                              buttonText="Export Data to Excel"
-                              TblContainer={TblContainer}
-                              TblHead={TblHead}
-                              TblPagination={TblPagination}
-                              headCells={headcells}
-                              recordsAfterSorting={recordsAfterAndSorting}
-                            />
-                            <MultipleSelectCheckmarks
-                              headcells={headcells}
-                              setheadcells={setheadcells}
-                              initialHeadCells={headCells}
-                              selected={selected}
-                              setSelected={setSelected}
-                            />
-                          </Grid>{" "}
-                        </Grid>
-                        <Grid
-                          item
-                          sm={2}
-                          xs={12}
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Controls.Button
-                            text="Add New"
-                            size="medium"
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={(e) => {
-                              setButtonPopup(true);
-                              setValues({ ...initialValues, vouNo: "" });
-                              setItemList([initialVouItem]);
-                            }}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Toolbar>{" "}
-                    <TableContainer>
-                      <TblContainer>
-                        <TblHead />
-                        {loading1 ? (
-                          <MuiSkeleton />
-                        ) : (
-                          <TableBody>
-                            {recordsAfterPagingAndSorting().map((item) => (
-                              <TableRow>
-                                {headcells.map((headcell, i) => (
-                                  <TableCell
-                                    key={headcell.id}
-                                    // sortDirection={orderBy === headcell.id ? order : false}
-                                    style={{
-                                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                                    }}
-                                  >
-                                    {headcell.label == "Edit" ? (
-                                      <>
-                                        <Controls.LoadingActionButton
-                                          value={values}
-                                          color="primary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            getEntry(item.vouNo, "v");
-                                            // setLoading(item.vouNo);
-                                          }}
-                                        >
-                                          <EditOutlinedIcon fontSize="small" />
-                                        </Controls.LoadingActionButton>
-                                        <Controls.ActionButton
-                                          color="secondary"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-
-                                            setConfirmDialog({
-                                              isOpen: true,
-                                              title:
-                                                "Are you sure to delete this record?",
-                                              subTitle:
-                                                "You can't undo this operation",
-                                              onConfirm: (e) => {
-                                                onDelete(item);
-                                                console.log(
-                                                  "records:" + records
-                                                );
-                                              },
-                                            });
-                                          }}
-                                        >
-                                          <CloseIcon fontSize="small" />
-                                        </Controls.ActionButton>
-                                        <Controls.ActionButton>
-                                          <PrintOne
-                                            key={i}
-                                            values={values}
-                                            item={item}
-                                            voucherItems={common.voucherItems}
-                                            adress={common.adress}
-                                            accounts={common.accounts}
-                                            products={common.products}
-                                            payTerms={common.payTerms}
-                                            getEntry={getEntry}
-                                            setopen={setPrint}
-                                            printPopup={print}
-                                          />
-                                        </Controls.ActionButton>
-                                      </>
-                                    ) : (
-                                      item[headcell.feild]
-                                    )}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        )}
-                      </TblContainer>
-                    </TableContainer>
-                    <TblPagination />
-                  </section>
-                  <Popup
-                    size="lg"
-                    title={`${title} form`}
-                    openPopup={buttonPopup}
-                    setOpenPopup={setButtonPopup}
-                    style={{ padding: "0px" }}
+              <Toolbar>
+                <Grid container style={{ display: "flex", flexGrow: 1 }}>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    <DcForm
-                      records={records}
-                      setRecords={setRecords}
-                      values={values}
-                      setValues={setValues}
-                      initialValues={initialValues}
-                      initialFilterValues={initialFilterValues}
-                      setButtonPopup={setButtonPopup}
-                      setNotify={setNotify}
-                      accounts={common.accounts}
-                      adress={common.adress}
-                      payTerms={common.payTerms}
-                      products={common.products}
-                      voucherItems={common.voucherItems}
-                      openPopup={buttonPopup}
-                      setOpenPopup={setButtonPopup}
-                      handleSubmit={handleSubmit}
-                      initialVouItem={initialVouItem}
-                      setCommon={setCommon}
-                      common={common}
-                      itemList={itemList}
-                      setItemList={setItemList}
-                      title={title}
-                      reference={reference}
+                    <Controls.Input
+                      label="Search"
+                      className={classes.searchInput}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                        endAdornment: filter.allFields && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setFilter(initialFilterValues);
+                                setFilterFn(initialFilterFn);
+                              }}
+                              style={{ boxShadow: "none" }}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      value={filter.allFields}
+                      onChange={handleFilter}
                     />
-                  </Popup>
-
-                  <Popup
-                    title={`Filter form`}
-                    openPopup={filterPopup}
-                    setOpenPopup={setFilterPopup}
+                  </Grid>{" "}
+                  <Grid
+                    item
+                    sm={1}
+                    xs={4}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <FilterForm
-                      filterIcon={filterIcon}
-                      setFilterPopup={setFilterPopup}
-                      setFilterIcon={setFilterIcon}
-                      setFilter={setFilter}
-                      filter={filter}
-                      accounts={common.accounts}
-                      products={common.products}
-                      setFilterFn={setFilterFn}
-                      voucherItems={common.voucherItems}
-                      initialFilterValues={initialFilterValues}
-                      setRefresh={setRefresh}
+                    <Filter setFilterPopup={setFilterPopup} />
+                  </Grid>
+                  <Grid
+                    item
+                    sm={3}
+                    xs={8}
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Grid container style={{ width: "100%" }}>
+                      <Excel
+                        buttonText="Export Data to Excel"
+                        title={title}
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filterFields={filterFields}
+                        filter={filter}
+                      />
+                      <Print
+                        title={title}
+                        buttonText="Export Data to Excel"
+                        headCells={headcells}
+                        recordsAfterSorting={recordsAfterAndSorting}
+                        filterFields={filterFields}
+                        filter={filter}
+                      />
+                      <MultipleSelectCheckmarks
+                        headcells={headcells}
+                        setheadcells={setheadcells}
+                        initialHeadCells={headCellsData}
+                        selected={selected}
+                        setSelected={setSelected}
+                      />
+                    </Grid>{" "}
+                  </Grid>
+                  <Grid
+                    item
+                    sm={2}
+                    xs={12}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Controls.Button
+                      text="Add New"
+                      size="medium"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={(e) => {
+                        setButtonPopup(true);
+                        setValues({ ...initialValues, vouNo: "" });
+                        setItemList([initialVouItem]);
+                        setErrors(validateValues);
+                      }}
                     />
-                  </Popup>
-
-                  <Notification notify={notify} setNotify={setNotify} />
-                  <ConfirmDialog
-                    confirmDialog={confirmDialog}
-                    setConfirmDialog={setConfirmDialog}
-                  />
-                </div>
-              </div>
+                  </Grid>
+                </Grid>
+              </Toolbar>{" "}
+              <TableContainer>
+                <TblContainer>
+                  <TblHead />
+                  {loading1 ? (
+                    <MuiSkeleton />
+                  ) : (
+                    <TableBody>
+                      {recordsAfterPagingAndSorting().map((item) => (
+                        <TableRow>
+                          {headcells.map((headcell, i) => (
+                            <TableCell
+                              key={headcell.id}
+                              // sortDirection={orderBy === headcell.id ? order : false}
+                              style={{
+                                borderRight: "1px solid rgba(0,0,0,0.2)",
+                              }}
+                              align={headcell.align}
+                            >
+                              {headcell.label == "Edit" ? (
+                                <>
+                                  <Controls.LoadingActionButton
+                                    value={values}
+                                    color="primary"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      getEntry(item.vouNo, "v");
+                                      // setLoading(item.vouNo);
+                                    }}
+                                  >
+                                    <EditOutlinedIcon fontSize="small" />
+                                  </Controls.LoadingActionButton>
+                                  <Controls.DeleteButton
+                                    handleConfirm={() => {
+                                      AuthHandler.canDelete()
+                                        ? onDelete(item)
+                                        : setNotify(NotifyMsg(8));
+                                    }}
+                                    setConfirmDialog={setConfirmDialog}
+                                  />
+                                  <Controls.ActionButton>
+                                    <PrintOne
+                                      key={i}
+                                      values={values}
+                                      item={item}
+                                      voucherItems={common.voucherItems}
+                                      adress={common.adress}
+                                      accounts={common.accounts}
+                                      products={common.products}
+                                      payTerms={common.payTerms}
+                                      getEntry={getEntry}
+                                      setopen={setPrint}
+                                      printPopup={print}
+                                    />
+                                  </Controls.ActionButton>
+                                </>
+                              ) : (
+                                item[headcell.feild]
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </TblContainer>
+              </TableContainer>
+              <TblPagination />
             </section>
+            <Popup
+              size="lg"
+              title={`${title} form`}
+              openPopup={buttonPopup}
+              setOpenPopup={setButtonPopup}
+              style={{ padding: "0px" }}
+            >
+              <GeneralForm
+                records={records}
+                setRecords={setRecords}
+                values={values}
+                setValues={setValues}
+                initialValues={initialValues}
+                initialFilterValues={initialFilterValues}
+                setButtonPopup={setButtonPopup}
+                setNotify={setNotify}
+                accounts={common.accounts}
+                adress={common.adress}
+                payTerms={common.payTerms}
+                products={common.products}
+                voucherItems={common.voucherItems}
+                openPopup={buttonPopup}
+                setOpenPopup={setButtonPopup}
+                handleSubmit={handleSubmit}
+                initialVouItem={initialVouItem}
+                setCommon={setCommon}
+                common={common}
+                itemList={itemList}
+                setItemList={setItemList}
+                title={title}
+                reference={reference}
+                errors={errors}
+                setErrors={setErrors}
+              />
+            </Popup>
+
+            <Popup
+              title={`Filter form`}
+              openPopup={filterPopup}
+              setOpenPopup={setFilterPopup}
+            >
+              <FilterForm
+                filterIcon={filterIcon}
+                setFilterPopup={setFilterPopup}
+                setFilterIcon={setFilterIcon}
+                setFilter={setFilter}
+                filter={filter}
+                accounts={common.accounts}
+                products={common.products}
+                setFilterFn={setFilterFn}
+                voucherItems={common.voucherItems}
+                initialFilterValues={initialFilterValues}
+                setRefresh={setRefresh}
+              />
+            </Popup>
+
+            <Notification notify={notify} setNotify={setNotify} />
+            <ConfirmDialog
+              confirmDialog={confirmDialog}
+              setConfirmDialog={setConfirmDialog}
+            />
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

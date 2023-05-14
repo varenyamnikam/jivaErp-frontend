@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Controls from "../../../components/controls/Controls";
-import BasicSelect from "../../Usermaster/basicselect";
 import { Grid } from "@material-ui/core";
 
 export default function DisabledInputs1(props) {

@@ -32,7 +32,7 @@ import Print from "../../components/print";
 import MultipleSelectCheckmarks from "../../components/multiSelect";
 import Filter from "../../components/filterButton";
 import AcForm from "./AcForm";
-import PrintAcc from "../../components/prinAcc";
+import PrintAcc from "../../components/printAcc";
 import { getTime } from "date-fns";
 import DateCalc from "../../components/dateCalc";
 import { NotifyMsg } from "../../components/notificationMsg";
@@ -102,7 +102,7 @@ export default function AcMaster(props) {
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
     { id: "Account", label: "Account", feild: "acName" },
-    { id: "Date", label: "Date", feild: "vouDate" },
+    { id: "Date", label: "Date", feild: "getDate" },
     { id: "Debit", label: "Debit", feild: "debit", align: "right" },
     { id: "Credit", label: "Credit", feild: "credit", align: "right" },
     { id: "Edit", label: "Edit", feild: "" },
@@ -171,7 +171,7 @@ export default function AcMaster(props) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(values, recordsAfterAndSorting());
+  console.log(values, records);
   console.log("filter=>", filter);
   console.log(Config.batch);
   const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
@@ -195,9 +195,9 @@ export default function AcMaster(props) {
         temp = temp.map((item) => ({
           ...item,
           acName: getName(item.acCode, res.data.mst_accounts),
-          vouDate: roleService.date(item.vouDate),
           debit: Math.abs(item.debit),
           credit: Math.abs(item.credit),
+          getDate: roleService.date(item.vouDate),
         }));
         console.log(temp);
         setRecords(temp);

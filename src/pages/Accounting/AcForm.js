@@ -181,7 +181,12 @@ export default function AcForm(props) {
       if (bankValues.docCode !== "JV") {
         console.log(Fil);
         Fil = Fil.map((item, i) => {
-          return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
+          return {
+            ...item,
+            srNo: i + 1,
+            vouNo: bankValues.vouNo,
+            getDate: roleService.date(item.vouDate),
+          };
         });
         // bankValues.srNo = 1;
         let obj = finalCalc(bankValues);
@@ -190,9 +195,15 @@ export default function AcForm(props) {
       } else {
         console.log(Fil);
         Fil = Fil.map((item, i) => {
-          return { ...item, srNo: i + 1, vouNo: bankValues.vouNo };
+          return {
+            ...item,
+            srNo: i + 1,
+            vouNo: bankValues.vouNo,
+            getDate: roleService.date(item.vouDate),
+          };
         });
       }
+      bankValues.getDate = roleService.date(bankValues.vouDate);
       const user = JSON.parse(localStorage.getItem("user"));
       if (x) {
         const handleRes = (res) => {
@@ -205,6 +216,7 @@ export default function AcForm(props) {
           setRecords([...records, ...Fil]);
           setNotify(NotifyMsg(1));
         };
+        console.log(bankValues, Fil);
         roleService.axiosPut(
           url,
           {
@@ -515,14 +527,14 @@ export default function AcForm(props) {
               // marginRight: "10px",
             }}
           >
-            <Controls.Button
+            {/* <Controls.Button
               type="reset"
               text="Reset"
               color="default"
               onClick={() => {
                 setBankValues(vouItems);
               }}
-            />
+            /> */}
             <Controls.Button
               type="submit"
               text="Submit"

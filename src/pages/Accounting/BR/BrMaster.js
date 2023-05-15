@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AuthHandler from "../../../Utils/AuthHandler";
 import Config from "../../../Utils/AuthHandler";
 import AcMaster from "../AcMaster";
+import * as roleService from "../../../services/roleService";
 export default function BR() {
   const user = AuthHandler.getUser();
   const initialValues = {
@@ -25,6 +26,9 @@ export default function BR() {
     favouringName: "",
     entryBy: "",
     entryOn: "",
+    getDate: function () {
+      return roleService.date(this.vouDate);
+    },
   };
   console.log(Config.ledger);
   return <AcMaster title="Bank Reciept" initialValues={initialValues} />;

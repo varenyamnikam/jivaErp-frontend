@@ -111,12 +111,12 @@ export default function DCReport({ docCode }) {
     { id: "Party", label: "Party", feild: "partyName" },
     { id: "Product Code", label: "Product Code", feild: "prodCode" },
     { id: "Product", label: "Product", feild: "prodName" },
-    { id: "Quantity", label: "Quantity", feild: "qty" },
-    { id: "Rate", label: "Rate", feild: "rate" },
-    { id: "Discount", label: "Discount", feild: "discount" },
-    { id: "GST", label: "GST", feild: "gst" },
-    { id: "%", label: "%", feild: "gstP" },
-    { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount" },
+    { id: "Quantity", label: "Quantity", feild: "qty", align: "right" },
+    { id: "Rate", label: "Rate", feild: "rate", align: "right" },
+    { id: "Discount", label: "Discount", feild: "discount", align: "right" },
+    { id: "GST", label: "GST", feild: "gst", align: "right" },
+    { id: "%", label: "%", feild: "gstP", align: "right" },
+    { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount", align: "right" },
   ];
   const filterFields = [
     { feild: "prodName", label: "Product Name" },
@@ -483,7 +483,7 @@ export default function DCReport({ docCode }) {
                   </Grid>
                 </Grid>
               </Toolbar>{" "}
-              <table className="table">
+              <TblContainer>
                 <TblHead />
                 {loading ? (
                   <MuiSkeleton />
@@ -499,6 +499,7 @@ export default function DCReport({ docCode }) {
                               borderRight: "1px solid rgba(0,0,0,0.2)",
                               wordBreak: "break-all",
                             }}
+                            align={headcell.align}
                           >
                             {item[headcell.feild]}
                           </TableCell>
@@ -507,7 +508,7 @@ export default function DCReport({ docCode }) {
                     ))}
                   </TableBody>
                 )}
-              </table>
+              </TblContainer>
               <TblPagination />
             </section>
             <Popup

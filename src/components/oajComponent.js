@@ -193,8 +193,9 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   }
   function getItems(values) {
     let arr = [];
+    console.log(records, values);
     arr = records.filter(
-      (item) => item.vouNo == values.vouNo && Number(item.srNo) !== 1
+      (item) => item.vouNo == values.vouNo && Number(item.srNo)
     );
     return arr;
   }

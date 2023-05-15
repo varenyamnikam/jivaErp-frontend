@@ -25,6 +25,7 @@ class AuthHandler {
         if (response.data.auth) {
           console.log(response.data);
           console.log(response.data.user);
+          localStorage.clear();
           reactLocalStorage.set("token", response.data.token);
           reactLocalStorage.set("userName", response.data.userName);
           localStorage.setItem("userCode", response.data.userCode);

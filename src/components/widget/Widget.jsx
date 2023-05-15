@@ -16,6 +16,7 @@ const Widget = ({ type }) => {
   const diff = 20;
   function onClick(e) {
     const data = e.target.getAttribute("value");
+    localStorage.setItem("screenCode","User Master");
     console.log(e.target, data);
     // if (data == "USER") {
     //   window.location = "/Admin/UserMaster";

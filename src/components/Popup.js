@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     // top: theme.spacing(2),
     border: `1px solid ${theme.palette.primary.light}`,
+    overflow: "hidden",
   },
   dialogTitle: {
     padding: "0px",
@@ -63,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   dialogContent: {
     // padding: "0px",
     // paddingRight: "1px",
-    overflowY: "auto",
+    overflow: "hidden",
   },
   ...styles(theme),
 }));
@@ -77,7 +78,7 @@ export default function Popup(props) {
     if (size) {
       return size;
     } else {
-      return "sm";
+      return "md";
     }
   }
   console.log(getSize());

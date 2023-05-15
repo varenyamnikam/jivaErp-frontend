@@ -64,12 +64,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  srNo: 0,
+  srNo: "0",
   prodCode: "0",
   openingStock: "0",
-  inward: 0,
-  outward: 0,
-  closingStock: 0,
+  inward: "0",
+  outward: "0",
+  closingStock: "0",
   reorderLevel: "0",
 };
 const initialProducts = {
@@ -210,7 +210,7 @@ export default function StockMaster({ title = "Stock Report" }) {
     let batchWiseStock = "NO";
     if (useBatch == "Yes" && batchWise) batchWiseStock = "Yes";
     console.log(batchWiseStock);
-    let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&useBatch=${batchWiseStock}`;
+    let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&useBatch=${batchWiseStock}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
     axios

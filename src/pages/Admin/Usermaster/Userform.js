@@ -208,6 +208,7 @@ export default function Userform(props) {
           error={errors.Password}
           onChange={handleChange}
           autoComplete="new-password"
+          fullWidth
         />
       </Grid>
       <Grid item sm={6} xs={12}>
@@ -218,6 +219,7 @@ export default function Userform(props) {
           error={errors.RePassword}
           onChange={handleChange}
           autoComplete="new-password"
+          fullWidth
         />
       </Grid>
       <Grid item sm={6} xs={12}>

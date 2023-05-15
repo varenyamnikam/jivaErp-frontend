@@ -120,13 +120,18 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
     { id: "Party", label: "Party", feild: "partyName" },
     { id: "Product Code", label: "Product Code", feild: "prodCode" },
     { id: "Product", label: "Product", feild: "prodName" },
-    { id: "Quantity", label: "Quantity", feild: "qty" },
-    { id: "Rate", label: "Rate", feild: "rate" },
-    { id: "Discount", label: "Discount", feild: "discount" },
-    { id: "GST", label: "GST", feild: "gst" },
-    { id: "%", label: "%", feild: "gstP" },
-    { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount" },
-    { id: "Delivered", label: "Delivered", feild: "deliveredQty" },
+    { id: "Quantity", label: "Quantity", feild: "qty", align: "right" },
+    { id: "Rate", label: "Rate", feild: "rate", align: "right" },
+    { id: "Discount", label: "Discount", feild: "discount", align: "right" },
+    { id: "GST", label: "GST", feild: "gst", align: "right" },
+    { id: "%", label: "%", feild: "gstP", align: "right" },
+    { id: "Bill Amt", label: "Bill Amt", feild: "itemAmount", align: "right" },
+    {
+      id: "Delivered",
+      label: "Delivered",
+      feild: "deliveredQty",
+      align: "right",
+    },
   ];
   const user = JSON.parse(localStorage.getItem("user"));
   const userCode = localStorage.getItem("userCode");
@@ -533,6 +538,7 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
                                     style={{
                                       borderRight: "1px solid rgba(0,0,0,0.2)",
                                     }}
+                                    align={headcell.align}
                                   >
                                     {item[headcell.feild]}
                                   </TableCell>

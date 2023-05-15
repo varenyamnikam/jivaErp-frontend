@@ -50,12 +50,13 @@ export default function RightsForm(props) {
     let temp = { ...errors };
     if ("userCode" in fieldValues)
       temp.userCode = fieldValues.userCode ? "" : "This field is required.";
-    if ("screenName" in fieldValues)
+    if ("screenName" in fieldValues && !fieldValues.copyUserRights)
       temp.screenName = fieldValues.screenName ? "" : "This field is required.";
     setErrors({
       ...temp,
     });
     const hasRight = AuthHandler.canEdit();
+    console.log(hasRight);
     if (!hasRight)
       fieldValues.userCode ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
 

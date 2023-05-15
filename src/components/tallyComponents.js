@@ -196,6 +196,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
     // arr = records.filter(
     //   (item) => item.vouNo == values.vouNo && Number(item.srNo) !== 1
     // );
+    console.log(records, values);
     arr = records.filter((item) => item.vouNo == values.vouNo);
 
     return arr;
@@ -325,7 +326,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <h3>{`${title} No. ${values.vouNo}`}</h3>
           </Grid>
           <Grid Item xs={6} sm={6} style={center}>
-            <h3>Date: {getDate(values.vouDate)}</h3>
+            <h3>Date: {values.getDate()}</h3>
           </Grid>
           <Grid Item xs={12} sm={12} style={{ ...center }}>
             <Grid

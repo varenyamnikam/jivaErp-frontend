@@ -8,7 +8,12 @@ export default function Validate(
   setNotify
 ) {
   console.log(fieldValues);
+  // delete errors.getDate;
+  console.log(errors);
   let temp = { ...errors };
+  // delete temp.getDate;
+  // delete fieldValues.getDate;
+  console.log(temp);
   function check(key) {
     if (key in fieldValues)
       temp[key] = fieldValues[key] ? "" : "This field is required.";
@@ -62,17 +67,18 @@ export default function Validate(
         ? "has to be zero"
         : "";
   }
-  console.log(temp);
   setErrors({
     ...temp,
   });
   delete temp.startDate;
   delete temp.endDate;
+  delete temp.getDate;
+
   const hasRight = fieldValues.acCode
     ? AuthHandler.canEdit()
     : AuthHandler.canAdd();
   if (!hasRight)
     fieldValues.acCode ? setNotify(NotifyMsg(7)) : setNotify(NotifyMsg(6));
-
+  console.log(temp);
   return Object.values(temp).every((x) => x == "") && hasRight;
 }

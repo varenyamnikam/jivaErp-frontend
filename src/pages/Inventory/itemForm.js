@@ -234,7 +234,7 @@ export default function GeneralItemForm(props) {
   if (Number(input.netAmount) !== Math.round(k)) {
     setInput({ ...input, netAmount: Math.round(k) });
   }
-  console.log(batchList);
+  console.log(batchList, itemList);
   if (
     Number(input.roundOff).toFixed(2) !==
     (k.toFixed(2) - Math.round(k)).toFixed(2)
@@ -371,10 +371,15 @@ export default function GeneralItemForm(props) {
                 batchList: batchList,
               },
             ]);
-            console.log(
-              { ...item, vouSrNo: newNo, vouNo: input.vouNo },
-              itemList
-            );
+            console.log([
+              ...itemList,
+              {
+                ...item,
+                vouSrNo: newNo,
+                vouNo: input.vouNo,
+                batchList: batchList,
+              },
+            ]);
             setItem({
               ...initialVouItem,
               vouNo: input.vouNo,
@@ -397,7 +402,7 @@ export default function GeneralItemForm(props) {
         setNotify(NotifyMsg(4));
       });
   };
-  console.log(item);
+  console.log(item, itemList);
   const classesContainer = useStylesContainer();
   return (
     <>

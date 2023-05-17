@@ -34,6 +34,7 @@ export default function CmnToolBar({
   selected,
   setSelected,
   filterFields,
+  tableContent = <></>,
   additionalComponent = () => <></>,
 }) {
   return (
@@ -114,6 +115,7 @@ export default function CmnToolBar({
                 recordsAfterSorting={recordsAfterSorting}
                 filterFields={filterFields}
                 filter={filter}
+                tableContent={tableContent}
               />
               <MultipleSelectCheckmarks
                 headcells={headcells}

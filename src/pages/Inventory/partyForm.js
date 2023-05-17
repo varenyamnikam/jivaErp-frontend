@@ -307,7 +307,7 @@ export default function CustomerForm(props) {
                       refInput &&
                         setInput({
                           ...refInput,
-                          vouNo: input.refNo,
+                          vouNo: input.vouNo,
                           vouDate: input.vouDate,
                           docCode: input.docCode,
                           refNo: input.refNo,

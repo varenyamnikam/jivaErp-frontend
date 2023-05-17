@@ -185,20 +185,30 @@ export default function Excel(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {recordsAfterSorting().map((item) => (
-              <TableRow key={item._id}>
-                {headCells.map((headCell) => (
-                  <TableCell
-                    key={headCell.id}
-                    style={{
-                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                    }}
-                  >
-                    {headCell.feild in item ? item[headCell.feild] : ""}
-                  </TableCell>
-                ))}{" "}
-              </TableRow>
-            ))}
+            {recordsAfterSorting().length ? (
+              recordsAfterSorting().map((item) => (
+                <TableRow key={item._id}>
+                  {headCells.map(
+                    (headCell) =>
+                      headCell.feild in item && (
+                        <TableCell
+                          key={headCell.id}
+                          style={{
+                            border: "1px solid rgba(0,0,0,0.2)",
+                            color: "black",
+                            whiteSpace: "nowrap",
+                          }}
+                          align={headCell.align}
+                        >
+                          {headCell.feild in item ? item[headCell.feild] : ""}
+                        </TableCell>
+                      )
+                  )}{" "}
+                </TableRow>
+              ))
+            ) : (
+              <></>
+            )}
           </TableBody>
         </TableContainer>
       </table>

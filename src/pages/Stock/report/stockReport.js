@@ -121,7 +121,7 @@ export default function StockMaster({ title = "Stock Report" }) {
     { id: "Outward", label: "Outward", feild: "outward" },
     { id: "Closing", label: "Closing", feild: "closingStock" },
     { id: "Reorder Level", label: "Reorder Level", feild: "reorderLevel" },
-    { id: "Ledger", label: "Ledger", feild: "reorderLevel" },
+    { id: "Ledger", label: "Ledger" },
   ];
   const filterFields = [{ feild: "prodName", label: "Product Name" }];
 
@@ -407,7 +407,14 @@ export default function StockMaster({ title = "Stock Report" }) {
       }
       arr.sort((a, b) => new Date(a.voudate) - new Date(b.voudate));
       console.log(arr);
-      setLedger(arr);
+      setLedger(
+        arr.sort((a, b) => {
+          const dateA = a.vouDate ? new Date(a.vouDate) : new Date(0);
+          const dateB = b.vouDate ? new Date(b.vouDate) : new Date(0);
+          return dateA - dateB;
+        })
+      );
+
       return arr;
     } else {
       console.log("empty");

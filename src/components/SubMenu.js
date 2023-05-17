@@ -104,7 +104,7 @@ const TreeNode = ({ node }) => {
               <InventoryIcon fontSize="small" />
             ) : node.screenName == "Purchase" ? (
               <ShoppingCartIcon fontSize="small" />
-            ) : node.screenName == "Stock" ? (
+            ) : node.screenName == "Inventory Transaction" ? (
               <FontAwesomeIcon icon="fas fa-cubes" />
             ) : node.screenName == "Sale" ? (
               <CurrencyRupeeIcon fontSize="small" />
@@ -157,8 +157,6 @@ const TreeNode = ({ node }) => {
                   borderColor: "white",
                 }}
               />
-            ) : node.screenName == "Inventory Transaction" ? (
-              <FontAwesomeIcon icon="fas fa-exchange-alt" />
             ) : (
               ""
             )}

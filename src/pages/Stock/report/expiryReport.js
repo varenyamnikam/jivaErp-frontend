@@ -228,7 +228,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
         prodName: item.prodName,
         UOM: item.UOM,
         batchNo: item.batchNo,
-        batchExpDate: item.batchExpDate,
+        batchExpDate: roleService.date(item.batchExpDate),
       };
       obj.closingStock > 0 && arr.push(obj);
 
@@ -433,14 +433,17 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
                                 borderRight: "1px solid rgba(0,0,0,0.2)",
                               }}
                             >
-                              {(headcell.feild == "prodCode" || //dont repeat same
-                                headcell.feild == "prodName") && //prodName & prodCode
-                              index !== 0 //cant compare with prev element if 0
-                                ? item[headcell.feild] ==
-                                  finalRecords[index - 1][headcell.feild]
-                                  ? ""
+                              {
+                                //all this for not repeat same prodName & prodCode
+                                (headcell.feild == "prodCode" ||
+                                  headcell.feild == "prodName") &&
+                                index !== 0 //cant compare with prev element if 0
+                                  ? item[headcell.feild] ==
+                                    finalRecords[index - 1][headcell.feild]
+                                    ? ""
+                                    : item[headcell.feild]
                                   : item[headcell.feild]
-                                : item[headcell.feild]}
+                              }
                             </TableCell>
                           ))}
                         </TableRow>

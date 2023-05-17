@@ -115,7 +115,10 @@ export default function StockLedger({ records }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log("records=>", records);
+  console.log(
+    "records=>",
+    records.sort((a, b) => new Date(a.vouDate) - new Date(b.vouDate))
+  );
 
   return (
     <>
@@ -124,21 +127,31 @@ export default function StockLedger({ records }) {
           <TblHead />
 
           <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
-              <TableRow>
-                {headcells.map((headcell, i) => (
-                  <TableCell
-                    key={headcell.id}
-                    // sortDirection={orderBy === headcell.id ? order : false}
-                    style={{
-                      borderRight: "1px solid rgba(0,0,0,0.2)",
-                    }}
-                  >
-                    {item[headcell.feild]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
+            {recordsAfterPagingAndSorting()
+              .sort((a, b) => {
+                const dateA = a.vouDate
+                  ? new Date(a.vouDate.split("/").reverse().join("/"))
+                  : new Date(0);
+                const dateB = b.vouDate
+                  ? new Date(b.vouDate.split("/").reverse().join("/"))
+                  : new Date(0);
+                return dateA - dateB;
+              })
+              .map((item) => (
+                <TableRow>
+                  {headcells.map((headcell, i) => (
+                    <TableCell
+                      key={headcell.id}
+                      // sortDirection={orderBy === headcell.id ? order : false}
+                      style={{
+                        borderRight: "1px solid rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      {item[headcell.feild]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
           </TableBody>
         </TblContainer>
       </TableContainer>

@@ -27,7 +27,12 @@ export default function (props) {
     headCells,
     filter = {},
     filterFields = [],
+    tableContent,
   } = props;
+  let headCellsArr = headCells.filter(
+    (headCell) => headCell.label !== "Edit" || headCell.label !== "Ledger"
+  );
+
   const [buttonPopup, setButtonPopup] = React.useState(false);
   let componentRef = React.useRef();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -78,12 +83,13 @@ export default function (props) {
   }
   console.log(filterInfoText());
   // recordsAfterSorting().map((item) => {
-  //   headCells.map((headCell) => {
+  //   headCellsArr.map((headCell) => {
   //     console.log(item, headCell.feild);
   //   });
   // });
-  console.log(filterFields, headCells, filter);
+  console.log(filterFields, headCellsArr, filter);
   let company = JSON.parse(reactLocalStorage.get("company"));
+  console.log(tableContent);
   return (
     <>
       {/* button to trigger printing of target component */}
@@ -161,71 +167,74 @@ export default function (props) {
                 <typography> {filterInfoText()}</typography>
               </Grid>
             )}
-            <Grid item sm={12}>
-              <table className="table">
-                <TableHead sx={{ "& td": { border: 0 } }}> </TableHead>
-                <br />
-                <TableHead>
-                  <TableRow>
-                    {headCells.map(
-                      (headCell) =>
-                        headCell.label !== "Edit" && (
-                          <TableCell
-                            key={headCell.id}
-                            style={{
-                              border: "1px solid rgba(0,0,0,0.2)",
-                            }}
-                          >
-                            {headCell.label == "Edit" ? "" : headCell.label}
-                          </TableCell>
-                        )
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {recordsAfterSorting().map((item) => (
-                    <TableRow key={item._id}>
-                      {headCells.map(
-                        (headCell) =>
-                          headCell.feild in item && (
-                            <TableCell
-                              key={headCell.id}
-                              style={{
-                                border: "1px solid rgba(0,0,0,0.2)",
-                                color: "black",
-                                whiteSpace: "nowrap",
-                              }}
-                              align={headCell.align}
-                            >
-                              {headCell.feild in item
-                                ? item[headCell.feild]
-                                : ""}
-                            </TableCell>
-                          )
-                      )}{" "}
-                    </TableRow>
-                  ))}{" "}
-                  {/* {recordsAfterSorting().map((item) => (
-                      <TableRow key={item._id}>
-                        {headCells.map(
+            <Grid
+              item
+              sm={12}
+              style={{
+                padding: "10px",
+                marginTop: "30px",
+              }}
+            >
+              <table
+                className="table"
+                style={{
+                  borderLeft: "1px solid rgba(0,0,0,0.2)",
+                }}
+              >
+                {recordsAfterSorting().length ? (
+                  <>
+                    {" "}
+                    <TableHead>
+                      <TableRow>
+                        {headCellsArr.map(
                           (headCell) =>
-                            headCell.feild in item && (
+                            headCell.label !== "Edit" &&
+                            headCell.label !== "Ledger" && (
                               <TableCell
                                 key={headCell.id}
                                 style={{
                                   border: "1px solid rgba(0,0,0,0.2)",
-                                  color: "black",
                                 }}
                               >
-                                {headCell.feild in item
-                                  ? item[headCell.feild]
-                                  : ""}
+                                {headCell.label == "Edit" ||
+                                headCell.label == "Ledger"
+                                  ? ""
+                                  : headCell.label}
                               </TableCell>
                             )
-                        )}{" "}
+                        )}
                       </TableRow>
-                    ))} */}
-                </TableBody>
+                    </TableHead>
+                    {recordsAfterSorting().map((item) => (
+                      <>
+                        <TableBody>
+                          <TableRow key={item._id}>
+                            {headCellsArr.map(
+                              (headCell) =>
+                                headCell.feild in item && (
+                                  <TableCell
+                                    key={headCell.id}
+                                    style={{
+                                      border: "1px solid rgba(0,0,0,0.2)",
+                                      color: "black",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    align={headCell.align}
+                                  >
+                                    {headCell.feild in item
+                                      ? item[headCell.feild]
+                                      : ""}
+                                  </TableCell>
+                                )
+                            )}{" "}
+                          </TableRow>
+                        </TableBody>
+                      </>
+                    ))}
+                  </>
+                ) : (
+                  <>{tableContent}</>
+                )}{" "}
               </table>{" "}
             </Grid>
             {/* <Grid

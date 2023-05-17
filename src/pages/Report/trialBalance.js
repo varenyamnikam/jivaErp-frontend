@@ -41,6 +41,9 @@ import TbLedger from "./tbForm";
 import ExportSwitch from "../../components/controls/Switch";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import { NotifyMsg } from "../../components/notificationMsg";
+import ReactToPrint from "react-to-print";
+import PrintIcon from "@mui/icons-material/Print";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -377,7 +380,80 @@ export default function TrialBalance({ title = "Trial Balance" }) {
       </Grid>
     );
   }
+  let componentRef = React.useRef();
+  function componentToRender() {
+    return (
+      <>
+        <TableHead>
+          {" "}
+          <TableRow
+            // style={{
+            //   borderBottom: "1px solid rgba(0,0,0,0.2)",
+            //   position: "sticky",
+            // }}
+            stickyHeader
+          >
+            {headcells.map((headCell) => (
+              <TableCell
+                key={headCell.id}
+                // sortDirection={orderBy === headCell.id ? order : false}
+                style={{
+                  borderRight: "1px solid rgba(0,0,0,0.2)",
+                  borderBottom: "1px solid rgba(0,0,0,0.2)",
+                }}
+                colSpan={
+                  headCell.label == "Grp Code" || headCell.label == "Grp Name"
+                    ? 1
+                    : 2
+                }
+              >
+                {headCell.label}
+              </TableCell>
+            ))}
+          </TableRow>
+          <TableRow stickyHeader>
+            <TableCell
+              style={{
+                borderRight: "1px solid rgba(0,0,0,0.2)",
+              }}
+            />
+            <TableCell
+              style={{
+                borderRight: "1px solid rgba(0,0,0,0.2)",
+              }}
+            />
 
+            {[...Array(3)].map((e, i) => (
+              <>
+                {" "}
+                <TableCell
+                  style={{
+                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                  }}
+                >
+                  Debit
+                </TableCell>
+                <TableCell
+                  style={{
+                    borderRight: "1px solid rgba(0,0,0,0.2)",
+                  }}
+                >
+                  Credit
+                </TableCell>
+              </>
+            ))}
+          </TableRow>
+        </TableHead>
+        {loading ? (
+          <MuiSkeleton />
+        ) : (
+          <TableBody>
+            {recursivelyCallArr(recordsAfterPagingAndSorting())}
+          </TableBody>
+        )}
+      </>
+    );
+  }
   return (
     <>
       <PageHeader
@@ -398,7 +474,7 @@ export default function TrialBalance({ title = "Trial Balance" }) {
                 initialFilterFn={initialFilterFn}
                 buttonText="Export Data to Excel"
                 headCells={headCells}
-                recordsAfterSorting={recordsAfterAndSorting}
+                recordsAfterSorting={() => []}
                 headcells={headcells}
                 setheadcells={setheadcells}
                 initialHeadCells={headCells}
@@ -408,70 +484,9 @@ export default function TrialBalance({ title = "Trial Balance" }) {
                 filterFields={filterFields}
                 title={title}
                 additionalComponent={additionalComponent}
+                tableContent={componentToRender()}
               />
-              <TblContainer>
-                <TableHead>
-                  {" "}
-                  <TableRow
-                    style={{
-                      borderBottom: "1px solid rgba(0,0,0,0.2)",
-                      position: "sticky",
-                    }}
-                    stickyHeader
-                  >
-                    {headcells.map((headCell) => (
-                      <TableCell
-                        key={headCell.id}
-                        // sortDirection={orderBy === headCell.id ? order : false}
-                        style={{
-                          borderRight: "1px solid rgba(0,0,0,0.2)",
-                          borderBottom: "1px solid rgba(0,0,0,0.2)",
-                        }}
-                        colSpan={
-                          headCell.label == "Grp Code" ||
-                          headCell.label == "Grp Name"
-                            ? 1
-                            : 2
-                        }
-                      >
-                        {headCell.label}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  <TableRow stickyHeader>
-                    <TableCell />
-                    <TableCell />
-
-                    {[...Array(3)].map((e, i) => (
-                      <>
-                        {" "}
-                        <TableCell
-                          style={{
-                            borderRight: "1px solid rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          Debit
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            borderRight: "1px solid rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          Credit
-                        </TableCell>
-                      </>
-                    ))}
-                  </TableRow>
-                </TableHead>
-
-                {loading ? (
-                  <MuiSkeleton />
-                ) : (
-                  <TableBody>
-                    {recursivelyCallArr(recordsAfterPagingAndSorting())}
-                  </TableBody>
-                )}
-              </TblContainer>
+              <TblContainer>{componentToRender()} </TblContainer>
               <TblPagination />
             </section>
             <Popup

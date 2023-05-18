@@ -1,6 +1,7 @@
 deploy:
 	git add .
-	git commit -am "makefile"
+	set /p commit_msg="Enter commit message: "
+	git commit -m "$$commit_msg"
 	git push origin main
 
 build:

@@ -127,7 +127,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
     { id: "Account", label: "Account", feild: "acName" },
-    { id: "Date", label: "Date", feild: "vouDate" },
+    { id: "Date", label: "Date", feild: "getDate" },
     { id: "Debit", label: "Debit", feild: "debit", align: "right" },
     { id: "Credit", label: "Credit", feild: "credit", align: "right" },
     { id: "Edit", label: "Edit", feild: "" },
@@ -141,13 +141,11 @@ export default function AcMaster({ title = "Opening Balance" }) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}`;
+  let query = `&date=${new Date()}`;
   const initialFilterFn = {
     fn: (items) => {
-      let newRecords = items.filter((item) => {
-        if (item.vouNo !== "") return item;
-      });
-      console.log(newRecords);
+      let newRecords = items.filter((item) => item.vouNo);
+      console.log(items, newRecords);
       return newRecords;
     },
   };
@@ -155,7 +153,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
     ...initialValues,
     vouNo: "",
     allFields: "",
-    startDate: getD(),
+    startDate: user.defaultYearStart,
     endDate: new Date(),
   };
   const [filterFn, setFilterFn] = useState(initialFilterFn);
@@ -199,28 +197,30 @@ export default function AcMaster({ title = "Opening Balance" }) {
 
   if (loading) {
     const handleRes = (res) => {
-      // console.log(res.data);
-
+      console.log(res.data, "hi");
       if (res.data.mst_accounts !== 0) {
         setAccounts(res.data.mst_accounts);
       }
       let temp = res.data.inv_voucher;
+      console.log("temp", temp);
       if (temp.length !== 0) {
         temp = temp.map((item) => ({
           ...item,
           acName: getName(item.acCode, res.data.mst_accounts),
-          vouDate: roleService.date(item.vouDate),
+          vouDate: item.vouDate,
           debit: Math.abs(item.debit),
           credit: Math.abs(item.credit),
+          getDate: roleService.date(item.vouDate),
         }));
         console.log(temp);
-        setRecords(temp.sort((a, b) => a.vouNo.localeCompare(b.vouNo)));
+        setRecords(temp);
       }
       //filter fn only shows srNo:1 in the table ie
       //table info
 
       loading && setLoading(false);
     };
+    console.log("hi");
     roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
 
@@ -295,9 +295,9 @@ export default function AcMaster({ title = "Opening Balance" }) {
       },
     });
   }
-  function getName(code) {
+  function getName(code, acc = accounts) {
     let name = "";
-    accounts.map((item) => {
+    acc.map((item) => {
       if (item.acCode == code) name = item.acName;
     });
     return name;

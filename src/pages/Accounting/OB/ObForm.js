@@ -167,7 +167,7 @@ export default function AcForm(props) {
       console.error(err);
     };
 
-    const query = `?&yearStart=${user.yearStartDate}`;
+    const query = `&yearStart=${user.yearStartDate}`;
     const url = Config.accounting + query;
     if (x) {
       const handleRes = (res) => {

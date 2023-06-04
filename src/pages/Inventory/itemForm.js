@@ -87,10 +87,8 @@ export default function GeneralItemForm(props) {
   } = props;
   const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
   const validateValues = { ...initialVouItem, vouNo: "", expDate: "" };
-  const initialSettings = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  );
-  const company = JSON.parse(localStorage.getItem("company"));
+  const initialSettings = AuthHandler.getSettings();
+  const company = AuthHandler.getCompany();
   const [batchList, setBatchlist] = useState(getBatchlist());
   const [errors, setErrors] = useState(validateValues);
   const [headCells, setHeadCells] = useState(initialHeadCells);
@@ -115,9 +113,7 @@ export default function GeneralItemForm(props) {
     },
   });
   const [popup, setPopup] = useState(false);
-  let useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
+  let useBatch = AuthHandler.getSettings().userBatchNo;
   if (input.docCode == "PR") useBatch = "NO";
   //no batch while purchasing
   const pause = {
@@ -152,7 +148,7 @@ export default function GeneralItemForm(props) {
     "cess"
   );
   const token = AuthHandler.getLoginToken();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = AuthHandler.getUser();
   const query = `&prodCode=${item.prodCode}&vouNo=${item.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
   const url = Config.batch + query;
   console.log(totalBeforeDs(), totalAfterDs());

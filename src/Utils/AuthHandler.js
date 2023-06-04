@@ -150,7 +150,27 @@ class AuthHandler {
   static getCompany() {
     return JSON.parse(localStorage.getItem("company"));
   }
-
+  static setCompany(values) {
+    reactLocalStorage.set("company", JSON.stringify(values));
+  }
+  static getImage() {
+    return localStorage.getItem("recent-image");
+  }
+  static getSettings(updatedSettings) {
+    return JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  }
+  static setNewParty(newParty) {
+    localStorage.setItem("newParty", JSON.stringify(newParty));
+  }
+  static getNewParty() {
+    return JSON.parse(localStorage.getItem("newParty"));
+  }
+  static updateSettings(updatedSettings) {
+    localStorage.setItem(
+      "adm_softwareSettings",
+      JSON.stringify(updatedSettings)
+    );
+  }
   static getQuery() {
     const user = JSON.parse(localStorage.getItem("user"));
 

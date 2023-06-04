@@ -89,10 +89,6 @@ const initialFilterValues = {
 };
 
 export default function AccountMaster() {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   const [buttonPopup, setButtonPopup] = useState(false);
@@ -131,7 +127,7 @@ export default function AccountMaster() {
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
-      .get(Config.paymentTerms + query, {
+      .get(Config.paymentTerms, {
         headers: {
           authorization: "Bearer" + token,
         },
@@ -161,7 +157,7 @@ export default function AccountMaster() {
     });
     const token = AuthHandler.getLoginToken();
     axios.post(
-      Config.paymentTerms + query,
+      Config.paymentTerms,
       { item },
       {
         headers: {
@@ -195,7 +191,7 @@ export default function AccountMaster() {
         const body = { hello: "hello" };
         axios
           .put(
-            Config.paymentTerms + query,
+            Config.paymentTerms,
             { values },
             {
               headers: {
@@ -218,7 +214,7 @@ export default function AccountMaster() {
         console.log("updated");
         axios
           .patch(
-            Config.paymentTerms + query,
+            Config.paymentTerms,
             { values },
             {
               headers: {

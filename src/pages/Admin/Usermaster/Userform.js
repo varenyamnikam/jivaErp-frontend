@@ -41,10 +41,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Userform(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     setRecords,
@@ -161,11 +157,9 @@ export default function Userform(props) {
         };
 
         roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
-        if (
-          values.userCode == JSON.parse(localStorage.getItem("user")).userCode
-        ) {
+        if (values.userCode == AuthHandler.getUser().userCode) {
           alert("plz login again");
-          localStorage.clear();
+          // localStorage.clear();
           page("/");
         }
       }

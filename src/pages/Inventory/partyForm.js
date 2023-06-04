@@ -18,6 +18,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ButtonAutosuggest from "../../components/buttonAutosuggest";
+import AuthHandler from "../../Utils/AuthHandler";
 const cash = [
   { id: "Cash", title: "Cash" },
   { id: "Credit", title: "Credit" },
@@ -34,9 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CustomerForm(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     values,
     initialValues,
@@ -209,7 +207,7 @@ export default function CustomerForm(props) {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  const settings = AuthHandler.getSettings()
   function getOptionsForRef() {
     if (initialValues.docCode == "PV") {
       return ["GR", "PO"];

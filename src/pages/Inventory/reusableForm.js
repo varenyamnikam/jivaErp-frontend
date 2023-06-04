@@ -48,9 +48,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function GeneralForm(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     values,
@@ -89,13 +86,13 @@ export default function GeneralForm(props) {
       return input.vouNo;
     }
   }
-  let newParty = JSON.parse(localStorage.getItem("newParty"));
+  let newParty = AuthHandler.getNewParty();
   const openOnRender = newParty.transactnOpen;
   if (openOnRender) {
     newParty.transactnValue && setInput(newParty.transactnValue);
     newParty.transactnList && setItemList(newParty.transactnList);
     newParty = AuthHandler.getResetParty();
-    localStorage.setItem("newParty", JSON.stringify(newParty));
+    AuthHandler.setNewParty(newParty);
   }
   return (
     <>

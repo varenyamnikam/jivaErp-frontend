@@ -16,7 +16,6 @@ import {
 } from "@material-ui/core";
 import useTable from "../../../components/useTable";
 import Controls from "../../../components/controls/Controls";
-import { reactLocalStorage } from "reactjs-localstorage";
 import { Grid } from "@material-ui/core";
 import { Form } from "../../../components/useForm";
 import Notification from "../../../components/Notification";
@@ -93,9 +92,6 @@ const initialValues = {
 };
 
 export default function Settings() {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const [values, setValues] = useState(initialValues);
   const [purchaseValues, setPurchaseValues] = useState(purchaseObj);
   const [saleValues, setSaleValues] = useState(saleObj);
@@ -172,10 +168,7 @@ export default function Settings() {
     const handleRes = (response) => {
       setButtonLoading(false);
       setValues(updatedSettings);
-      localStorage.setItem(
-        "adm_softwareSettings",
-        JSON.stringify(updatedSettings)
-      );
+      AuthHandler.updateSettings(updatedSettings);
     };
     function handleErr(err) {
       console.log(err);
@@ -193,7 +186,7 @@ export default function Settings() {
   useEffect(() => {
     !save && setSave(true);
   }, [values]);
-  let company = JSON.parse(reactLocalStorage.get("company"));
+  let company = AuthHandler.getCompany();
 
   return (
     <>

@@ -115,12 +115,8 @@ export default function FinancialYearform(props) {
           console.log(newrecord);
           setRecords([...newrecord, input]);
           setNotify(NotifyMsg(2));
-          if (
-            input.yearCode ==
-            JSON.parse(localStorage.getItem("user")).defaultYearCode
-          ) {
+          if (input.yearCode == AuthHandler.getUser().defaultYearCode) {
             alert("plz login again");
-
             page("/");
           }
         }

@@ -8,8 +8,8 @@ const user = JSON.parse(localStorage.getItem("user"));
 const userCode = user.userCode;
 const userCompanyCode = user.userCompanyCode;
 const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-// const url = `http://localhost:${PORT}`;
-const url = `http://147.182.252.2:${PORT}`;
+const url = `http://localhost:${PORT}`;
+// const url = `http://147.182.252.2:${PORT}`;
 
 // console.log(userCompanyCode, userCode);
 class Config {

@@ -9,6 +9,18 @@ const KEYS = {
   roleitems: "roleitems",
   roleId: "roleId",
 };
+function refreshToken(response) {
+  const token = response.headers.authorization;
+  localStorage.setItem("token", token);
+  console.log(token);
+}
+function timeOutErr(error) {
+  if (error.response.status == 440) {
+    alert("session timed out!");
+    window.location = "/";
+  }
+}
+function getFilterDate() {}
 //trailbalance excluded
 export function axiosGet(url, responseFn, errFn, finalFn = () => {}) {
   const token = AuthHandler.getLoginToken();
@@ -18,16 +30,18 @@ export function axiosGet(url, responseFn, errFn, finalFn = () => {}) {
   axios
     .get(url, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     })
     .then((response) => {
       console.log(response);
       responseFn(response);
+      refreshToken(response);
     })
     .catch((error) => {
       console.log(error);
       errFn(error);
+      timeOutErr(error);
     })
     .finally(() => {
       finalFn();
@@ -44,10 +58,12 @@ export function axiosPost(url, data, responseFn, errFn, finalFn = () => {}) {
     })
     .then((response) => {
       responseFn(response);
+      refreshToken(response);
     })
     .catch((error) => {
       console.log(error);
       errFn(error);
+      timeOutErr(error);
     })
     .finally(() => {
       finalFn();
@@ -64,10 +80,12 @@ export function axiosPut(url, data, responseFn, errFn, finalFn = () => {}) {
     })
     .then((response) => {
       responseFn(response);
+      refreshToken(response);
     })
     .catch((error) => {
       console.log(error);
       errFn(error);
+      timeOutErr(error);
     })
     .finally(() => {
       finalFn();
@@ -84,10 +102,12 @@ export function axiosPatch(url, data, responseFn, errFn, finalFn = () => {}) {
     })
     .then((response) => {
       responseFn(response);
+      refreshToken(response);
     })
     .catch((error) => {
       console.log(error);
       errFn(error);
+      timeOutErr(error);
     })
     .finally(() => {
       finalFn();
@@ -105,10 +125,12 @@ export function axiosDelete(url, data, responseFn, errFn, finalFn = () => {}) {
     })
     .then((response) => {
       responseFn(response);
+      refreshToken(response);
     })
     .catch((error) => {
       console.log(error);
       errFn(error);
+      timeOutErr(error);
     })
     .finally(() => {
       finalFn();

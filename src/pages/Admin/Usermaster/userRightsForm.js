@@ -129,9 +129,9 @@ export default function RightsForm(props) {
           setNotify(NotifyMsg(2));
           setPopup(false);
           setUserRights(updatedRights);
-          if (userCode == JSON.parse(localStorage.getItem("user")).userCode) {
+          if (userCode == AuthHandler.getUser().userCode) {
             alert("plz login again");
-            localStorage.clear();
+            // localStorage.clear();
             page("/");
           }
         };

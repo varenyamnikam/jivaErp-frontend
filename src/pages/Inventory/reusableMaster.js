@@ -34,7 +34,6 @@ import { useForm, Form } from "../../components/useForm";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import IconButton from "@material-ui/core/IconButton";
-import { reactLocalStorage } from "reactjs-localstorage";
 import Table from "@mui/material/Table";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
@@ -105,11 +104,9 @@ export default function ReuseMaster(props) {
     { feild: "manualNo", label: "Manual No." },
     { feild: "vouNo", label: "Voucher No" },
   ];
-  const user = JSON.parse(localStorage.getItem("user"));
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  let useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
+  const user = AuthHandler.getUser();
+  const settings = AuthHandler.getSettings();
+  let useBatch = settings.userBatchNo;
 
   let query = `&date=${new Date()}&useBatch=${useBatch}&yearStart=${
     user.yearStartDate
@@ -157,7 +154,7 @@ export default function ReuseMaster(props) {
     loading && setLoading(false);
   };
 
-  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const newParty = AuthHandler.getNewParty();
   const openOnRender = newParty.transactnOpen;
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(

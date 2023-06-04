@@ -104,10 +104,6 @@ const initialFilterFn = {
 };
 
 export default function FinancialYearMaster(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
   const [records, setRecords] = useState([initialValues]);
   const [filter, setFilter] = useState(initialFilterValues);
   const [filterFn, setFilterFn] = useState(initialFilterFn);

@@ -45,7 +45,7 @@ const userCode = localStorage.getItem("userCode");
 const userCompanyCode = localStorage.getItem("userCompanyCode");
 
 export default function ChangeFinyear({ setButtonPopup }) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = AuthHandler.getUser();
   const [loading, setLoading] = useState(true);
   const [values, setValues] = useState(user);
   const [records, setRecords] = useState([initialValues]);
@@ -59,9 +59,8 @@ export default function ChangeFinyear({ setButtonPopup }) {
 
   if (loading) {
     const token = AuthHandler.getLoginToken();
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
     axios
-      .get(Config.usermasterUrl + query, {
+      .get(Config.usermasterUrl, {
         headers: {
           authorization: "Bearer" + token,
         },

@@ -6,7 +6,6 @@ import { Grid } from "@material-ui/core";
 import Controls from "./controls/Controls";
 import Config from "../Utils/Config";
 import AuthHandler from "../Utils/AuthHandler";
-import axios from "axios";
 import ButtonLoader from "./loading";
 import SmartAutosuggest from "./smartAutoSuggest";
 import Divider from "@mui/material/Divider";
@@ -51,9 +50,6 @@ export default function AcLedgerSettings({
   setNotify,
 }) {
   let company = JSON.parse(reactLocalStorage.get("company"));
-  const token = AuthHandler.getLoginToken();
-  const userCode = localStorage.getItem("userCode");
-  const query = `?userCompanyCode=${company.companyCode}&userCode=${userCode}`;
   const [purchaseErrors, setPurchaseErrors] = useState(purchaseErrObj);
   const [saleErrors, setSaleErrors] = useState(saleErrObj);
   const [buttonLoading, setButtonLoading] = useState(false);

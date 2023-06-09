@@ -74,16 +74,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
-
 export default function ReuseMaster(props) {
   const { docCode, title, initialValues, route } = props;
   const headCellsData = [
@@ -125,8 +115,8 @@ export default function ReuseMaster(props) {
     prodCode: "",
     vouNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const validateValues = {
     ...initialValues,
@@ -239,7 +229,7 @@ export default function ReuseMaster(props) {
     if (initialValues.docCode == "DC") {
       qry = JSON.stringify({ $in: ["DC", "QT", "SO"] });
     }
-    const queryForGet = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}`;
+    const queryForGet = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
     const url = Config[route] + queryForGet;
 
     const handleRes = (res) => {
@@ -255,8 +245,8 @@ export default function ReuseMaster(props) {
       const collectiveData = {
         accounts: acc.length !== 0 ? acc : [initialAc],
         voucherItems: items.length !== 0 ? items : [initialVouItem],
-        adress: adress.length !== 0 ? adress : [initialVouItem],
-        payTerms: payTerms.length !== 0 ? payTerms : [initialVouItem],
+        adress: adress.length !== 0 ? adress : [initialAdress],
+        payTerms: payTerms.length !== 0 ? payTerms : [],
         products: prodData.length !== 0 ? prodData : [initialProdValues],
       };
       setCommon(collectiveData);
@@ -350,6 +340,7 @@ export default function ReuseMaster(props) {
     if (validateParty(input, errors, setErrors, setNotify, vouExists)) {
       console.log("before");
       const batchQuery = `&vouNo=${input.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
+
       const batchUrl = Config.batch + batchQuery;
       const promise = new Promise((resolve, reject) => {
         let stockNotReduced = true;

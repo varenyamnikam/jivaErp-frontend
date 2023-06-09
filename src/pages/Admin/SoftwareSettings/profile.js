@@ -16,6 +16,7 @@ import * as roleService from "../../../services/roleService";
 const Profile = ({ setNotify }) => {
   const recentImageDataUrl = AuthHandler.getImage();
   let company = AuthHandler.getCompany();
+  console.log(company);
   const [values, setValues] = useState(company);
   const [errors, setErrors] = useState({});
   const [location, setLocation] = useState({
@@ -39,7 +40,7 @@ const Profile = ({ setNotify }) => {
       check(x);
     });
     const hasRight = AuthHandler.canEdit();
-
+    console.log(hasRight);
     if (!hasRight) setNotify(NotifyMsg(7));
 
     setErrors({
@@ -260,15 +261,24 @@ const Profile = ({ setNotify }) => {
               fullWidth
             />
           </Grid>
-          <Grid
-            item
-            sm={4}
-            xs={6}
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          ></Grid>
+          <Grid item xs={12} sm={4}>
+            <Controls.Input
+              name="declaration"
+              label="Invoice Declaration"
+              value={values.declaration}
+              onChange={handleInputChange}
+              fullWidth
+            />
+          </Grid>{" "}
+          <Grid item xs={12} sm={4}>
+            <Controls.Input
+              name="footer"
+              label="Invoice Footer"
+              value={values.footer}
+              onChange={handleInputChange}
+              fullWidth
+            />
+          </Grid>{" "}
           <Grid
             item
             sm={12}

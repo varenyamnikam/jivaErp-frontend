@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../components/PageHeader";
 import AuthHandler from "../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../Utils/Config";
 import {
   makeStyles,
@@ -41,9 +40,7 @@ import TbLedger from "./tbForm";
 import ExportSwitch from "../../components/controls/Switch";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
 import { NotifyMsg } from "../../components/notificationMsg";
-import ReactToPrint from "react-to-print";
-import PrintIcon from "@mui/icons-material/Print";
-
+import * as roleService from "../../services/roleService";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -105,20 +102,15 @@ export default function TrialBalance({ title = "Trial Balance" }) {
   ];
   const filterFields = [{ feild: "groupType", label: "Account Group Type" }];
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = user.userCode;
-  const userCompanyCode = user.userCompanyCode;
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  const { getD } = DateCalc(user);
+  const user = AuthHandler.getUser();
+
   const { initialVouValues } = DcValues();
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const [filter, setFilter] = useState(initialFilterValues);
 
@@ -171,34 +163,34 @@ export default function TrialBalance({ title = "Trial Balance" }) {
       ? [filter.groupType]
       : groupTypeOptions;
 
-    let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&groupTypes=${filterByGrpType}`;
-    const token = AuthHandler.getLoginToken();
-    axios
-      .get(Config.trialBalance + query, {
-        params: {
-          groupTypes: filterByGrpType,
-        },
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((res) => {
-        let data = res.data.allGrps;
-        let acc = res.data.mst_acGroup;
-        //data is array of obj having two fields ->{childArr:[...],
-        //displayData:{...}} rest of feilds are useLess
-        console.log(data, acc);
-        data.length !== 0
-          ? setRecords(data)
-          : setRecords([{ ...initialValues, acGroupCode: "" }]);
-      })
-      .catch((error) => {
-        setNotify(NotifyMsg(4));
-        console.log(error);
-      })
-      .finally(() => {
+    let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}&groupTypes=${filterByGrpType}`;
+
+    const url = Config.trialBalance + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+      console.log(err);
+    };
+    const handleRes = (res) => {
+      let data = res.data.allGrps;
+      let acc = res.data.mst_acGroup;
+      //data is array of obj having two fields ->{childArr:[...],
+      //displayData:{...}} rest of feilds are useLess
+      console.log(data, acc);
+      data.length !== 0
+        ? setRecords(data)
+        : setRecords([{ ...initialValues, acGroupCode: "" }]);
+    };
+    roleService.axiosGet(
+      url,
+      handleRes,
+      handleErr,
+      () => {
         loading && setLoading(false);
-      });
+      },
+      {
+        groupTypes: filterByGrpType,
+      }
+    );
   }
 
   console.log(records);
@@ -260,7 +252,7 @@ export default function TrialBalance({ title = "Trial Balance" }) {
     }
     return (
       <>
-        <TableRow>
+        <TableRow style={{ borderLeft: "1px solid rgba(0,0,0,0.2)" }}>
           {modifiedHeadCells.map((headcell, i) =>
             headcell.feild == "acGroupCode" ||
             headcell.feild == "acGroupName" ||
@@ -387,10 +379,10 @@ export default function TrialBalance({ title = "Trial Balance" }) {
         <TableHead>
           {" "}
           <TableRow
-            // style={{
-            //   borderBottom: "1px solid rgba(0,0,0,0.2)",
-            //   position: "sticky",
-            // }}
+            style={{
+              borderLeft: "1px solid rgba(0,0,0,0.2)",
+              backgroundColor: "red",
+            }}
             stickyHeader
           >
             {headcells.map((headCell) => (
@@ -400,6 +392,7 @@ export default function TrialBalance({ title = "Trial Balance" }) {
                 style={{
                   borderRight: "1px solid rgba(0,0,0,0.2)",
                   borderBottom: "1px solid rgba(0,0,0,0.2)",
+                  backgroundColor: "white",
                 }}
                 colSpan={
                   headCell.label == "Grp Code" || headCell.label == "Grp Name"
@@ -411,7 +404,10 @@ export default function TrialBalance({ title = "Trial Balance" }) {
               </TableCell>
             ))}
           </TableRow>
-          <TableRow stickyHeader>
+          <TableRow
+            stickyHeader
+            style={{ borderLeft: "1px solid rgba(0,0,0,0.2)" }}
+          >
             <TableCell
               style={{
                 borderRight: "1px solid rgba(0,0,0,0.2)",

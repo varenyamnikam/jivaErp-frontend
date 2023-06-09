@@ -144,100 +144,166 @@ export default function (props) {
             padding: "20px",
           }}
         >
-          <Grid container spacing={1}>
-            <Grid
-              item
-              sm={12}
-              style={{ display: "flex", justifyContent: "center" }}
-            >
-              <h1>{company.companyName}</h1>
-            </Grid>
-            <Grid item sm={6}>
-              <h1>{title}</h1>
-            </Grid>
-            <Grid item sm={6} style={{ display: "flex", alignItems: "center" }}>
-              <h2> {GetTimePeriod()}</h2>
-            </Grid>
-            {filterInfoText() && (
-              <Grid
-                item
-                sm={12}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <typography> {filterInfoText()}</typography>
-              </Grid>
-            )}
-            <Grid
-              item
-              sm={12}
+          {" "}
+          {!recordsAfterSorting().length && (
+            <TableRow
               style={{
-                padding: "10px",
-                marginTop: "30px",
+                border: "0px",
+                borderTop: "0px",
+                borderColor: "red",
               }}
             >
-              <table
-                className="table"
-                style={{
-                  borderLeft: "1px solid rgba(0,0,0,0.2)",
-                }}
-              >
-                {recordsAfterSorting().length ? (
+              <TableCell colSpan={80}>
+                <Grid container spacing={1}>
+                  <Grid
+                    item
+                    sm={12}
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <h1>{company.companyName}</h1>
+                  </Grid>
+                  <Grid item sm={6}>
+                    <h2>{title}</h2>
+                  </Grid>
+                  <Grid
+                    item
+                    sm={6}
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <h3> {GetTimePeriod()}</h3>
+                  </Grid>
+                  {filterInfoText() && (
+                    <Grid
+                      item
+                      sm={12}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <typography> {filterInfoText()}</typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </TableCell>
+            </TableRow>
+          )}
+          <table
+            className="table"
+            style={{
+              // borderLeft: "1px solid rgba(0,0,0,0.2)",
+              borderTop: "0px",
+              borderColor: "red",
+            }}
+          >
+            {" "}
+            {recordsAfterSorting().length ? (
+              <>
+                {" "}
+                <TableHead
+                  style={{
+                    marginTop: "20px",
+                    borderTop: "0px",
+                    borderColor: "red",
+                    backgroundColor: "red",
+                  }}
+                >
+                  {" "}
+                  <TableRow
+                    style={{
+                      border: "0px",
+                      borderTop: "0px",
+                      borderColor: "red",
+                      backgroundColor: "green",
+                    }}
+                  >
+                    <TableCell
+                      colSpan={80}
+                      style={{ borderTop: "0px", backgroundColor: "red" }}
+                    >
+                      <Grid container spacing={1}>
+                        <Grid
+                          item
+                          sm={12}
+                          style={{ display: "flex", justifyContent: "center" }}
+                        >
+                          <h1>{company.companyName}</h1>
+                        </Grid>
+                        <Grid item sm={6}>
+                          <h2>{title}</h2>
+                        </Grid>
+                        <Grid
+                          item
+                          sm={6}
+                          style={{ display: "flex", alignItems: "center" }}
+                        >
+                          <h3> {GetTimePeriod()}</h3>
+                        </Grid>
+                        {filterInfoText() && (
+                          <Grid
+                            item
+                            sm={12}
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <typography> {filterInfoText()}</typography>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow style={{ borderLeft: "1px solid rgba(0,0,0,0.2)" }}>
+                    {headCellsArr.map(
+                      (headCell) =>
+                        headCell.label !== "Edit" &&
+                        headCell.label !== "Ledger" && (
+                          <TableCell
+                            key={headCell.id}
+                            style={{
+                              border: "1px solid rgba(0,0,0,0.2)",
+                            }}
+                            align={headCell.align}
+                          >
+                            {headCell.label == "Edit" ||
+                            headCell.label == "Ledger"
+                              ? ""
+                              : headCell.label}
+                          </TableCell>
+                        )
+                    )}
+                  </TableRow>
+                </TableHead>
+                {recordsAfterSorting().map((item) => (
                   <>
-                    {" "}
-                    <TableHead>
-                      <TableRow>
+                    <TableBody>
+                      <TableRow
+                        key={item._id}
+                        style={{ borderLeft: "1px solid rgba(0,0,0,0.2)" }}
+                      >
                         {headCellsArr.map(
                           (headCell) =>
-                            headCell.label !== "Edit" &&
-                            headCell.label !== "Ledger" && (
+                            headCell.feild in item && (
                               <TableCell
                                 key={headCell.id}
                                 style={{
                                   border: "1px solid rgba(0,0,0,0.2)",
+                                  color: "black",
+                                  whiteSpace: "nowrap",
                                 }}
+                                align={headCell.align}
                               >
-                                {headCell.label == "Edit" ||
-                                headCell.label == "Ledger"
-                                  ? ""
-                                  : headCell.label}
+                                {headCell.feild in item
+                                  ? item[headCell.feild]
+                                  : ""}
                               </TableCell>
                             )
-                        )}
+                        )}{" "}
                       </TableRow>
-                    </TableHead>
-                    {recordsAfterSorting().map((item) => (
-                      <>
-                        <TableBody>
-                          <TableRow key={item._id}>
-                            {headCellsArr.map(
-                              (headCell) =>
-                                headCell.feild in item && (
-                                  <TableCell
-                                    key={headCell.id}
-                                    style={{
-                                      border: "1px solid rgba(0,0,0,0.2)",
-                                      color: "black",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                    align={headCell.align}
-                                  >
-                                    {headCell.feild in item
-                                      ? item[headCell.feild]
-                                      : ""}
-                                  </TableCell>
-                                )
-                            )}{" "}
-                          </TableRow>
-                        </TableBody>
-                      </>
-                    ))}
+                    </TableBody>
                   </>
-                ) : (
-                  <>{tableContent}</>
-                )}{" "}
-              </table>{" "}
-            </Grid>
-            {/* <Grid
+                ))}
+              </>
+            ) : (
+              <>{tableContent}</>
+            )}{" "}
+          </table>{" "}
+          {/* <Grid
               container
               style={{
                 padding: "1rem",
@@ -252,7 +318,6 @@ export default function (props) {
             >
               <h1> Footer </h1>
             </Grid> */}
-          </Grid>
         </div>
         {/* </Popup> */}
       </div>

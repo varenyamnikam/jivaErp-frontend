@@ -1,22 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import ReactToPrint from "react-to-print";
-import { reactLocalStorage } from "reactjs-localstorage";
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  makeStyles,
-  TableBody,
-  TablePagination,
-  TableSortLabel,
-} from "@material-ui/core";
-import Controls from "./controls/Controls";
+import { makeStyles } from "@material-ui/core";
 import PrintIcon from "@mui/icons-material/Print";
-import { Grid } from "@mui/material";
-import { add } from "date-fns";
 import { useReactToPrint } from "react-to-print";
 import ComponentToPrint from "./componentToPrint";
+import AuthHandler from "../Utils/AuthHandler";
 const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
@@ -57,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   center: { alignItems: "center", justifyContent: "flex-end" },
 }));
 function getTheme() {
-  const color = JSON.parse(localStorage.getItem("adm_softwareSettings")).color;
+  const color = AuthHandler.getSettings().color;
   if (color == "blue") {
     return "#79A9C5EB";
   } else {
@@ -78,8 +65,7 @@ export default function (props) {
     printPopup,
     setopen,
   } = props;
-  const classes = useStyles();
-  const recentImageDataUrl = localStorage.getItem("recent-image");
+  const recentImageDataUrl = AuthHandler.getImage();
   const ad = adress.filter((item) => item.acCode == values.partyCode);
   console.log(ad, adress, values);
   const [print, setPrint] = React.useState(values);
@@ -107,33 +93,13 @@ export default function (props) {
         />
       );
   }
-  console.log(getTheme(), localStorage.getItem("color"));
   let componentRef = React.useRef();
-  let company = JSON.parse(reactLocalStorage.get("company"));
-  function getDate(code) {
-    const date = new Date(code);
-    const zeroPad = (num, places) => String(num).padStart(places, "0");
-
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(zeroPad(date.getMonth() + 1, 2)) +
-      "/" +
-      // String(date.getFullYear()).slice(-2)
-      String(date.getFullYear())
-    );
-  }
-  // values={item}
-  // voucherItems={voucherItems}
-  // adress={adress}
-  // accounts={accounts}
   console.log(print);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
   function hi() {
     setPrint(getEntry(item.vouNo, "p"));
-    //handlePrint();
   }
   useEffect(() => {
     if (printPopup) {
@@ -142,6 +108,7 @@ export default function (props) {
       handlePrint();
     }
   }, [print]);
+  console.log(voucherItems);
   return (
     <>
       <div>

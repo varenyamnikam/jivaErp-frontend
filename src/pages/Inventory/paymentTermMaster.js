@@ -33,7 +33,7 @@ import IconButton from "@material-ui/core/IconButton";
 import "../../components/public.css";
 import MuiSkeleton from "../../components/skeleton";
 import UnusedAutosuggest from "../../components/unusedautosuggest";
-
+import { NotifyMsg } from "../../components/notificationMsg";
 const statusItems = [
   { id: "Active", title: "Active" },
   { id: "Inactive", title: "Inactive" },
@@ -105,6 +105,7 @@ export default function AccountMaster() {
     subTitle: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
     function check(key) {
@@ -123,48 +124,42 @@ export default function AccountMaster() {
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(records, headCells, filterFn);
   console.log(values, records);
-  if (records[0] && records[0].paymentTermsCode == "X X X X") {
-    const token = AuthHandler.getLoginToken();
-    const body = { hello: "hello" };
-    axios
-      .get(Config.paymentTerms, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        if (response.data.mst_paymentTerm.length !== 0) {
-          setRecords(response.data.mst_paymentTerm);
-        } else {
-          setRecords([initialFilterValues]);
-        }
-      });
+  const url = Config.paymentTerms;
+  const handleErr = (err) => {
+    setNotify(NotifyMsg(4));
+  };
+
+  if (loading) {
+    const handleRes = (res) => {
+      console.log(res.data);
+      if (res.data.mst_paymentTerm.length !== 0) {
+        setRecords(res.data.mst_paymentTerm);
+      } else {
+        setRecords([initialFilterValues]);
+      }
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {
+      loading && setLoading(false);
+    });
   }
   function onDelete(item) {
-    let newRecord = [];
-    newRecord = records.filter((record) => {
-      return record.paymentTermsCode !== item.paymentTermsCode;
-    });
-    if (newRecord.length == 0) {
-      setRecords([initialFilterValues]);
-    } else {
-      setRecords(newRecord);
-    }
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
-    const token = AuthHandler.getLoginToken();
-    axios.post(
-      Config.paymentTerms,
-      { item },
-      {
-        headers: {
-          authorization: "Bearer" + token,
-        },
+
+    const handleRes = (res) => {
+      let newRecord = [];
+      newRecord = records.filter((record) => {
+        return record.paymentTermsCode !== item.paymentTermsCode;
+      });
+      if (newRecord.length == 0) {
+        setRecords([initialFilterValues]);
+      } else {
+        setRecords(newRecord);
       }
-    );
+      roleService.axiosDelete(url, item, handleRes, handleErr, () => {});
+    };
   }
   function handleInputChange(e) {
     const { value, name } = e.target;
@@ -187,50 +182,18 @@ export default function AccountMaster() {
       });
       console.log(x);
       if (x) {
-        const token = AuthHandler.getLoginToken();
-        const body = { hello: "hello" };
-        axios
-          .put(
-            Config.paymentTerms,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-            setRecords([...records, response.data.values]);
-            setNotify({
-              isOpen: true,
-              message: "Account created  successfully",
-              type: "success",
-            });
-            setButtonPopup(false);
-          });
+        function handleRes(res) {
+          console.log("hi....", res.data.values);
+          setNotify(NotifyMsg(1));
+          setButtonPopup(false);
+        }
+        roleService.axiosPut(url, values, handleRes, handleErr, () => {});
       } else {
-        const token = AuthHandler.getLoginToken();
-        console.log("updated");
-        axios
-          .patch(
-            Config.paymentTerms,
-            { values },
-            {
-              headers: {
-                authorization: "Bearer" + token,
-              },
-            }
-          )
-          .then((response) => {
-            console.log("hi....", response.data.values);
-          });
-        setNotify({
-          isOpen: true,
-          message: "Account updated  successfully",
-          type: "success",
-        });
-        setButtonPopup(false);
+        function handleRes(res) {
+          setNotify(NotifyMsg(2));
+          setButtonPopup(false);
+        }
+        roleService.axiosPatch(url, values, handleRes, handleErr, () => {});
       }
     }
   }

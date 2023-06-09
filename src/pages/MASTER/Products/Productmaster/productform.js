@@ -57,9 +57,6 @@ const roleOptions = [
 ];
 
 export default function Productform(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   let history = useNavigate();
 
   const {
@@ -161,11 +158,11 @@ export default function Productform(props) {
 
         const handleRes = (res) => {
           setRecords([...records, res.data.values]);
-          let newParty = JSON.parse(localStorage.getItem("newParty"));
+          let newParty = AuthHandler.getNewParty();
           if (newParty.partyOpen) {
-            let newParty = JSON.parse(localStorage.getItem("newParty"));
+            let newParty = AuthHandler.getNewParty();
             newParty.partyOpen = false;
-            localStorage.setItem("newParty", JSON.stringify(newParty));
+            AuthHandler.setNewParty(newParty)
             history(newParty.path);
           }
           setFormPopup(false);

@@ -154,7 +154,7 @@ export default function Settings() {
       setLoading(false);
     }
     function handelErr(err) {
-      console.lo(err);
+      console.log(err);
       setNotify(NotifyMsg(4));
     }
     roleService.axiosGet(url, handleRes, handelErr, () => {});

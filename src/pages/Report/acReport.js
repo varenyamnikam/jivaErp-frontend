@@ -62,15 +62,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  const today = new Date();
-  const oneMonthAgo = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate()
-  );
-  return oneMonthAgo;
-}
 const initialValues = {
   srNo: "",
   acCode: "0",
@@ -90,31 +81,28 @@ export default function AcReport({ title = "A.C Report" }) {
     { id: "Vou No", label: "Vou No", feild: "vouNo" },
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
-    { id: "Debit", label: "Debit", feild: "debit" },
-    { id: "Credit", label: "Credit", feild: "credit" },
+    { id: "Narration", label: "Narration", feild: "narration" },
+
+    { id: "Debit", label: "Debit", feild: "debit", align: "right" },
+    { id: "Credit", label: "Credit", feild: "credit", align: "right" },
     {
       id: "Balance",
       label: "Balance",
       feild: "currentBalance",
+      align: "right",
     },
   ];
   const filterFields = [{ feild: "acName", label: "Account Name" }];
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = user.userCode;
-  const userCompanyCode = user.userCompanyCode;
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  let query = `&date=${new Date()}&useBatch=${useBatch}`;
-  const { getD } = DateCalc(user);
+  const user = AuthHandler.getUser();
+  const useBatch = AuthHandler.getSettings().userBatchNo;
 
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const [filter, setFilter] = useState(initialFilterValues);
 
@@ -158,8 +146,7 @@ export default function AcReport({ title = "A.C Report" }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   if (loading) {
-    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
-    const token = AuthHandler.getLoginToken();
+    const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&acCode=${filter.acCode}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
     console.log(query);
     const url = Config.acReport + query;
 
@@ -288,6 +275,7 @@ export default function AcReport({ title = "A.C Report" }) {
                               style={{
                                 borderRight: "1px solid rgba(0,0,0,0.2)",
                               }}
+                              align={headcell.align}
                             >
                               {typeof item[headcell.feild] == "number"
                                 ? Math.abs(item[headcell.feild])

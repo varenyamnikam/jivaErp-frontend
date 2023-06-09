@@ -34,7 +34,6 @@ import Productform from "./productform";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
 import IconButton from "@material-ui/core/IconButton";
-import { reactLocalStorage } from "reactjs-localstorage";
 import Table from "@mui/material/Table";
 import "../../../../components/public.css";
 import MuiSkeleton from "../../../../components/skeleton";
@@ -122,7 +121,7 @@ const initialFilterValues = {
   allFields: "",
 };
 export default function ProductMaster(props) {
-  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const newParty =AuthHandler.getNewParty()
   const openOnRender = newParty.partyOpen;
 
   const [records, setRecords] = useState([initialValues]);

@@ -216,6 +216,7 @@ export default function useTable(records, headCells, filterFn) {
               style={{
                 borderRight: "1px solid rgba(0,0,0,0.2)",
               }}
+              align={headCell.align}
             >
               {headCell.label}
             </TableCell>

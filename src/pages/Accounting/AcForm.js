@@ -204,7 +204,7 @@ export default function AcForm(props) {
         });
       }
       bankValues.getDate = roleService.date(bankValues.vouDate);
-      const user = JSON.parse(localStorage.getItem("user"));
+      const user = AuthHandler.getUser()
       if (x) {
         const handleRes = (res) => {
           console.log(res.data.itemList);

@@ -301,7 +301,6 @@ export default function UnusedAutosuggest(props) {
       <Grid container>
         <Grid Item sm={8} xs={12}>
           <Autocomplete
-            disablePortal
             id="combo-box-demo"
             size="small"
             classes={{

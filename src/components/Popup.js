@@ -16,9 +16,6 @@ import { useNavigate } from "react-router-dom";
 
 const styles = (theme) => ({
   "@global": {
-    ".MuiAutocomplete-popper": {
-      zIndex: "2000",
-    },
     "*::-webkit-scrollbar": {
       width: "6px",
       // top: "5px",
@@ -51,20 +48,16 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     // top: theme.spacing(2),
     border: `1px solid ${theme.palette.primary.light}`,
-    overflow: "hidden",
   },
   dialogTitle: {
     padding: "0px",
     paddingLeft: "16px",
     backgroundColor: theme.palette.primary.light,
     color: "white",
-    overflowY: "auto",
-    zIndex: theme.zIndex.modal + 1,
   },
   dialogContent: {
     // padding: "0px",
     // paddingRight: "1px",
-    overflow: "hidden",
   },
   ...styles(theme),
 }));
@@ -78,7 +71,7 @@ export default function Popup(props) {
     if (size) {
       return size;
     } else {
-      return "md";
+      return "sm";
     }
   }
   console.log(getSize());
@@ -102,7 +95,6 @@ export default function Popup(props) {
       open={openPopup}
       maxWidth={getSize()}
       classes={{ paper: classes.dialogWrapper }}
-      scroll="paper"
       {...other}
     >
       <DialogTitle className={classes.dialogTitle}>
@@ -111,7 +103,6 @@ export default function Popup(props) {
             display: "flex",
             justifyContent: "space-between",
             alignContent: "center",
-            overflowY: "auto",
           }}
         >
           <Typography

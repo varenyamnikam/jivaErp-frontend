@@ -136,8 +136,8 @@ export default function DCReport({ docCode }) {
     ...initialReport,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -229,9 +229,10 @@ export default function DCReport({ docCode }) {
   }
   if (loading) {
     const qrObj = JSON.stringify({ $in: ["SI", docCode] });
-    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}`;
-    const token = AuthHandler.getLoginToken();
-    console.log(query);
+    const user = AuthHandler.getUser();
+
+    const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}
+    `;
     const url = Config.both + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));

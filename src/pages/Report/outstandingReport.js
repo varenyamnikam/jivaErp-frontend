@@ -95,21 +95,14 @@ export default function OutstandingReport({ title = "Outstanding Report" }) {
     { feild: "acName", label: "Account Name" },
   ];
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = user.userCode;
-  const userCompanyCode = user.userCompanyCode;
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  let query = `&date=${new Date()}&useBatch=${useBatch}`;
-  const { getD } = DateCalc(user);
+  const user = AuthHandler.getUser();
 
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const [filter, setFilter] = useState(initialFilterValues);
 
@@ -160,8 +153,7 @@ export default function OutstandingReport({ title = "Outstanding Report" }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   if (loading) {
-    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}`;
-    const token = AuthHandler.getLoginToken();
+    const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}`;
     console.log(query);
     const url = Config.acReport + query;
 

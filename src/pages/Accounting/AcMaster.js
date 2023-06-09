@@ -94,7 +94,7 @@ const initialAccounts = {
 };
 export default function AcMaster(props) {
   const { title, initialValues } = props;
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =  AuthHandler.getUser()
   const { getD } = DateCalc(user);
   initialValues.narration = "";
   console.log(initialValues);
@@ -115,8 +115,8 @@ export default function AcMaster(props) {
     ...initialValues,
     vouNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
     vouDate: "",
     docCode: "",
   };

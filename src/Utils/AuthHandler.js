@@ -12,6 +12,24 @@ const newParty = {
   transactnOpen: false,
   partyOpen: false,
 };
+let temp = [];
+
+function flattenArray(array) {
+  array.map((item) => {
+    if (item.pageLink && item.pageLink !== "#") {
+      temp.push({
+        screenName: item.screenName,
+        link: item.pageLink,
+        ...item,
+      });
+    }
+    if ("subNav" in item) {
+      flattenArray(item.subNav);
+    }
+  });
+  return temp;
+}
+
 class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
     axios
@@ -112,7 +130,6 @@ class AuthHandler {
       return false;
     }
   }
-
   static getLoginToken() {
     return reactLocalStorage.get("token");
   }
@@ -123,6 +140,9 @@ class AuthHandler {
   static getMenuItem() {
     return JSON.parse(reactLocalStorage.get("adm_screen"));
   }
+  static menuArr = flattenArray(
+    JSON.parse(reactLocalStorage.get("adm_screen"))
+  );
 
   static getUserRole() {
     return JSON.parse(reactLocalStorage.get("adm_userrole"));
@@ -171,6 +191,16 @@ class AuthHandler {
       JSON.stringify(updatedSettings)
     );
   }
+  static getUserRights() {
+    return JSON.parse(localStorage.getItem("adm_userrights"));
+  }
+  static setScreenCode(code) {
+    localStorage.setItem("screenCode", code);
+  }
+  static getColour() {
+    return JSON.parse(localStorage.getItem("newParty"));
+  }
+
   static getQuery() {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -185,17 +215,29 @@ class AuthHandler {
   }
   static canAdd() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    const screenCode = localStorage.getItem("screenCode");
+    let menuObj = this.menuArr.find(
+      (item) => item.pageLink == window.location.pathname
+    );
+    const screenCode = menuObj ? menuObj.screenCode : "";
+
     return userRights.addRight.includes(screenCode);
   }
   static canEdit() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    const screenCode = localStorage.getItem("screenCode");
+    let menuObj = this.menuArr.find(
+      (item) => item.pageLink == window.location.pathname
+    );
+    const screenCode = menuObj ? menuObj.screenCode : "";
     return userRights.editRight.includes(screenCode);
   }
   static canDelete() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    const screenCode = localStorage.getItem("screenCode");
+    let menuObj = this.menuArr.find(
+      (item) => item.pageLink == window.location.pathname
+    );
+    const screenCode = menuObj ? menuObj.screenCode : "";
+    console.log(menuObj, screenCode, window.location.pathname, this.menuArr);
+
     return userRights.deleteRight.includes(screenCode);
   }
 
@@ -206,5 +248,4 @@ class AuthHandler {
     localStorage.clear();
   }
 }
-
 export default AuthHandler;

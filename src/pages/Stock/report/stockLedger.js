@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import {
   makeStyles,
@@ -77,7 +76,7 @@ const initialLedgerValues = {
 
 export default function StockLedger({ records }) {
   const useBatch =
-    JSON.parse(localStorage.getItem("adm_softwareSettings")).userBatchNo ==
+    AuthHandler.getSettings().userBatchNo ==
     "Yes";
   const headCells = [
     { id: "Date", label: "Date", feild: "vouDate" },
@@ -88,12 +87,7 @@ export default function StockLedger({ records }) {
     { id: "CumIssue", label: "CumIssue", feild: "cumIssue" },
     { id: "CumStock", label: "CumStock", feild: "cumStock" },
   ];
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
-  const { getD } = DateCalc(user);
+  const user = AuthHandler.getUser();
 
   const initialFilterFn = {
     fn: (items) => {

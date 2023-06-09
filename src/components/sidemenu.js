@@ -11,7 +11,7 @@ import { FcManager } from "react-icons/fc";
 
 const Sidemenu = (props) => {
   const matches = useMediaQuery("(min-width:1000px)");
-  const recentImageDataUrl = localStorage.getItem("recent-image");
+  const recentImageDataUrl = AuthHandler.getImage();
 
   function getImage() {
     return recentImageDataUrl

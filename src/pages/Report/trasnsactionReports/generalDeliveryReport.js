@@ -133,21 +133,19 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
       align: "right",
     },
   ];
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
+  const user = AuthHandler.getUser();
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
+
   const { getD } = DateCalc(user);
 
   const initialFilterValues = {
     ...initialReport,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -240,8 +238,7 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
   }
   if (loading) {
     const qrObj = JSON.stringify({ $in: [deliveryDocCode, docCode] });
-    query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}`;
-    const token = AuthHandler.getLoginToken();
+    const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
     console.log(query);
     const url = Config.both + query;
 

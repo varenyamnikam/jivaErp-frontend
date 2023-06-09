@@ -4,6 +4,7 @@ import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import { useNavigate } from "react-router-dom";
+import AuthHandler from "../Utils/AuthHandler";
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: "black",
@@ -56,15 +57,19 @@ const options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"];
 
 export default function MyAutocomplete({ data }) {
   let history = useNavigate();
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = React.useState({});
   const [linkValue, setLinkValue] = React.useState("");
-
+  console.log(inputValue);
   const classes = useStyles();
   let temp = [];
   function flattenArray(array = data) {
     array.map((item) => {
       if (item.pageLink && item.pageLink !== "#") {
-        temp.push({ screenName: item.screenName, link: item.pageLink });
+        temp.push({
+          screenName: item.screenName,
+          link: item.pageLink,
+          ...item,
+        });
       }
       if ("subNav" in item) {
         flattenArray(item.subNav);
@@ -90,11 +95,11 @@ export default function MyAutocomplete({ data }) {
         onChange={(event, newValue, reason) => {
           if (reason == "clear") setInputValue("");
           else {
-            console.log(newValue.link);
+            console.log(newValue);
             history(newValue.link);
             setLinkValue(newValue.link);
             setInputValue(newValue);
-            localStorage.setItem("screenCode", newValue.screenCode);
+            AuthHandler.setScreenCode(newValue.screenCode);
           }
           //other codes go here like setting the value of input
         }}
@@ -120,8 +125,9 @@ export default function MyAutocomplete({ data }) {
           className="btn btn-sidebar"
           style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4 }}
           onClick={() => {
-            console.log(linkValue);
+            console.log(linkValue, typeof inputValue, inputValue);
             linkValue && history(linkValue);
+            AuthHandler.setScreenCode(inputValue.screenCode);
           }}
         >
           <i className="fas fa-search fa-fw"></i>

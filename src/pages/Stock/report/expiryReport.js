@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import {
   makeStyles,
@@ -35,6 +34,7 @@ import StaticDatePickerLandscape from "../../../components/calendarLandscape";
 import StockLedger from "./stockLedger";
 import * as roleService from "../../../services/roleService";
 import SmartAutosuggest from "../../../components/smartAutoSuggest";
+import { NotifyMsg } from "../../../components/notificationMsg";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -102,21 +102,17 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     { feild: "expDateString()", label: "Expiry Date" },
   ];
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
+  const user = AuthHandler.getUser();
+  const useBatch = AuthHandler.getSettings().userBatchNo;
   const { getD } = DateCalc(user);
 
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
-    expDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
+    expDate: roleService.getEndDate(),
     "expDateString()": function () {
       return roleService.date(this.expDate);
     },
@@ -124,7 +120,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
   const initialFilterFn = {
     fn: (items) => {
       let newRecords = items.filter((item) => {
-        if (item.refNo !== "") return item;
+        if (item.prodCode) return item;
       });
       console.log(newRecords);
       return newRecords;
@@ -153,7 +149,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     Stock: "",
     subTitle: "",
   });
-  const setting = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  const setting =AuthHandler.getSettings()
   const initialkeepOpen = setting.keepBatchWiseStockOpen
     ? setting.keepBatchWiseStockOpen
     : false;
@@ -187,30 +183,20 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     let batchWiseStock = "NO";
     if (useBatch == "Yes") batchWiseStock = "Yes";
     console.log(batchWiseStock);
-    let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&useBatch=${batchWiseStock}`;
-    const token = AuthHandler.getLoginToken();
-    console.log(query);
-    axios
-      .get(Config.stockReport + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        setLoading(false);
-        let data = response.data.records;
-        let stk = response.data.stock;
-        console.log(data, stk);
-        mountStockData(data, stk);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      })
-      .finally(() => {});
+    let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&useBatch=${batchWiseStock}`;
+    const url = Config.stockReport + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+    };
+    const handleRes = (res) => {
+      let data = res.data.records;
+      let stk = res.data.stock;
+      console.log(data, stk);
+      mountStockData(data, stk);
+    };
+    roleService.axiosGet(url, handleRes, handleErr, () => {
+      loading && setLoading(false);
+    });
   }
   function mountStockData(data, stk) {
     console.log(data, stk);
@@ -237,7 +223,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     setRecords(arr);
     if (refresh) setRefresh(false);
   }
-  console.log(products);
+  console.log(products, records);
   function handleFilter(e) {
     console.log("hi..");
     const value = e.target.value;
@@ -290,7 +276,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
       new Date(item.batchExpDate).setUTCHours(0, 0, 0, 0) <=
       new Date(filter.expDate).setUTCHours(0, 0, 0, 0)
   );
-  console.log(filter["expDateString()"]());
+  console.log(finalRecords.length, recordsAfterPagingAndSorting().length);
   return (
     <>
       <PageHeader

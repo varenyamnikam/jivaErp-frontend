@@ -79,9 +79,6 @@ export default function Grouped(props) {
   const [records, setRecords] = useState(batchList);
   const [formData, setFormData] = useState({});
 
-  const token = AuthHandler.getLoginToken();
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
   console.log(values, records, batchList);
   const classes = useStyles();
   const {
@@ -204,11 +201,9 @@ export default function Grouped(props) {
   async function getStock() {
     console.log("getting stock");
     try {
-      const useBatch = JSON.parse(
-        localStorage.getItem("adm_softwareSettings")
-      ).userBatchNo;
-      const user = JSON.parse(localStorage.getItem("user"));
-      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}&branchCode=${user.defaultBranchCode}&yearCode=${user.defaultYearCode}`;
+      const useBatch = AuthHandler.getSettings().userBatchNo;
+      const user = AuthHandler.getUser();
+      const query = `&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
       console.log(batchList, records);
       const url = Config.batch + query;
 

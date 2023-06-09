@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../components/PageHeader";
 import AuthHandler from "../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../Utils/Config";
 import {
   makeStyles,
@@ -62,10 +61,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
-function getD() {
-  return new Date(user.defaultYearStart);
-}
-const user = JSON.parse(localStorage.getItem("user"));
 const initialValues = {
   userCompanyCode: "",
   prodCode: "",
@@ -109,17 +104,13 @@ export default function StockMaster({ title = "Opening Stock" }) {
     { feild: "vouNo", label: "Voucher No" },
   ];
 
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
+  const useBatch = AuthHandler.getSettings().userBatchNo;
   let query = `&date=${new Date()}&useBatch=${useBatch}`;
   const initialFilterValues = {
     ...initialValues,
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -164,7 +155,7 @@ export default function StockMaster({ title = "Opening Stock" }) {
   console.log(values, recordsAfterAndSorting);
   console.log("filter=>", filter);
   console.log(Config.batch);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = AuthHandler.getUser();
 
   query = `&prodCode=0&useBatch=idk&vouN=${values.refNo}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
   const url = Config.batch + query;

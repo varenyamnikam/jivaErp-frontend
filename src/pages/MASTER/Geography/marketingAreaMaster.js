@@ -56,10 +56,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 const initialEValues = { acName: "", acCode: "X X X X" };
 const initialFilterEValues = { acName: "", acCode: "" };
-const userCode = localStorage.getItem("userCode");
-const userCompanyCode = localStorage.getItem("userCompanyCode");
-const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-
+const user = AuthHandler.getUser();
 let dataBase = [
   {
     mktAreaCode: "5001",
@@ -67,8 +64,8 @@ let dataBase = [
     mktArea: "India",
     child: [],
     assignTo: "",
-    userCompanyCode: userCompanyCode,
-    entryBy: userCode,
+    userCompanyCode: user.userCompanyCode,
+    entryBy: user.userCode,
     entryOn: new Date(),
   },
 ];

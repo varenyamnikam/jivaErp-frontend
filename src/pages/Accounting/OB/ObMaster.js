@@ -153,8 +153,8 @@ export default function AcMaster({ title = "Opening Balance" }) {
     ...initialValues,
     vouNo: "",
     allFields: "",
-    startDate: user.defaultYearStart,
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [buttonPopup, setButtonPopup] = useState(false);

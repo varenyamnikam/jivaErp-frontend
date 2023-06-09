@@ -153,7 +153,6 @@ export default function UnusedAutosuggest(props) {
   return (
     <>
       <Autocomplete
-        disablePortal
         id="combo-box-demo"
         size="small"
         classes={{

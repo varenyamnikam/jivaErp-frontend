@@ -117,17 +117,15 @@ export default function StockConversionMaster({ title = "Stock Conversion" }) {
     { feild: "vouNo", label: "Voucher No" },
   ];
 
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  const user = JSON.parse(localStorage.getItem("user"));
+  const settings = AuthHandler.getSettings();
+  const user = AuthHandler.getUser();
 
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const initialFilterFn = {
     fn: (items) => {

@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import Divider from "@mui/material/Divider";
 import { NotifyMsg } from "../../../components/notificationMsg";
 import Config from "../../../Utils/Config";
+import AuthHandler from "../../../Utils/AuthHandler";
 const Firms = [
   "N.A.",
   "Proprietary",
@@ -122,10 +123,10 @@ export default function Adressform(props) {
       const url = Config.acadress;
       console.log(input);
       roleService.axiosPatch(url, input, handleRes, handleErr);
-      let newParty = JSON.parse(localStorage.getItem("newParty"));
+      let newParty = AuthHandler.getNewParty();
       if (newParty.partyOpen) {
         newParty.partyOpen = false;
-        localStorage.setItem("newParty", JSON.stringify(newParty));
+        AuthHandler.setNewParty(newParty);
         history(newParty.path);
       }
     }
@@ -183,8 +184,6 @@ export default function Adressform(props) {
             value={input.addressLine1}
             onChange={handleChange}
             error={errors.addressLine1}
-            multiline
-            rows={3}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -194,8 +193,6 @@ export default function Adressform(props) {
             value={input.addressLine2}
             onChange={handleChange}
             error={errors.addressLine2}
-            multiline
-            rows={3}
           />
         </Grid>
         <Grid item xs={12} sm={12}>

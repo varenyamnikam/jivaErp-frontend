@@ -145,8 +145,8 @@ export default function AcMaster({ title = "Contra Voucher" }) {
     ...initialValues,
     vouNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
     vouDate: "",
     docCode: "",
   };

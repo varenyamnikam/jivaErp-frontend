@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../components/PageHeader";
 import AuthHandler from "../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../Utils/Config";
 import {
   makeStyles,
@@ -106,13 +105,7 @@ export default function BankBook({ docCode1, docCode2 }) {
   const isDayBook = docCode1 == "DAY";
 
   isDayBook && headCells.pop();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = user.userCode;
-  const userCompanyCode = user.userCompanyCode;
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  let query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&date=${new Date()}&useBatch=${useBatch}`;
+  const user = AuthHandler.getUser();
   const { getD } = DateCalc(user);
   const { acTransactnDocCodes, transactnDocCodes } = DocCodes();
   const docCodeOptions = [...acTransactnDocCodes, ...transactnDocCodes];
@@ -120,8 +113,8 @@ export default function BankBook({ docCode1, docCode2 }) {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
     docCode: "",
   };
   const openingObj = {
@@ -175,9 +168,8 @@ export default function BankBook({ docCode1, docCode2 }) {
   console.log(Config.batch);
   console.log(records[0], loading);
   if (loading) {
-    query = `
-    &startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
-    const token = AuthHandler.getLoginToken();
+    const query = `
+    &startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
     console.log(query);
     const url = Config.bankReport + query;
     const handleErr = (err) => {

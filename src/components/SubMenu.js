@@ -34,8 +34,8 @@ const DropdownLink = styled(Link)`
   }
 `;
 function getRights(node) {
-  let adm_userrights = JSON.parse(localStorage.getItem("adm_userrights"));
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  let adm_userrights = AuthHandler.getUserRights();
+  const settings = AuthHandler.getSettings();
   let x = true;
   if (adm_userrights.menuRight) {
     x = adm_userrights.menuRight.includes(node.screenCode);
@@ -92,7 +92,8 @@ const TreeNode = ({ node }) => {
             color: "white",
           }}
           onClick={() => {
-            localStorage.setItem("screenCode", node.screenCode);
+            console.log(node);
+            AuthHandler.setScreenCode(node.screenCode);
           }}
         >
           <div className="glow">

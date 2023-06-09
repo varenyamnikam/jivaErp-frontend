@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import AuthHandler from "../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../Utils/Config";
 import { Grid } from "@material-ui/core";
 import SmartAutoSuggest from "./smartAutoSuggest";
@@ -11,6 +10,9 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
 import Notification from "./Notification";
 import Controls from "./controls/Controls";
+import { NotifyMsg } from "./notificationMsg";
+import * as roleService from "../services/roleService";
+
 const initialBranchValues = {
   contactNo: "",
   Mobileno: "",
@@ -58,53 +60,39 @@ export default function ChangeFinyear({ setButtonPopup }) {
   });
 
   if (loading) {
-    const token = AuthHandler.getLoginToken();
-    axios
-      .get(Config.usermasterUrl, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        if (response.data.adm_finYear.length !== 0)
-          setRecords(response.data.adm_finYear);
-        else {
-          console.log("no data");
-        }
-        if (response.data.adm_branch.length !== 0)
-          setBranch(response.data.adm_branch);
-        else {
-          console.log("no data");
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      })
-      .finally(() => {});
+    function handleRes(response) {
+      console.log(response);
+      if (response.data.adm_finYear.length !== 0)
+        setRecords(response.data.adm_finYear);
+      else {
+        console.log("no data");
+      }
+      if (response.data.adm_branch.length !== 0)
+        setBranch(response.data.adm_branch);
+      else {
+        console.log("no data");
+      }
+    }
+    function handleErr(error) {
+      setNotify(NotifyMsg(4));
+    }
+
+    roleService.axiosGet(Config.usermasterUrl, handleRes, handleErr, () => {
+      setLoading(false);
+    });
   }
   function findDate(code) {
-    let date = null;
-    records.map((item) => {
-      if (item.yearCode == code) date = item.yearStartDate;
-    });
-    console.log(code, date);
-    return date;
+    let yearObj = records.find((item) => item.yearCode == code);
+    return yearObj;
   }
   console.log(branch, records);
   let options = records.map((item) => item.finYear);
   let options1 = branch.map((item) => item.branchName);
 
   function handleSubmit() {
-    const token = AuthHandler.getLoginToken();
-    const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
     console.log(values);
-    values.defaultYearStart = findDate(values.defaultYearCode);
+    values.currentYearStart = findDate(values.currentYearCode).yearStartDate;
+    values.currentYearEnd = findDate(values.currentYearCode).yearEndDate;
 
     localStorage.setItem("user", JSON.stringify(values));
     setButtonPopup(false);

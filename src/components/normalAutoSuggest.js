@@ -90,7 +90,6 @@ export default function UnusedAutosuggest(props) {
   return (
     <>
       <Autocomplete
-        disablePortal
         id="combo-box-demo"
         classes={{
           clearIndicatorDirty: classes.clearIndicator,

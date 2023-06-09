@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import { makeStyles } from "@material-ui/core";
 import Controls from "../../../components/controls/Controls";
@@ -24,12 +23,9 @@ const docOptions = ["DC", "QT", "GR", "SI"];
 const useStyles = makeStyles((theme) => ({
   // input: { minWidth: "200px", flexGrow: 1 },
 }));
-const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+const settings = AuthHandler.getSettings();
 
 export default function StockConversionForm(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     values,
@@ -92,9 +88,6 @@ export default function StockConversionForm(props) {
       y = false;
     }
   });
-  const userDate = new Date(
-    JSON.parse(localStorage.getItem("user")).defaultYearStart
-  );
   function getVouNo() {
     if (y) {
       return " NEW ";
@@ -105,11 +98,11 @@ export default function StockConversionForm(props) {
   const user = AuthHandler.getUser();
 
   if (
-    !input.refNo.includes(user.defaultBranchCode + "SC" + user.defaultYearCode)
+    !input.refNo.includes(user.currentBranchCode + "SC" + user.currentYearCode)
   )
     setInput({
       ...input,
-      refNo: user.defaultBranchCode + "SC" + user.defaultYearCode,
+      refNo: user.currentBranchCode + "SC" + user.currentYearCode,
     });
   console.log(settings.userBatchNo);
   return (

@@ -88,9 +88,6 @@ const initialFilterValues = {
 };
 
 export default function AccountTypesMaster() {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
 
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);

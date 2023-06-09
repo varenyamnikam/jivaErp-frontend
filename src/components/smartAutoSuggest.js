@@ -130,7 +130,7 @@ export default function SmartAutosuggest(props) {
   return (
     <>
       <Autocomplete
-        disablePortal
+        // disablePortal
         id="combo-box-demo"
         size="small"
         classes={{

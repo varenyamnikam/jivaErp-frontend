@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageHeader from "../../../components/PageHeader";
 import AuthHandler from "../../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../../Utils/Config";
 import {
   makeStyles,
@@ -36,7 +35,7 @@ import StockLedger from "./stockLedger";
 import ExportSwitch from "../../../components/controls/Switch";
 import SmartAutosuggest from "../../../components/smartAutoSuggest";
 import * as roleService from "../../../services/roleService";
-
+import { NotifyMsg } from "../../../components/notificationMsg";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -125,20 +124,15 @@ export default function StockMaster({ title = "Stock Report" }) {
   ];
   const filterFields = [{ feild: "prodName", label: "Product Name" }];
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
-  const { getD } = DateCalc(user);
+  const user = AuthHandler.getUser();
+  const useBatch = AuthHandler.getSettings().userBatchNo;
 
   const initialFilterValues = {
     ...initialValues,
     refNo: "",
     allFields: "",
-    startDate: getD(),
-    endDate: new Date(),
+    startDate: roleService.getStartDate(),
+    endDate: roleService.getEndDate(),
   };
   const initialFilterFn = {
     fn: (items) => {
@@ -174,7 +168,7 @@ export default function StockMaster({ title = "Stock Report" }) {
     Stock: "",
     subTitle: "",
   });
-  const setting = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+  const setting = AuthHandler.getSettings();
   const initialkeepOpen = setting.keepBatchWiseStockOpen
     ? setting.keepBatchWiseStockOpen
     : false;
@@ -210,30 +204,24 @@ export default function StockMaster({ title = "Stock Report" }) {
     let batchWiseStock = "NO";
     if (useBatch == "Yes" && batchWise) batchWiseStock = "Yes";
     console.log(batchWiseStock);
-    let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&useBatch=${batchWiseStock}`;
+    let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&useBatch=${batchWiseStock}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
-    axios
-      .get(Config.stockReport + query, {
-        headers: {
-          authorization: "Bearer" + token,
-        },
-      })
-      .then((response) => {
-        setLoading(false);
-        let data = response.data.records;
-        let stk = response.data.stock;
-        console.log(data, stk);
-        mountStockData(data, stk);
-      })
-      .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Unable to connect to servers",
-          type: "warning",
-        });
-      })
-      .finally(() => {});
+    const url = Config.stockReport + query;
+    const handleErr = (err) => {
+      setNotify(NotifyMsg(4));
+    };
+    const handleRes = (res) => {
+      setLoading(false);
+      let data = res.data.records;
+      let stk = res.data.stock;
+      console.log(data, stk);
+      mountStockData(data, stk);
+    };
+
+    roleService.axiosGet(url, handleRes, handleErr, () => {
+      loading && setLoading(false);
+    });
   }
   function mountStockData(data, stk) {
     if (stk.length != 0) setStock(stk);
@@ -277,14 +265,12 @@ export default function StockMaster({ title = "Stock Report" }) {
     setBatchWise(event.target.checked);
     setRefresh(true);
 
-    const prevSetting = JSON.parse(
-      localStorage.getItem("adm_softwareSettings")
-    );
+    const prevSetting = AuthHandler.getSettings();
     const newSetting = {
       ...prevSetting,
       keepBatchWiseStockOpen: event.target.checked,
     };
-    localStorage.setItem("adm_softwareSettings", JSON.stringify(newSetting));
+    AuthHandler.updateSettings(newSetting);
   }
   console.log(filter);
   function search(allfields) {

@@ -16,6 +16,8 @@ import Controls from "./controls/Controls";
 import PrintIcon from "@mui/icons-material/Print";
 import { Grid } from "@mui/material";
 import { add } from "date-fns";
+import AuthHandler from "../Utils/AuthHandler";
+import * as roleService from "../services/roleService";
 const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
@@ -143,8 +145,8 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
     });
     return temp;
   }
-  const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
-  let company = JSON.parse(reactLocalStorage.get("company"));
+  const settings = AuthHandler.getSettings();
+  let company = AuthHandler.getCompany();
   function getDate(code) {
     const date = new Date(code);
     const zeroPad = (num, places) => String(num).padStart(places, "0");
@@ -220,7 +222,8 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
       .replace(/(\.0+|0+)$/, "");
   }
   console.log(getTax(values));
-  const borderObj = { border: "2px solid #dee2e6" };
+  const partyAdress = getAd(values);
+  console.log(window.location.pathname);
   return (
     <>
       <div
@@ -260,7 +263,19 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               <h5> From</h5>
             </Grid>
             <h4>{company.companyName}</h4>
-            <span>{company.adressLine1}</span>
+            <span>{company.adressLine1}</span>,{" "}
+            <span>{company.adressLine2}</span>,{" "}
+            <span>
+              {company.district}-{company.pinCode}
+            </span>
+            ,{" "}
+            <span>
+              {company.stateName}({company.stateCode})
+            </span>
+            ,{" "}
+            <span>
+              {company.countryName}({company.countryCode})
+            </span>
             <br></br>
             <span>Phone: {company.contactNo}</span>
             <br></br>
@@ -278,13 +293,29 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               <h5>Bill To</h5>
             </Grid>
             <h4>{getParty(values) && getParty(values).acName}</h4>
-            {getAd(values) && (
+            {getAd && (
               <>
-                <span>Country: {getAd(values).countryName} </span>
-                <span> State: {getAd(values).stateName}</span>
+                <span>{getAd(values).addressLine1}</span>,{" "}
+                <span>{getAd(values).addressLine2}</span>,{" "}
+                {partyAdress.districtName && (
+                  <span> {partyAdress.districtName}, </span>
+                )}
+                {partyAdress.talukaName && (
+                  <span> {partyAdress.talukaName}, </span>
+                )}
                 <br />
-                <span>District: {getAd(values).districtName} </span>
-                <span> Taluka: {getAd(values).talukaName}</span>
+                {partyAdress.stateName && (
+                  <span>
+                    {" "}
+                    {partyAdress.stateName}({partyAdress.stateCode}),{" "}
+                  </span>
+                )}
+                {partyAdress.countryName && (
+                  <span>
+                    {" "}
+                    {partyAdress.countryName}({partyAdress.countryCode}),{" "}
+                  </span>
+                )}
               </>
             )}
           </Grid>
@@ -298,157 +329,132 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               <h5> Ship To</h5>
             </Grid>
             <h4>{getParty(values) && getParty(values).acName}</h4>
-            {getAd(values) && (
+            {partyAdress && (
               <>
-                <span>Country: {getAd(values).countryName} </span>
-                <span> State: {getAd(values).stateName}</span>
+                <span>{getAd(values).addressLine1}</span>,{" "}
+                <span>{getAd(values).addressLine2}</span>,{" "}
+                {partyAdress.districtName && (
+                  <span> {partyAdress.districtName}, </span>
+                )}
+                {partyAdress.talukaName && (
+                  <span> {partyAdress.talukaName}, </span>
+                )}
                 <br />
-                <span>District: {getAd(values).districtName} </span>
-                <span> Taluka: {getAd(values).talukaName}</span>
+                {partyAdress.stateName && (
+                  <span>
+                    {" "}
+                    {partyAdress.stateName}({partyAdress.stateCode}),{" "}
+                  </span>
+                )}
+                {partyAdress.countryName && (
+                  <span>
+                    {" "}
+                    {partyAdress.countryName}({partyAdress.countryCode}),{" "}
+                  </span>
+                )}
               </>
             )}
           </Grid>
           <Grid Item sm={12} xs={12}>
             <Table style={{ padding: "20px" }} className={classes.table}>
               <TableRow className={classes.table}>
-                <TableCell
-                  style={{
-                    width: "20%",
-                    backgroundColor: "white",
-                  }}
-                >
+                <TableCell style={{ backgroundColor: "white" }}>
                   Product
                 </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-
-                    width: "5%",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   Quantity
                 </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   Rate
                 </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   Amount
                 </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   Discount
                 </TableCell>
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   G.S.T
                 </TableCell>
-                {settings.useCessitem == "Yes" && (
+                {settings.useCessitem === "Yes" && (
                   <TableCell
                     className={classes.table}
                     align="right"
-                    style={{
-                      backgroundColor: "white",
-                    }}
+                    style={{ backgroundColor: "white" }}
                   >
-                    cess
+                    Cess
                   </TableCell>
                 )}
-                <TableCell
-                  align="right"
-                  style={{
-                    backgroundColor: "white",
-                    width: "10%",
-                  }}
-                >
+                <TableCell align="right" style={{ backgroundColor: "white" }}>
                   Item Total
                 </TableCell>
               </TableRow>
               <TableBody>
                 {getItems(values).map((item) => (
                   <TableRow className={classes.table}>
-                    <TableCell className={classes.table} style={{}}>
-                      {getProdName(item.prodCode)}
-                    </TableCell>
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {item.qty}
-                    </TableCell>
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {Number(item.rate)}
-                    </TableCell>
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {Number(item.qr)}
-                    </TableCell>
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {rnd(Number(item.discount))} ({rnd(item.disPer)}%)
-                    </TableCell>
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {rnd(
-                        Number(item.cgst) +
-                          Number(item.sgst) +
-                          Number(item.igst)
+                    <TableCell className={classes.table}>
+                      <div style={{ display: "flex" }}>
+                        {getProdName(item.prodCode)}
+                      </div>
+                      {settings.userBatchNo === "Yes" && (
+                        <div>
+                          {item.batchList.map((batch, i) => (
+                            <span key={i}>
+                              {batch.batchNo}-{batch.sell} (
+                              {roleService.date(batch.expDate)})
+                              {i < item.batchList.length - 1 && ", "}
+                            </span>
+                          ))}
+                        </div>
                       )}
-                      (
-                      {rnd(
-                        Number(item.cgstP) +
-                          Number(item.sgstP) +
-                          Number(item.igstP)
-                      )}
-                      %)
                     </TableCell>
-                    {settings.useCessitem == "Yes" && (
-                      <TableCell
-                        className={classes.table}
-                        align="right"
-                        style={{}}
-                      >
-                        {rnd(item.cess)} ({rnd(item.cessP)}%)
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>{item.qty}</div>
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>{Number(item.rate)}</div>
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>{Number(item.qr)}</div>
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>
+                        ({rnd(item.disPer)}%) {rnd(Number(item.discount))}
+                      </div>
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <div style={{ marginRight: "10px" }}>
+                            (
+                            {rnd(
+                              Number(item.cgstP) +
+                                Number(item.sgstP) +
+                                Number(item.igstP)
+                            )}
+                            %)
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            {rnd(
+                              Number(item.cgst) +
+                                Number(item.sgst) +
+                                Number(item.igst)
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    {settings.useCessitem === "Yes" && (
+                      <TableCell className={classes.table} align="right">
+                        <div style={{ display: "flex" }}>
+                          ({rnd(item.cessP)}%) {rnd(item.cess)}
+                        </div>
                       </TableCell>
                     )}
-                    <TableCell
-                      className={classes.table}
-                      align="right"
-                      style={{}}
-                    >
-                      {Number(item.itemAmount)}
+                    <TableCell className={classes.table} align="right">
+                      <div style={{ display: "flex" }}>
+                        {Number(item.itemAmount)}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -478,7 +484,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell className={classes.table}>cgst</TableCell>
+                  <TableCell className={classes.table}>CGST</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -498,7 +504,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell className={classes.table}>sgst</TableCell>
+                  <TableCell className={classes.table}>SGST</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -518,7 +524,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell className={classes.table}>igst</TableCell>
+                  <TableCell className={classes.table}>IGST</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -601,17 +607,18 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             xs={12}
             style={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "space-between",
               fontWeight: 700,
               margin: "20px",
             }}
           >
+            <h5>Declaration {company.declaration}</h5>
             <h5>For {company.companyName}</h5>
           </Grid>
           <Grid
             Item
-            xs={6}
-            sm={6}
+            xs={12}
+            sm={12}
             sx={{
               fontWeight: 600,
             }}
@@ -631,6 +638,15 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               Subject To {company.district} Jurisdiction hi
             </h5  >{" "} */}
             <h5
+              style={{ marginRight: "100px" }}
+              sx={{
+                fontWeight: 600,
+              }}
+            >
+              {company.footer}
+            </h5>
+            <h5
+              style={{ marginLeft: "50px" }}
               sx={{
                 fontWeight: 600,
               }}

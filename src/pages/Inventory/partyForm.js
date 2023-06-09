@@ -76,6 +76,7 @@ export default function CustomerForm(props) {
     .filter((item) => input.refType == item.docCode)
     .map((item) => item.vouNo);
   const payOptions = payTerms.map((item) => item.paymentTerms);
+  console.log(payOptions, payTerms);
   const addressOptions = adress
     .filter((item) => item.acCode == input.partyCode)
     .map((item) => item.addressLine1);
@@ -207,7 +208,7 @@ export default function CustomerForm(props) {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const settings = AuthHandler.getSettings()
+  const settings = AuthHandler.getSettings();
   function getOptionsForRef() {
     if (initialValues.docCode == "PV") {
       return ["GR", "PO"];

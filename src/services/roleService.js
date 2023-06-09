@@ -20,15 +20,46 @@ function timeOutErr(error) {
     window.location = "/";
   }
 }
-function getFilterDate() {}
+export function getStartDate() {
+  let user = AuthHandler.getUser();
+  if (user.defaultYearCode == user.currentYearCode) {
+    const today = new Date();
+    const oneMonthAgo = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      today.getDate()
+    );
+    return oneMonthAgo;
+  } else {
+    const today = new Date(user.currentYearEnd);
+    const oneMonthAgo = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      today.getDate()
+    );
+    return oneMonthAgo;
+  }
+}
+export function getEndDate() {
+  let user = AuthHandler.getUser();
+
+  return user.defaultYearCode == user.currentYearCode
+    ? new Date()
+    : new Date(user.currentYearEnd);
+}
 //trailbalance excluded
-export function axiosGet(url, responseFn, errFn, finalFn = () => {}) {
+export function axiosGet(
+  url,
+  responseFn,
+  errFn,
+  finalFn = () => {},
+  params = {}
+) {
   const token = AuthHandler.getLoginToken();
   console.log(token);
-
-  const body = { hello: "hello" };
   axios
     .get(url, {
+      params: params,
       headers: {
         authorization: token,
       },
@@ -53,7 +84,7 @@ export function axiosPost(url, data, responseFn, errFn, finalFn = () => {}) {
   axios
     .post(url, data, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     })
     .then((response) => {
@@ -75,7 +106,7 @@ export function axiosPut(url, data, responseFn, errFn, finalFn = () => {}) {
   axios
     .put(url, data, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     })
     .then((response) => {
@@ -97,7 +128,7 @@ export function axiosPatch(url, data, responseFn, errFn, finalFn = () => {}) {
   axios
     .patch(url, data, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     })
     .then((response) => {
@@ -119,7 +150,7 @@ export function axiosDelete(url, data, responseFn, errFn, finalFn = () => {}) {
   axios
     .delete(url, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
       data: data,
     })
@@ -153,7 +184,7 @@ export function GetAllRoles() {
   axios
     .post(Config.userUrl, body, {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     })
     .then(function (response) {
@@ -176,7 +207,7 @@ export function insertnewRole(data) {
       { roleCode: data.roleCode, roleName: data.roleName },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -203,7 +234,7 @@ export function insertnewRoleRights(data) {
       },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -227,7 +258,7 @@ export function deleteUserRole(data) {
       },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -288,7 +319,7 @@ export function deleteUserRights(data) {
     },
     {
       headers: {
-        authorization: "Bearer" + token,
+        authorization: token,
       },
     }
   );
@@ -303,7 +334,7 @@ export function deleteUserRights(data) {
 //       { values },
 //       {
 //         headers: {
-//           authorization: "Bearer" + token,
+//           authorization: token,
 //         },
 //       }
 //     )
@@ -328,7 +359,7 @@ export function updateuser(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -354,7 +385,7 @@ export function deleteuser(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -369,7 +400,7 @@ export function deleteuser(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -385,7 +416,7 @@ export function deleteBranch(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -405,7 +436,7 @@ export function updateBranch(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -429,7 +460,7 @@ export function insertLocation(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -447,7 +478,7 @@ export function insertglGroup(data) {
       { ...values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -470,7 +501,7 @@ export function insertAcAdress(data) {
       { ...values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )
@@ -493,7 +524,7 @@ export function deleteAcAdress(data) {
       { values },
       {
         headers: {
-          authorization: "Bearer" + token,
+          authorization: token,
         },
       }
     )

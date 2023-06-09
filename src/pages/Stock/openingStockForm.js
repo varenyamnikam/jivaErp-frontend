@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import AuthHandler from "../../Utils/AuthHandler";
-import axios from "axios";
 import Config from "../../Utils/Config";
 import { makeStyles } from "@material-ui/core";
 import Controls from "../../components/controls/Controls";
@@ -24,12 +23,9 @@ const docOptions = ["DC", "QT", "GR", "SI"];
 const useStyles = makeStyles((theme) => ({
   // input: { minWidth: "200px", flexGrow: 1 },
 }));
-const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
+const settings = AuthHandler.getSettings();
 
 export default function GeneralForm(props) {
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
   const {
     records,
     values,
@@ -88,9 +84,7 @@ export default function GeneralForm(props) {
       y = false;
     }
   });
-  const userDate = new Date(
-    JSON.parse(localStorage.getItem("user")).defaultYearStart
-  );
+  const userDate = new Date(AuthHandler.getUser().currentYearStart);
   const newDate = new Date(
     new Date().setFullYear(userDate.getFullYear(), 2, 31)
   );
@@ -105,12 +99,12 @@ export default function GeneralForm(props) {
 
   if (
     !input.refNo.includes(
-      user.defaultBranchCode + input.refType + user.defaultYearCode
+      user.currentBranchCode + input.refType + user.currentYearCode
     )
   )
     setInput({
       ...input,
-      refNo: user.defaultBranchCode + input.refType + user.defaultYearCode,
+      refNo: user.currentBranchCode + input.refType + user.currentYearCode,
     });
   if (input.refType == "OP" && String(input.vouDate) !== String(newDate)) {
     console.log(newDate, String(input.vouDate) !== String(newDate));

@@ -113,7 +113,7 @@ const initialAdress = {
 };
 
 export default function GeneralAccountMaster({ acTypeFor, initialValues }) {
-  const newParty = JSON.parse(localStorage.getItem("newParty"));
+  const newParty = AuthHandler.getNewParty();
   const openOnRender = newParty.partyOpen;
   const initialFilterValues = {
     ...initialValues,

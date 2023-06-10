@@ -148,7 +148,7 @@ export default function AcReport({ title = "A.C Report" }) {
   if (loading) {
     const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&acCode=${filter.acCode}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
     console.log(query);
-    const url = Config.acReport + query;
+    const url = Config().acReport + query;
 
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));

@@ -26,6 +26,5 @@ export default function BR() {
     entryBy: "",
     entryOn: "",
   };
-  console.log(initialValues);
   return <AcMaster title="Cash Reciept" initialValues={initialValues} />;
 }

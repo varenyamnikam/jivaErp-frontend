@@ -76,8 +76,8 @@ const Branchmaster = (props) => {
     let name = parentBranch ? parentBranch.branchName : "";
     return name;
   }
-  const url = Config.Branch;
-
+  const url = Config().Branch;
+  console.log(url);
   if (loading) {
     const handleRes = (response) => {
       console.log(response);
@@ -108,7 +108,7 @@ const Branchmaster = (props) => {
     roleService.axiosGet(url, handleRes, handleErr, handleFinally);
   }
   // if (!location.states[0] && !location.country[0]) {
-  //   const url = Config.location;
+  //   const url = Config().location;
   //   const body = { hello: "hello" };
 
   //   const handleRes = (response) => {

@@ -94,7 +94,7 @@ const initialAccounts = {
 };
 export default function AcMaster(props) {
   const { title, initialValues } = props;
-  const user =  AuthHandler.getUser()
+  const user = AuthHandler.getUser();
   const { getD } = DateCalc(user);
   initialValues.narration = "";
   console.log(initialValues);
@@ -173,9 +173,9 @@ export default function AcMaster(props) {
   } = useTable(records, headcells, filterFn);
   console.log(values, records);
   console.log("filter=>", filter);
-  console.log(Config.batch);
+  console.log(Config().batch);
   const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
-  const url = Config.accounting + addQuery;
+  const url = Config().accounting + addQuery;
   console.log(url);
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));

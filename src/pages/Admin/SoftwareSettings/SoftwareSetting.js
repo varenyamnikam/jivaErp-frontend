@@ -133,7 +133,7 @@ export default function Settings() {
     return Object.values(temp).every((x) => x == "") && hasRight;
   };
 
-  const url = Config.soft;
+  const url = Config().soft;
   if (loading) {
     function handleRes(response) {
       console.log(response.data);

@@ -71,7 +71,7 @@ export default function AcLedgerSettings({
       console.log(err);
       setNotify(NotifyMsg(4));
     }
-    roleService.axiosGet(Config.accounts, handleRes, handleErr, () => {
+    roleService.axiosGet(Config().accounts, handleRes, handleErr, () => {
       setLoading(false);
     });
   }
@@ -82,7 +82,7 @@ export default function AcLedgerSettings({
   // reactLocalStorage.set("company", JSON.stringify(values));
   // axios
   //   .patch(
-  //     Config.register + query,
+  //     Config().register + query,
   //     { values: values },
   //     {
   //       headers: {

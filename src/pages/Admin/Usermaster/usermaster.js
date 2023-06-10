@@ -134,7 +134,7 @@ const Usermaster = (props) => {
     useTable(records, headCells, filterFn);
   console.log(userRights);
 
-  const url = Config.usermasterUrl;
+  const url = Config().usermasterUrl;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     loading && setLoading(false);

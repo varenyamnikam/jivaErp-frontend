@@ -154,11 +154,11 @@ export default function StockMaster({ title = "Opening Stock" }) {
   } = useTable(records, headcells, filterFn);
   console.log(values, recordsAfterAndSorting);
   console.log("filter=>", filter);
-  console.log(Config.batch);
+  console.log(Config().batch);
   const user = AuthHandler.getUser();
 
   query = `&prodCode=0&useBatch=idk&vouN=${values.refNo}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
-  const url = Config.batch + query;
+  const url = Config().batch + query;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);

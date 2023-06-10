@@ -196,7 +196,7 @@ export default function UnusedAutosuggest(props) {
       console.log(query);
       axios
         .post(
-          Config.acReport,
+          Config().acReport,
           {
             userCompanyCode: userCompanyCode,
             userCode: userCode,

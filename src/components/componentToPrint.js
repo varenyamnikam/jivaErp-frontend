@@ -612,7 +612,9 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
               margin: "20px",
             }}
           >
-            <h5>Declaration {company.declaration}</h5>
+            <h5>
+              {company.declaration && <>Declaration {company.declaration}</>}
+            </h5>
             <h5>For {company.companyName}</h5>
           </Grid>
           <Grid

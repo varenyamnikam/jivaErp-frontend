@@ -184,7 +184,7 @@ export default function DCReport({ docCode }) {
   } = useTable(records, headcells, filterFn);
   console.log(values, records);
   console.log("filter=>", filter);
-  console.log(Config.batch);
+  console.log(Config().batch);
   function getPartyName(code, arr) {
     let name = "";
     console.log(arr, code);
@@ -233,7 +233,7 @@ export default function DCReport({ docCode }) {
 
     const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}
     `;
-    const url = Config.both + query;
+    const url = Config().both + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
       setRecords([{ ...initialReport, vouNo: "" }]);

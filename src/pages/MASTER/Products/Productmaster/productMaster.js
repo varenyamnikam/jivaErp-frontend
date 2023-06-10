@@ -121,7 +121,7 @@ const initialFilterValues = {
   allFields: "",
 };
 export default function ProductMaster(props) {
-  const newParty =AuthHandler.getNewParty()
+  const newParty = AuthHandler.getNewParty();
   const openOnRender = newParty.partyOpen;
 
   const [records, setRecords] = useState([initialValues]);
@@ -159,7 +159,7 @@ export default function ProductMaster(props) {
     setNotify(NotifyMsg(4));
     setLoading(false);
   };
-  const url = Config.prodMaster;
+  const url = Config().prodMaster;
 
   if (loading) {
     const handleRes = (response) => {

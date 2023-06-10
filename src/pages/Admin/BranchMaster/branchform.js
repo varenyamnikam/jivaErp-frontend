@@ -140,7 +140,7 @@ export default function Branchform(props) {
       )
         y = false;
     });
-    const url = Config.Branch;
+    const url = Config().yay;
     const body = { input };
     function handleErr(err) {
       setNotify(NotifyMsg(4));

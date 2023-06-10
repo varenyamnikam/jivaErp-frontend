@@ -3,11 +3,10 @@ import Home from "./home/Home";
 import Config from "../Utils/Config";
 import AuthHandler from "../Utils/AuthHandler";
 const Dashboard = (props) => {
-  console.log(Config.homeUrl);
+  console.log(Config().homeUrl);
   let userCompanyCode = AuthHandler.getUser().userCompanyCode;
   let userCode = AuthHandler.getUser().userCode;
   console.log(userCompanyCode, userCode);
-  console.log(Config.query);
 
   return (
     <>

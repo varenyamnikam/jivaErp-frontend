@@ -77,7 +77,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
       setNotify(NotifyMsg(4));
     }
 
-    roleService.axiosGet(Config.usermasterUrl, handleRes, handleErr, () => {
+    roleService.axiosGet(Config().usermasterUrl, handleRes, handleErr, () => {
       setLoading(false);
     });
   }
@@ -98,7 +98,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
     setButtonPopup(false);
     // axios
     //   .patch(
-    //     Config.usermasterUrl + query,
+    //     Config().usermasterUrl + query,
     //     { values },
     //     {
     //       headers: {
@@ -127,16 +127,13 @@ export default function ChangeFinyear({ setButtonPopup }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100px",
-          width: "250px",
-          margin: "25px",
         }}
         spacing={2}
       >
         <Grid
           item
           xs={12}
-          sm={12}
+          sm={6}
           style={{
             display: "flex",
             justifyContent: "center",
@@ -159,7 +156,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
         <Grid
           item
           xs={12}
-          sm={12}
+          sm={6}
           style={{
             display: "flex",
             justifyContent: "center",
@@ -185,7 +182,7 @@ export default function ChangeFinyear({ setButtonPopup }) {
           sm={12}
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "flex-end",
             alignItems: "center",
           }}
         >

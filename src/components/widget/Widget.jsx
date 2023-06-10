@@ -5,8 +5,7 @@ import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalance
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { Route, Redirect } from "react-router-dom";
-import Config from "../../Utils/Config";
-import { Link, NavLink } from "react-router-dom";
+import Config from "../../Utils/Config"; import { Link, NavLink } from "react-router-dom";
 import { Grid } from "@mui/material";
 const Widget = ({ type }) => {
   let data;

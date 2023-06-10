@@ -171,7 +171,7 @@ export default function StockConversionMaster({ title = "Stock Conversion" }) {
   console.log("filter=>", filter);
   console.log(settings);
   let query = `&useBatch=${settings.userBatchNo}&vouN=${values.refNo}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
-  const url = Config.stockConversion + query;
+  const url = Config().stockConversion + query;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);

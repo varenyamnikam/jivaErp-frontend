@@ -53,6 +53,8 @@ const initialFValues = {
   regMobileNo: "",
   gstInNo: "",
   regType: "FREE",
+  footer: "",
+  declaration: "",
 };
 const initialValues = {
   userCompanyCode: "X X X X",
@@ -140,16 +142,16 @@ export default function RegisterForm() {
       // const token = AuthHandler.getLoginToken();
       // const body = { hello: "hello" };
       // axios
-      //   .post(Config.location, body, {
+      //   .post(Config().location, body, {
       //     headers: {
       //       authorization: "Bearer" + token,
       //     },
       //   })
       const handleRes = (response) => {
         console.log(response.data);
-        setLocation(response.data);
+        setLocation(response.data.location);
       };
-      const url = Config.location;
+      const url = Config().register;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
         console.error(err);
@@ -177,26 +179,21 @@ export default function RegisterForm() {
 
     if (validate()) {
       alert(`${values.regMobileNo} is this no. correct?`);
-      const token = AuthHandler.getLoginToken();
-      const body = { hello: "hello" };
-      axios
-        .post(
-          Config.register,
-          { values, input },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-          alert(`UserCompanyCode : ${response.data.companyCode}   
-          userCode: ${response.data.userCode}   password:${response.data.password} .
+      const urlx = Config().register;
+      const handleErr = (err) => {
+        setNotify(NotifyMsg(4));
+        console.error(err);
+      };
+      const handleRes = (res) => {
+        console.log(res);
+        alert(`UserCompanyCode : ${res.data.companyCode}   
+          userCode: ${res.data.userCode}   password:${res.data.password} .
           plz check mobile number (${values.regMobileNo}) for details`);
-          localStorage.setItem("adm_softwareSettings", JSON.stringify(input));
-          window.location = "/";
-        });
+        localStorage.setItem("adm_softwareSettings", JSON.stringify(input));
+        window.location = "/";
+      };
+      const send = { values, input };
+      roleService.axiosPost(urlx, send, handleRes, handleErr);
     }
   };
   const handleInputChange = (e) => {

@@ -88,7 +88,6 @@ const initialFilterValues = {
 };
 
 export default function AccountTypesMaster() {
-
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   const [buttonPopup, setButtonPopup] = useState(false);
@@ -142,7 +141,7 @@ export default function AccountTypesMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.acgl;
+  const url = Config().acgl;
 
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));

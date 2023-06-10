@@ -230,7 +230,7 @@ export default function ReuseMaster(props) {
       qry = JSON.stringify({ $in: ["DC", "QT", "SO"] });
     }
     const queryForGet = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qry}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
-    const url = Config[route] + queryForGet;
+    const url = Config()[route] + queryForGet;
 
     const handleRes = (res) => {
       console.log(res.data);
@@ -341,7 +341,7 @@ export default function ReuseMaster(props) {
       console.log("before");
       const batchQuery = `&vouNo=${input.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
 
-      const batchUrl = Config.batch + batchQuery;
+      const batchUrl = Config().batch + batchQuery;
       const promise = new Promise((resolve, reject) => {
         let stockNotReduced = true;
         if (

@@ -125,6 +125,7 @@ const Headerpart = (props) => {
                 fontSize="small"
                 onClick={() => {
                   history("/");
+                  localStorage.clear();
                 }}
               />
             </IconButton>

@@ -193,7 +193,7 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
   } = useTable(records, headcells, filterFn);
   console.log(values, records);
   console.log("filter=>", filter);
-  console.log(Config.batch);
+  console.log(Config().batch);
   function getPartyName(code, arr) {
     let name = "";
     console.log(arr, code);
@@ -240,7 +240,7 @@ export default function POReport({ deliveryDocCode = "GR", docCode = "PO" }) {
     const qrObj = JSON.stringify({ $in: [deliveryDocCode, docCode] });
     const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&docCode=${qrObj}&yearStart=${user.yearStartDate}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
     console.log(query);
-    const url = Config.both + query;
+    const url = Config().both + query;
 
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));

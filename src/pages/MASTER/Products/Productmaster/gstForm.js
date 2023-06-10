@@ -151,8 +151,8 @@ export default function GstForm(props) {
     } else {
       axios
         .patch(
-          // Config.addUser,
-          Config.prodMaster,
+          // Config().addUser,
+          Config().prodMaster,
           input,
           {
             headers: {

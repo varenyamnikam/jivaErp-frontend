@@ -158,7 +158,7 @@ export default function Grouped(props) {
   //   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}&branchCode=${user.defaultBranchCode}&yearCode=${user.defaultYearCode}`;
   //   let data = records;
   //   console.log(batchList, records);
-  //   const url = Config.batch + query;
+  //   const url = Config().batch + query;
 
   //   const handleErr = (err) => {
   //     setNotify(NotifyMsg(4));
@@ -205,7 +205,7 @@ export default function Grouped(props) {
       const user = AuthHandler.getUser();
       const query = `&prodCode=${values.prodCode}&vouNo=${values.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
       console.log(batchList, records);
-      const url = Config.batch + query;
+      const url = Config().batch + query;
 
       // Wrap the axios request in a Promise
       return new Promise((resolve, reject) => {

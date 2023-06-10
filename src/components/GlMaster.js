@@ -149,7 +149,7 @@ export default function AcGl() {
     console.log("req sent");
     const token = AuthHandler.getLoginToken();
     axios
-      .get(Config.acgl + query, {
+      .get(Config().acgl + query, {
         headers: {
           authorization: "Bearer" + token,
         },
@@ -174,7 +174,7 @@ export default function AcGl() {
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
-      .get(Config.acglgroup + query, {
+      .get(Config().acglgroup + query, {
         headers: {
           authorization: "Bearer" + token,
         },
@@ -213,7 +213,7 @@ export default function AcGl() {
     const token = AuthHandler.getLoginToken();
     axios
       .post(
-        Config.acgl + query,
+        Config().acgl + query,
         { item },
         {
           headers: {

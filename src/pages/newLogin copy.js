@@ -151,7 +151,7 @@ export default function SignIn() {
         });
       } else {
         setState({ ...state, loginStatus: 4 });
-        // window.location = Config.loginUrl;
+        // window.location = Config().loginUrl;
         console.log(data.message);
         setnotify({
           isOpen: true,
@@ -161,7 +161,7 @@ export default function SignIn() {
       }
     } else {
       setState({ ...state, loginStatus: 3 });
-      // window.location = Config.homeUrl;
+      // window.location = Config().homeUrl;
       history.push("/home");
       // setnotify({
       //   isOpen: true,

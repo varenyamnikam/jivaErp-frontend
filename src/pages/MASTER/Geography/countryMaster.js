@@ -37,7 +37,7 @@ const Countrymaster = (props) => {
       setLoading(false);
     };
 
-    const url = Config.location;
+    const url = Config().location;
 
     const handleErr = (error) => {
       setNotify(NotifyMsg(4));

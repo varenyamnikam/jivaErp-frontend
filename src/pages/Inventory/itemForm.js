@@ -150,7 +150,7 @@ export default function GeneralItemForm(props) {
   const token = AuthHandler.getLoginToken();
   const user = AuthHandler.getUser();
   const query = `&prodCode=${item.prodCode}&vouNo=${item.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
-  const url = Config.batch + query;
+  const url = Config().batch + query;
   console.log(totalBeforeDs(), totalAfterDs());
   if (totalBeforeDs()) {
     console.log(item, totalBeforeDs());

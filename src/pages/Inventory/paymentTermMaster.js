@@ -124,7 +124,7 @@ export default function AccountMaster() {
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(records, headCells, filterFn);
   console.log(values, records);
-  const url = Config.paymentTerms;
+  const url = Config().paymentTerms;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
   };

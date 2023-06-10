@@ -141,7 +141,7 @@ export default function ProdTypeMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.prodType;
+  const url = Config().prodType;
 
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));

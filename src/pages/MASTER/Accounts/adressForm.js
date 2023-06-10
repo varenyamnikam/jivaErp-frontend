@@ -120,7 +120,7 @@ export default function Adressform(props) {
         console.log(error);
       };
 
-      const url = Config.acadress;
+      const url = Config().acadress;
       console.log(input);
       roleService.axiosPatch(url, input, handleRes, handleErr);
       let newParty = AuthHandler.getNewParty();

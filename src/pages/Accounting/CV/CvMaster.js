@@ -193,9 +193,9 @@ export default function AcMaster({ title = "Contra Voucher" }) {
   } = useTable(records, headcells, filterFn);
   console.log(values, records);
   console.log("filter=>", filter);
-  console.log(Config.batch);
+  console.log(Config().batch);
   const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
-  const url = Config.accounting + addQuery;
+  const url = Config().accounting + addQuery;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);

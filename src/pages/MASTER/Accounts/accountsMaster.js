@@ -114,7 +114,6 @@ const initialFilterValues = {
 };
 
 export default function AccountMaster() {
-
   const [filterFn, setFilterFn] = useState(initialFilterFn);
   const [filter, setFilter] = useState(initialFilterValues);
   const [buttonPopup, setButtonPopup] = useState(false);
@@ -169,7 +168,7 @@ export default function AccountMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.accounts ;
+  const url = Config().accounts;
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
     loading && setLoading(false);

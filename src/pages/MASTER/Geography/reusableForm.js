@@ -70,7 +70,7 @@ export default function ReuseForm(props) {
     let cntry = country.find((c) => c.countryName == values.countryName);
 
     if (validate() && cntry) {
-      const url = Config.location;
+      const url = Config().location;
 
       const handleErr = (error) => {
         setNotify(NotifyMsg(4));

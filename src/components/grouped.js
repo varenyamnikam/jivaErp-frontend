@@ -144,7 +144,7 @@ export default function Grouped(props) {
     let data = records;
     console.log(batchList, records);
     axios
-      .get(Config.batch + query, {
+      .get(Config().batch + query, {
         headers: {
           authorization: "Bearer" + token,
         },

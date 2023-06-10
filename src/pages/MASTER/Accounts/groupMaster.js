@@ -149,7 +149,7 @@ export default function AcGlGroup() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.acglgroup;
+  const url = Config().acglgroup;
 
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));

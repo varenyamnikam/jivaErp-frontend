@@ -130,7 +130,7 @@ export default function FinancialYearMaster(props) {
   console.log(values);
   console.log("filter=>", filter);
 
-  const url = Config.finYear;
+  const url = Config().finYear;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
   };

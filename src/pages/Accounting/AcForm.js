@@ -142,7 +142,7 @@ export default function AcForm(props) {
   console.log(initialValues);
   const query = `?&yearStart=${user.yearStartDate}`;
 
-  const url = Config.accounting + query;
+  const url = Config().accounting + query;
 
   function finalCalc(obj) {
     let temp = 0;
@@ -204,7 +204,7 @@ export default function AcForm(props) {
         });
       }
       bankValues.getDate = roleService.date(bankValues.vouDate);
-      const user = AuthHandler.getUser()
+      const user = AuthHandler.getUser();
       if (x) {
         const handleRes = (res) => {
           console.log(res.data.itemList);

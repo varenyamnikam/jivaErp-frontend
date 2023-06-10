@@ -170,11 +170,11 @@ export default function JvReport({ title = "J.V Report" }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(Config.batch);
+  console.log(Config().batch);
   if (loading) {
     const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}`;
     console.log(query);
-    const url = Config.acReport + query;
+    const url = Config().acReport + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
       console.error(err);

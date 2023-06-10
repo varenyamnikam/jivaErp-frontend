@@ -188,7 +188,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   const addQuery = `&date=${filter.startDate}&docCode=${initialValues.docCode}&yearStart=${user.yearStartDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}`;
-  const url = Config.accounting + addQuery;
+  const url = Config().accounting + addQuery;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);
@@ -242,7 +242,7 @@ export default function AcMaster({ title = "Opening Balance" }) {
     });
     const token = AuthHandler.getLoginToken();
     axios
-      .delete(Config.accounting + query, {
+      .delete(Config().accounting + query, {
         headers: {
           authorization: "Bearer" + token,
         },

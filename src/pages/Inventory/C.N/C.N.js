@@ -41,7 +41,7 @@ export default function QT() {
     receivedCash: "",
     returnCash: "",
   };
-  console.log(Config.ledger);
+  console.log(Config().ledger);
   return (
     <ReuseMaster
       title="Credit Note"

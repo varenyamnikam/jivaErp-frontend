@@ -30,6 +30,5 @@ export default function BR() {
       return roleService.date(this.vouDate);
     },
   };
-  console.log(Config.ledger);
   return <AcMaster title="Bank Reciept" initialValues={initialValues} />;
 }

@@ -102,7 +102,7 @@ export function axiosPost(url, data, responseFn, errFn, finalFn = () => {}) {
 }
 export function axiosPut(url, data, responseFn, errFn, finalFn = () => {}) {
   const token = AuthHandler.getLoginToken();
-  console.log(token);
+  console.log(token, url, data);
   axios
     .put(url, data, {
       headers: {
@@ -182,7 +182,7 @@ export function GetAllRoles() {
 
   const body = { hello: "hello" };
   axios
-    .post(Config.userUrl, body, {
+    .post(Config().userUrl, body, {
       headers: {
         authorization: token,
       },
@@ -203,7 +203,7 @@ export function insertnewRole(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .put(
-      Config.userUrl,
+      Config().userUrl,
       { roleCode: data.roleCode, roleName: data.roleName },
       {
         headers: {
@@ -223,7 +223,7 @@ export function insertnewRoleRights(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .post(
-      Config.userRightsUrl,
+      Config().userRightsUrl,
       {
         roleCode: data.roleCode,
         roleName: data.roleName,
@@ -252,7 +252,7 @@ export function deleteUserRole(data) {
   console.log(data);
   axios
     .post(
-      Config.deleteUserRoleUrl,
+      Config().deleteUserRoleUrl,
       {
         roleCode: data,
       },
@@ -312,7 +312,7 @@ export function deleteUserRights(data) {
   const token = AuthHandler.getLoginToken();
   console.log(data);
   axios.post(
-    Config.resetUrl,
+    Config().resetUrl,
     {
       roleCode: roleCode,
       roleName: roleName,
@@ -330,7 +330,7 @@ export function deleteUserRights(data) {
 //   const token = AuthHandler.getLoginToken();
 //   axios
 //     .post(
-//       Config.addUser,
+//       Config().addUser,
 //       { values },
 //       {
 //         headers: {
@@ -355,7 +355,7 @@ export function updateuser(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .patch(
-      Config.usermasterUrl + query,
+      Config().usermasterUrl + query,
       { values },
       {
         headers: {
@@ -381,7 +381,7 @@ export function deleteuser(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .put(
-      Config.usermasterUrl + query,
+      Config().usermasterUrl + query,
       { values },
       {
         headers: {
@@ -396,7 +396,7 @@ export function deleteuser(data) {
     });
   axios
     .put(
-      Config.userRightsUrl + query,
+      Config().userRightsUrl + query,
       { values },
       {
         headers: {
@@ -406,46 +406,7 @@ export function deleteuser(data) {
     )
     .then(function (response) {});
 }
-export function deleteBranch(data) {
-  const values = data;
-  console.log(values);
-  const token = AuthHandler.getLoginToken();
-  axios
-    .post(
-      Config.deleteBranch,
-      { values },
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    )
-    .then(function (response) {
-      if (response.data.auth) {
-        console.log(response.data.err);
-      }
-    });
-}
-export function updateBranch(data) {
-  const values = data;
-  console.log(values);
-  const token = AuthHandler.getLoginToken();
-  axios
-    .post(
-      Config.updateBranch,
-      { values },
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    )
-    .then(function (response) {
-      if (response.data.auth) {
-        console.log(response.data.err);
-      }
-    });
-}
+
 export function insertLocation(data) {
   const userCode = localStorage.getItem("userCode");
   const userCompanyCode = localStorage.getItem("userCompanyCode");
@@ -456,7 +417,7 @@ export function insertLocation(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .post(
-      Config.addlocation + query,
+      Config().addlocation + query,
       { values },
       {
         headers: {
@@ -474,7 +435,7 @@ export function insertglGroup(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .post(
-      Config.addacglgroup,
+      Config().addacglgroup,
       { ...values },
       {
         headers: {
@@ -497,7 +458,7 @@ export function insertAcAdress(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .patch(
-      Config.acadress + query,
+      Config().acadress + query,
       { ...values },
       {
         headers: {
@@ -520,7 +481,7 @@ export function deleteAcAdress(data) {
   const token = AuthHandler.getLoginToken();
   axios
     .post(
-      Config.acadress + query,
+      Config().acadress + query,
       { values },
       {
         headers: {

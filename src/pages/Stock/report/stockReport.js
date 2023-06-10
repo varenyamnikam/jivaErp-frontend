@@ -185,7 +185,7 @@ export default function StockMaster({ title = "Stock Report" }) {
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
   console.log("ledger=>", ledger);
-  console.log(Config.batch);
+  console.log(Config().batch);
   if (useBatch == "Yes" && batchWise) {
     let found = headcells.find((item) => item.id == "batch");
     if (!found) {
@@ -207,7 +207,7 @@ export default function StockMaster({ title = "Stock Report" }) {
     let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&useBatch=${batchWiseStock}`;
     const token = AuthHandler.getLoginToken();
     console.log(query);
-    const url = Config.stockReport + query;
+    const url = Config().stockReport + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
     };

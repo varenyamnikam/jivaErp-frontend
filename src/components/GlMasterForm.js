@@ -83,7 +83,7 @@ export default function Gimasterform(props) {
         const body = { hello: "hello" };
         axios
           .put(
-            Config.acgl + query,
+            Config().acgl + query,
             { values },
             {
               headers: {
@@ -113,7 +113,7 @@ export default function Gimasterform(props) {
         console.log("updated");
         axios
           .patch(
-            Config.acgl + query,
+            Config().acgl + query,
             { values },
             {
               headers: {

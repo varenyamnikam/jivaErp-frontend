@@ -46,7 +46,7 @@ export default function Login() {
     if (data.error) {
       // if (data.message == "wrong userName/password") {
       //   setState({ ...state, loginStatus: 4 });
-      //   // window.location = Config.loginUrl;
+      //   // window.location = Config().loginUrl;
       //   console.log(data.message);
       //   setnotify({
       //     isOpen: true,
@@ -56,7 +56,7 @@ export default function Login() {
       // }
       if (data.message == "unable to connect to servers") {
         setState({ ...state, loginStatus: 5 });
-        // window.location = Config.loginUrl;
+        // window.location = Config().loginUrl;
         console.log(data.message);
         setnotify({
           isOpen: true,
@@ -65,7 +65,7 @@ export default function Login() {
         });
       } else {
         setState({ ...state, loginStatus: 4 });
-        // window.location = Config.loginUrl;
+        // window.location = Config().loginUrl;
         console.log(data.message);
         setnotify({
           isOpen: true,
@@ -75,7 +75,9 @@ export default function Login() {
       }
     } else {
       setState({ ...state, loginStatus: 3 });
-      window.location = Config.homeUrl;
+      window.location = Config().homeUrl;
+      window.location.reload();
+
       setnotify({
         isOpen: true,
         message: "login success",
@@ -117,7 +119,7 @@ export default function Login() {
   };
 
   // if (AuthHandler.loggedIn()) {
-  //   return <Redirect to={Config.homeUrl} />;
+  //   return <Redirect to={Config().homeUrl} />;
   // }
   // <div
   //   style={{

@@ -22,7 +22,6 @@ import { getFormLabelUtilityClasses } from "@mui/material";
 import AuthHandler from "../../../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../../../Utils/Config";
-
 const Firms = [
   "N.A.",
   "Proprietary",

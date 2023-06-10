@@ -26,6 +26,5 @@ export default function BR() {
     entryBy: "",
     entryOn: "",
   };
-  console.log(Config.ledger);
   return <AcMaster title="Cash Payment" initialValues={initialValues} />;
 }

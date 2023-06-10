@@ -142,7 +142,7 @@ export default function ProdTypeMaster() {
     useTable(records, headCells, filterFn);
   console.log(values);
 
-  const url = Config.prodCompany;
+  const url = Config().prodCompany;
 
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
@@ -250,7 +250,7 @@ export default function ProdTypeMaster() {
   return (
     <>
       <PageHeader
-        title="Product Types"
+        title="Product Companies"
         icon={<PeopleOutlineTwoToneIcon fontSize="large" />}
       />
       <section className="content">
@@ -349,7 +349,7 @@ export default function ProdTypeMaster() {
               <TblPagination />
             </section>
             <Popup
-              title="Group Master Form"
+              title="Form"
               openPopup={buttonPopup}
               setOpenPopup={setButtonPopup}
             >

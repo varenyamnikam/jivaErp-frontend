@@ -103,7 +103,7 @@ export default function Generalform(props) {
       let x;
       setValues(input);
       x = records.find((item) => item.acGroupCode == input.acGroupCode);
-      const url = Config.accounts;
+      const url = Config().accounts;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
       };

@@ -36,7 +36,7 @@ const Talukamaster = (props) => {
     const token = AuthHandler.getLoginToken();
     const body = { hello: "hello" };
     axios
-      .post(Config.location, body, {
+      .post(Config().location, body, {
         headers: {
           authorization: "Bearer" + token,
         },

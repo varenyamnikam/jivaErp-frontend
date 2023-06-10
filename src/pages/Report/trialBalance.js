@@ -157,7 +157,7 @@ export default function TrialBalance({ title = "Trial Balance" }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(Config.batch);
+  console.log(Config().batch);
   if (loading) {
     const filterByGrpType = filter.groupType
       ? [filter.groupType]
@@ -165,7 +165,7 @@ export default function TrialBalance({ title = "Trial Balance" }) {
 
     let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}&groupTypes=${filterByGrpType}`;
 
-    const url = Config.trialBalance + query;
+    const url = Config().trialBalance + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
       console.log(err);

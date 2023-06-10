@@ -136,7 +136,7 @@ export default function RightsForm(props) {
           }
         };
 
-        const url = Config.userRightsUrl;
+        const url = Config().userRightsUrl;
         const handleErr = (err) => {
           console.log(err);
           setNotify(NotifyMsg(4));

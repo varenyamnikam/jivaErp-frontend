@@ -147,7 +147,7 @@ export default function Productform(props) {
           x = false;
         }
       });
-      const url = Config.prodMaster;
+      const url = Config().prodMaster;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
         console.error(err);
@@ -162,7 +162,7 @@ export default function Productform(props) {
           if (newParty.partyOpen) {
             let newParty = AuthHandler.getNewParty();
             newParty.partyOpen = false;
-            AuthHandler.setNewParty(newParty)
+            AuthHandler.setNewParty(newParty);
             history(newParty.path);
           }
           setFormPopup(false);

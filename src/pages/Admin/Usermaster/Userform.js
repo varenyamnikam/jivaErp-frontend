@@ -133,7 +133,7 @@ export default function Userform(props) {
     console.log(values);
 
     if (validate()) {
-      const url = Config.usermasterUrl;
+      const url = Config().usermasterUrl;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
       };

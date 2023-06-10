@@ -1,224 +1,116 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import AuthHandler from "./AuthHandler";
 
-let PORT = process.env.PORT;
-PORT = PORT ? PORT : "3001";
-const user = JSON.parse(localStorage.getItem("user"));
+const Config = () => {
+  const PORT = process.env.PORT ? process.env.PORT : "3001";
+  const url =
+    "https://648345bdf49167220c26838b--calm-moonbeam-0e9488.netlify.app";
 
-const userCode = user.userCode;
-const userCompanyCode = user.userCompanyCode;
-const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-// const url = `http://localhost:${PORT}`;
-const url = `http://147.182.252.2:${PORT}`;
+  const getUrlWithQuery = (endpoint) => url + endpoint + AuthHandler.getQuery();
 
-// console.log(userCompanyCode, userCode);
-class Config {
-  static loginUrl = url + "/api/login" + query;
-  static register = url + "/api/register" + query;
-  static homeUrl = url + "/api/home" + query;
-  static userUrl = url + "/api/adm_userrole" + query;
-  static userRightsUrl = url + "/api/adm_userrights" + query;
-  static showRights = url + "/api/post_userrights" + query;
-  static deleteUserRoleUrl = url + "/api/delete_adm_userrole" + query;
-  static logoutPageUrl = "/" + query;
-  static resetUrl = url + "/api/delete_adm_userrights" + query;
-  static usermasterUrl = url + "/api/adm_usermaster" + query;
-  static addUser = url + "/api/post_adduser" + query;
-  static deleteUser = url + "/api/post_deleteuser" + query;
-  static updateUser = url + "/api/post_updateuser" + query;
-  static location = url + "/api/mst_location" + query;
-  static Branch = url + "/api/adm_branch" + query;
-  static deleteBranch = url + "/api/post_deletebranch" + query;
-  static updateBranch = url + "/api/post_updatebranch" + query;
-  static addlocation = url + "/api/post_addlocation" + query;
-  static marketareaemployee = url + "/api/post_marketarea" + query;
-  static getacGlGroup = url + "/api/post_acGlGroup" + query;
-  static getacGl = url + "/api/post_acGl" + query;
-  static addacglgroup = url + "/api/post_addAcGlGroup" + query;
-  static getaccounts = url + "/api/post_accounts" + query;
-  static getmktArea = url + "/api/post_mktArea" + query;
-  static getacadress = url + "/api/post_acadress" + query;
-  static addacadress = url + "/api/post_addacadress" + query;
-  static getAcTypes = url + "/api/post_acTypes" + query;
-  static getDeptTypes = url + "/api/post_deptTypes" + query;
-  static random = url + "/api/random" + query;
-  static unit = url + "/api/mst_unit" + query;
-  static prodCompany = url + "/api/mst_prodCompany" + query;
-  static prodType = url + "/api/mst_prodTypes" + query;
-  static prodMaster = url + "/api/mst_prodMaster" + query;
-  static finYear = url + "/api/adm_finYear" + query;
-  static accounts = url + "/api/mst_accounts" + query;
-  static acglgroup = url + "/api/mst_acglgroup" + query;
-  static acgl = url + "/api/mst_acgl" + query;
-  static acadress = url + "/api/mst_acadress" + query;
-  static paymentTerms = url + "/api/mst_paymentTerms" + query;
-  static dc = url + "/api/inv_dc" + query;
-  static soft = url + "/api/soft" + query;
-  static ledger = url + "/api/inv_ledger" + query;
-  static both = url + "/api/inv_both" + query;
-  static register = url + "/api/register" + query;
-  static batch = url + "/api/batch" + query;
-  static accounting = url + "/api/accounting" + query;
-  static stockReport = url + "/api/stockReport" + query;
-  static acReport = url + "/api/acReport" + query;
-  static bankReport = url + "/api/bankReport" + query;
-  static mktArea = url + "/api/mst_mktArea" + query;
-  static none = url + "/api/inv_none" + query;
-  static trialBalance = url + "/api/trialBalance" + query;
-  static stockConversion = url + "/api/inv_stockConversion" + query;
+  const loginUrl = getUrlWithQuery("/api/login");
+  const register = getUrlWithQuery("/api/register");
+  const homeUrl = getUrlWithQuery("/api/home");
+  const userUrl = getUrlWithQuery("/api/adm_userrole");
+  const userRightsUrl = getUrlWithQuery("/api/adm_userrights");
+  const showRights = getUrlWithQuery("/api/post_userrights");
+  const deleteUserRoleUrl = getUrlWithQuery("/api/delete_adm_userrole");
+  const logoutPageUrl = `/${AuthHandler.getQuery()}`;
+  const resetUrl = getUrlWithQuery("/api/delete_adm_userrights");
+  const usermasterUrl = getUrlWithQuery("/api/adm_usermaster");
+  const addUser = getUrlWithQuery("/api/post_adduser");
+  const deleteUser = getUrlWithQuery("/api/post_deleteuser");
+  const updateUser = getUrlWithQuery("/api/post_updateuser");
+  const location = getUrlWithQuery("/api/mst_location");
+  const Branch = getUrlWithQuery("/api/adm_branch");
+  const addlocation = getUrlWithQuery("/api/post_addlocation");
+  const marketareaemployee = getUrlWithQuery("/api/post_marketarea");
+  const getacGlGroup = getUrlWithQuery("/api/post_acGlGroup");
+  const getacGl = getUrlWithQuery("/api/post_acGl");
+  const addacglgroup = getUrlWithQuery("/api/post_addAcGlGroup");
+  const getaccounts = getUrlWithQuery("/api/post_accounts");
+  const getmktArea = getUrlWithQuery("/api/post_mktArea");
+  const getacadress = getUrlWithQuery("/api/post_acadress");
+  const addacadress = getUrlWithQuery("/api/post_addacadress");
+  const getAcTypes = getUrlWithQuery("/api/post_acTypes");
+  const getDeptTypes = getUrlWithQuery("/api/post_deptTypes");
+  const random = getUrlWithQuery("/api/random");
+  const unit = getUrlWithQuery("/api/mst_unit");
+  const prodCompany = getUrlWithQuery("/api/mst_prodCompany");
+  const prodType = getUrlWithQuery("/api/mst_prodTypes");
+  const prodMaster = getUrlWithQuery("/api/mst_prodMaster");
+  const finYear = getUrlWithQuery("/api/adm_finYear");
+  const accounts = getUrlWithQuery("/api/mst_accounts");
+  const acglgroup = getUrlWithQuery("/api/mst_acglgroup");
+  const acgl = getUrlWithQuery("/api/mst_acgl");
+  const acadress = getUrlWithQuery("/api/mst_acadress");
+  const paymentTerms = getUrlWithQuery("/api/mst_paymentTerms");
+  const dc = getUrlWithQuery("/api/inv_dc");
+  const soft = getUrlWithQuery("/api/soft");
+  const ledger = getUrlWithQuery("/api/inv_ledger");
+  const both = getUrlWithQuery("/api/inv_both");
+  const batch = getUrlWithQuery("/api/batch");
+  const accounting = getUrlWithQuery("/api/accounting");
+  const stockReport = getUrlWithQuery("/api/stockReport");
+  const acReport = getUrlWithQuery("/api/acReport");
+  const bankReport = getUrlWithQuery("/api/bankReport");
+  const mktArea = getUrlWithQuery("/api/mst_mktArea");
+  const none = getUrlWithQuery("/api/inv_none");
+  const trialBalance = getUrlWithQuery("/api/trialBalance");
+  const stockConversion = getUrlWithQuery("/api/inv_stockConversion");
 
-  // static loginUrl = "http://147.182.252.2:3001/api/login";
-  // static registerUrl = "http://147.182.252.2:3001/api/register";
-  // static homeUrl = "http://147.182.252.2:3001/api/home";
-  // static userUrl = "http://147.182.252.2:3001/api/adm_userrole";
-  // // static postuserroleUrl = "http://147.182.252.2:3001/api/post_userrole" ;
-  // static userRightsUrl = "http://147.182.252.2:3001/api/adm_userrights";
-  // static showRights = "http://147.182.252.2:3001/api/post_userrights";
-  // static deleteUserRoleUrl =
-  //   "http://147.182.252.2:3001/api/delete_adm_userrole";
-  // static logoutPageUrl = "/login";
-  // static resetUrl = "http://147.182.252.2:3001/api/delete_adm_userrights";
-  // static usermasterUrl = "http://147.182.252.2:3001/api/adm_usermaster";
-  // static addUser = "http://147.182.252.2:3001/api/post_adduser";
-  // static deleteUser = "http://147.182.252.2:3001/api/post_deleteuser";
-  // static updateUser = "http://147.182.252.2:3001/api/post_updateuser";
-  // static location = "http://147.182.252.2:3001/api/post_location";
-  // static Branch = "http://147.182.252.2:3001/api/adm_branch";
-  // static deleteBranch = "http://147.182.252.2:3001/api/post_deletebranch";
-  // static updateBranch = "http://147.182.252.2:3001/api/post_updatebranch";
-  // static addlocation = "http://147.182.252.2:3001/api/post_addlocation";
-  // static marketareaemployee = "http://147.182.252.2:3001/api/post_marketarea";
-  // static getacGlGroup = "http://147.182.252.2:3001/api/post_acGlGroup";
-  // static getacGl = "http://147.182.252.2:3001/api/post_acGl";
-  // static addacglgroup = "http://147.182.252.2:3001/api/post_addAcGlGroup";
-  // static getaccounts = "http://147.182.252.2:3001/api/post_accounts";
-  // static getmktArea = "http://147.182.252.2:3001/api/post_mktArea";
-  // static getacadress = "http://147.182.252.2:3001/api/post_acadress";
-  // static addacadress = "http://147.182.252.2:3001/api/post_addacadress";
-  // static getAcTypes = "http://147.182.252.2:3001/api/post_acTypes";
-  // static getDeptTypes = "http://147.182.252.2:3001/api/post_deptTypes";
-  // static random = "http://147.182.252.2:3001/api/random";
-  // static unit = "http://147.182.252.2:3001/api/mst_unit";
-  // static prodCompany = "http://147.182.252.2:3001/api/mst_prodCompany";
-  // static prodType = "http://147.182.252.2:3001/api/mst_prodTypes";
-  // static prodMaster = "http://147.182.252.2:3001/api/mst_prodMaster";
-  // static finYear = "http://147.182.252.2:3001/api/adm_finYear";
-  // static accounts = "http://147.182.252.2:3001/api/mst_accounts";
-  // static acglgroup = "http://147.182.252.2:3001/api/mst_acglgroup";
-  // static acgl = "http://147.182.252.2:3001/api/mst_acgl";
-  // static acadress = "http://147.182.252.2:3001/api/mst_acadress";
-  // static paymentTerms = "http://147.182.252.2:3001/api/mst_paymentTerms";
-  // static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
-  // static register = "http://147.182.252.2:3001/api/register";
-  // static dc = "http://147.182.252.2:3001/api/inv_dc";
-  // static ledger = "http://147.182.252.2:3001/api/inv_ledger";
-  // static both = "http://147.182.252.2:3001/api/inv_both";
-  // static soft = "http://147.182.252.2:3001/api/soft";
-  // static batch = "http://147.182.252.2:3001/api/batch";
-  // static accounting = "http://147.182.252.2:3001/api/accounting";
-  // static stockReport = "http://147.182.252.2:3001/api/stockReport";
-  // static acReport = "http://147.182.252.2:3001/api/acReport";
-  // static bankReport = "http://147.182.252.2:3001/api/bankReport";
-  // static mktArea = "http://147.182.252.2:3001/api/mst_mktArea";
-  // static none = "http://147.182.252.2:3001/api/inv_none";
-  // static trialBalance = "http://147.182.252.2:3001/api/trialBalance";
-
-  static sidebarItem = [
-    { index: "0", title: "Home", url: "/home", icons: "home" },
-    { index: "1", title: "Role", url: "/Admin/RoleMaster" },
-  ];
-}
+  return {
+    loginUrl,
+    register,
+    homeUrl,
+    userUrl,
+    userRightsUrl,
+    showRights,
+    deleteUserRoleUrl,
+    logoutPageUrl,
+    resetUrl,
+    usermasterUrl,
+    addUser,
+    deleteUser,
+    updateUser,
+    location,
+    Branch,
+    addlocation,
+    marketareaemployee,
+    getacGlGroup,
+    getacGl,
+    addacglgroup,
+    getaccounts,
+    getmktArea,
+    getacadress,
+    addacadress,
+    getAcTypes,
+    getDeptTypes,
+    random,
+    unit,
+    prodCompany,
+    prodType,
+    prodMaster,
+    finYear,
+    accounts,
+    acglgroup,
+    acgl,
+    acadress,
+    paymentTerms,
+    dc,
+    soft,
+    ledger,
+    both,
+    batch,
+    accounting,
+    stockReport,
+    acReport,
+    bankReport,
+    mktArea,
+    none,
+    trialBalance,
+    stockConversion,
+  };
+};
 
 export default Config;
-// export default function Config() {
-//   console.log(userCompanyCode, userCode);
-//   const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}`;
-//   //FOR TEST URL
-//   // static loginUrl = "/login";
-//   // static registerUrl = "/register";
-//   // static homeUrl = "/home" + this.query;
-//   // static userUrl = "/adm_userrole" + this.query;
-//   // // static postuserroleUrl = "/post_userrole" + this.query;
-//   // static userRightsUrl = "/adm_userrights" + this.query;
-//   // static showRights = "/post_userrights" + this.query;
-//   // static deleteUserRoleUrl = "/delete_adm_userrole" + this.query;
-//   // static logoutPageUrl = "/login" + this.query;
-//   // static resetUrl = "/delete_adm_userrights" + this.query;
-//   // static usermasterUrl = "/adm_usermaster" + this.query;
-//   // static addUser = "/post_adduser" + this.query;
-//   // static deleteUser = "/post_deleteuser" + this.query;
-//   // static updateUser = "/post_updateuser" + this.query;
-//   // static location = "/post_location" + this.query;
-//   // static Branch = "/adm_branch" + this.query;
-//   // static deleteBranch = "/post_deletebranch" + this.query;
-//   // static updateBranch = "/post_updatebranch" + this.query;
-//   // static addlocation = "/post_addlocation" + this.query;
-//   // static marketareaemployee = "/post_marketarea" + this.query;
-//   // static getacGlGroup = "/post_acGlGroup" + this.query;
-//   // static getacGl = "/post_acGl" + this.query;
-//   // static addacglgroup = "/post_addAcGlGroup" + this.query;
-//   // static getaccounts = "/post_accounts" + this.query;
-//   // static getmktArea = "/post_mktArea" + this.query;
-//   // static getacadress = "/post_acadress" + this.query;
-//   // static addacadress = "/post_addacadress" + this.query;
-//   // static getAcTypes = "/post_acTypes" + this.query;
-//   // static getDeptTypes = "/post_deptTypes" + this.query;
-//   // static random = "/random" + this.query;
-//   // static unit = "/mst_unit" + this.query;
-//   // static prodCompany = "/mst_prodCompany" + this.query;
-//   // static prodType = "/mst_prodTypes" + this.query;
-//   // static prodMaster = "/mst_prodMaster" + this.query;
-//   // static finYear = "/adm_finYear" + this.query;
-//   // static accounts = "/mst_accounts" + this.query;
-//   // static acglgroup = "/mst_acglgroup" + this.query;
-//   // static acgl = "/mst_acgl" + this.query;
-//   // static acadress = "/mst_acadress" + this.query;
-//   // static paymentTerms = "/mst_paymentTerms" + this.query;
-//   const loginUrl = "http://Localhost:3001/login";
-//   const registerUrl = "http://Localhost:3001/register";
-//   const homeUrl = "http://Localhost:3001/home" + query;
-//   const userUrl = url+"/adm_userrole" + query;
-//   // const postuserroleUrl = url+"/post_userrole" + query;
-//   const userRightsUrl = url+"/adm_userrights" + query;
-//   const showRights = url+"/post_userrights" + query;
-//   const deleteUserRoleUrl = url+"/delete_adm_userrole" + query;
-//   const logoutPageUrl = "/login" + query;
-//   const resetUrl = url+"/delete_adm_userrights" + query;
-//   const usermasterUrl = url+"/adm_usermaster" + query;
-//   const addUser = url+"/post_adduser" + query;
-//   const deleteUser = url+"/post_deleteuser" + query;
-//   const updateUser = url+"/post_updateuser" + query;
-//   const location = url+"/post_location" + query;
-//   const Branch = url+"/adm_branch" + query;
-//   const deleteBranch = url+"/post_deletebranch" + query;
-//   const updateBranch = url+"/post_updatebranch" + query;
-//   const addlocation = url+"/post_addlocation" + query;
-//   const marketareaemployee = url+"/post_marketarea" + query;
-//   const getacGlGroup = url+"/post_acGlGroup" + query;
-//   const getacGl = url+"/post_acGl" + query;
-//   const addacglgroup = url+"/post_addAcGlGroup" + query;
-//   const getaccounts = url+"/post_accounts" + query;
-//   const getmktArea = url+"/post_mktArea" + query;
-//   const getacadress = url+"/post_acadress" + query;
-//   const addacadress = url+"/post_addacadress" + query;
-//   const getAcTypes = url+"/post_acTypes" + query;
-//   const getDeptTypes = url+"/post_deptTypes" + query;
-//   const random = url+"/random" + query;
-//   const unit = url+"/mst_unit" + query;
-//   const prodCompany = url+"/mst_prodCompany" + query;
-//   const prodType = url+"/mst_prodTypes" + query;
-//   const prodMaster = url+"/mst_prodMaster" + query;
-//   const finYear = url+"/adm_finYear" + query;
-//   const accounts = url+"/mst_accounts" + query;
-//   const acglgroup = url+"/mst_acglgroup" + query;
-//   const acgl = url+"/mst_acgl" + query;
-//   const acadress = url+"/mst_acadress" + query;
-//   const paymentTerms = url+"/mst_paymentTerms" + query;
-//   const mktArea = url+"/mst_mktArea" + query;
-//   const register = url+"/register";
-
-//   const sidebarItem = [
-//     { index: "0", title: "Home", url: "/home", icons: "home" },
-//     { index: "1", title: "Role", url: "/Admin/RoleMaster" },
-//   ];
-// }

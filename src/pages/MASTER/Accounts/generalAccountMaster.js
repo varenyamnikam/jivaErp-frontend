@@ -172,17 +172,17 @@ export default function GeneralAccountMaster({ acTypeFor, initialValues }) {
   //   const token = AuthHandler.getLoginToken();
 
   //   axios
-  //     .get(Config.acadress , {
+  //     .get(Config().acadress , {
   //       headers: {
   //         authorization: "Bearer" + token,
   //       },
   //     })
   //     .then((response) => {
-  //       console.log("req sent Config.getacadress", adressData);
+  //       console.log("req sent Config().getacadress", adressData);
   //       setAdressData(response.data.acadress);
   //     });
   // }
-  const url = Config.accounts;
+  const url = Config().accounts;
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
     loading && setLoading(false);
@@ -255,7 +255,7 @@ export default function GeneralAccountMaster({ acTypeFor, initialValues }) {
   //   const token = AuthHandler.getLoginToken();
   //   const body = { hello: "hello" };
   //   axios
-  //     .get(Config.mktArea , {
+  //     .get(Config().mktArea , {
   //       headers: {
   //         authorization: "Bearer" + token,
   //       },
@@ -288,7 +288,7 @@ export default function GeneralAccountMaster({ acTypeFor, initialValues }) {
   //     const token = AuthHandler.getLoginToken();
   //     const body = { hello: "hello" };
   //     axios
-  //       .post(Config.location + query, body, {
+  //       .post(Config().location + query, body, {
   //         headers: {
   //           authorization: "Bearer" + token,
   //         },

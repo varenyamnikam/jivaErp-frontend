@@ -165,13 +165,13 @@ export default function BankBook({ docCode1, docCode2 }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(Config.batch);
+  console.log(Config().batch);
   console.log(records[0], loading);
   if (loading) {
     const query = `
     &startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}&docCode1=${docCode1}&docCode2=${docCode2}`;
     console.log(query);
-    const url = Config.bankReport + query;
+    const url = Config().bankReport + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
       console.error(err);

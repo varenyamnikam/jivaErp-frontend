@@ -56,7 +56,7 @@ const Profile = ({ setNotify }) => {
     setValues({ ...values, [name]: value });
     // !save && setSave(true);
   }
-  const url = Config.register;
+  const url = Config().register;
 
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
@@ -92,7 +92,7 @@ const Profile = ({ setNotify }) => {
       setSave(false);
       console.log("hi");
       AuthHandler.setCompany(values);
-      const url = Config.register;
+      const url = Config().register;
       const handleRes = (response) => {
         setButtonLoading(false);
         setValues(values);

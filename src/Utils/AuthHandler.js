@@ -1,5 +1,5 @@
 import axios from "axios";
-import Config from "./Config";
+import Config from "../Utils/Config";
 import { Redirect } from "react-router-dom";
 import { reactLocalStorage } from "reactjs-localstorage";
 import PropTypes from "prop-types";
@@ -32,8 +32,9 @@ function flattenArray(array) {
 
 class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
+    console.log(Config().loginUrl);
     axios
-      .post(Config.loginUrl, {
+      .post("http://localhost:3001/api/login", {
         usrCode: usrCode,
         usrPassword: usrPassword,
         usrCompanyCode: usrCompanyCode,
@@ -140,9 +141,9 @@ class AuthHandler {
   static getMenuItem() {
     return JSON.parse(reactLocalStorage.get("adm_screen"));
   }
-  static menuArr = flattenArray(
-    JSON.parse(reactLocalStorage.get("adm_screen"))
-  );
+  static menuArr() {
+    return flattenArray(JSON.parse(reactLocalStorage.get("adm_screen")));
+  }
 
   static getUserRole() {
     return JSON.parse(reactLocalStorage.get("adm_userrole"));
@@ -202,7 +203,9 @@ class AuthHandler {
   }
 
   static getQuery() {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = AuthHandler.getUser()
+      ? AuthHandler.getUser()
+      : { userCode: null, userCompanyCode: null };
 
     const userCode = user.userCode;
     const userCompanyCode = user.userCompanyCode;
@@ -215,7 +218,7 @@ class AuthHandler {
   }
   static canAdd() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    let menuObj = this.menuArr.find(
+    let menuObj = this.menuArr().find(
       (item) => item.pageLink == window.location.pathname
     );
     const screenCode = menuObj ? menuObj.screenCode : "";
@@ -224,7 +227,7 @@ class AuthHandler {
   }
   static canEdit() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    let menuObj = this.menuArr.find(
+    let menuObj = this.menuArr().find(
       (item) => item.pageLink == window.location.pathname
     );
     const screenCode = menuObj ? menuObj.screenCode : "";
@@ -232,11 +235,11 @@ class AuthHandler {
   }
   static canDelete() {
     const userRights = JSON.parse(localStorage.getItem("adm_userrights"));
-    let menuObj = this.menuArr.find(
+    let menuObj = this.menuArr().find(
       (item) => item.pageLink == window.location.pathname
     );
     const screenCode = menuObj ? menuObj.screenCode : "";
-    console.log(menuObj, screenCode, window.location.pathname, this.menuArr);
+    console.log(menuObj, screenCode, window.location.pathname, this.menuArr());
 
     return userRights.deleteRight.includes(screenCode);
   }

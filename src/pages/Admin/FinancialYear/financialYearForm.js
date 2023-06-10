@@ -121,7 +121,7 @@ export default function FinancialYearform(props) {
           }
         }
       };
-      const url = Config.finYear;
+      const url = Config().finYear;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
         loading && setLoading(false);

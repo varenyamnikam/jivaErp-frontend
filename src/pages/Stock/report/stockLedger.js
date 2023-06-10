@@ -75,9 +75,7 @@ const initialLedgerValues = {
 };
 
 export default function StockLedger({ records }) {
-  const useBatch =
-    AuthHandler.getSettings().userBatchNo ==
-    "Yes";
+  const useBatch = AuthHandler.getSettings().userBatchNo == "Yes";
   const headCells = [
     { id: "Date", label: "Date", feild: "vouDate" },
     { id: "Voucher", label: "Voucher", feild: "vouNo" },

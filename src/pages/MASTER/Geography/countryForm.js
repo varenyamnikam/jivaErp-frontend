@@ -70,7 +70,7 @@ export default function CountryForm(props) {
     }
     if (validate()) {
       console.log(values);
-      const url = Config.location;
+      const url = Config().location;
 
       const handleErr = (error) => {
         setNotify(NotifyMsg(4));

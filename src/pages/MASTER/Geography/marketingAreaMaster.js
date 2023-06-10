@@ -56,19 +56,6 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 const initialEValues = { acName: "", acCode: "X X X X" };
 const initialFilterEValues = { acName: "", acCode: "" };
-const user = AuthHandler.getUser();
-let dataBase = [
-  {
-    mktAreaCode: "5001",
-    parentAreaCode: "0",
-    mktArea: "India",
-    child: [],
-    assignTo: "",
-    userCompanyCode: user.userCompanyCode,
-    entryBy: user.userCode,
-    entryOn: new Date(),
-  },
-];
 export default function MarketingArea() {
   const classes = useStyles;
   const [errors, setErrors] = useState({});
@@ -90,22 +77,35 @@ export default function MarketingArea() {
     message: "",
     type: "",
   });
+  const user = AuthHandler.getUser();
+  let dataBase = [
+    {
+      mktAreaCode: "5001",
+      parentAreaCode: "0",
+      mktArea: "India",
+      child: [],
+      assignTo: "",
+      userCompanyCode: user.userCompanyCode,
+      entryBy: user.userCode,
+      entryOn: new Date(),
+    },
+  ];
+
   const [employeeData, setEmployeeData] = useState([initialEValues]);
   const [dataBases, setDataBases] = useState(dataBase);
   const [editText, setEditText] = useState("EDIT");
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(true);
-  const url = Config.accounts;
+  const url = Config().accounts;
   const handleErr = (error) => {
     setNotify(NotifyMsg(4));
     console.log(error);
   };
-
   useEffect(() => {
     // if (!loading) {
     //   const token = AuthHandler.getLoginToken();
     //   axios
-    //     .get(Config.mktArea , {
+    //     .get(Config().mktArea , {
     //       headers: {
     //         authorization: "Bearer" + token,
     //       },
@@ -184,7 +184,7 @@ export default function MarketingArea() {
     ).toString();
   }
   const handleSubmit = (e) => {
-    const url = Config.mktArea;
+    const url = Config().mktArea;
 
     if (validate()) {
       if (editText == "EDIT") {

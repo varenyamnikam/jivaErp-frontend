@@ -155,7 +155,7 @@ export default function OutstandingReport({ title = "Outstanding Report" }) {
   if (loading) {
     const query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&acCode=${filter.acCode}`;
     console.log(query);
-    const url = Config.acReport + query;
+    const url = Config().acReport + query;
 
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));

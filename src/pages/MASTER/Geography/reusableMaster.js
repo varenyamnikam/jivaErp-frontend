@@ -101,7 +101,7 @@ const Reusemaster = (props) => {
   //   const token = AuthHandler.getLoginToken();
   //   const body = { hello: "hello" };
   //   axios
-  //     .post(Config.location, body, {
+  //     .post(Config().location, body, {
   //       headers: {
   //         authorization: "Bearer" + token,
   //       },
@@ -124,7 +124,7 @@ const Reusemaster = (props) => {
   console.log(records);
 
   function onDelete(item) {
-    const url = Config.location;
+    const url = Config().location;
     function handleRes(res) {
       let newRecord = [];
       setConfirmDialog({

@@ -149,7 +149,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     Stock: "",
     subTitle: "",
   });
-  const setting =AuthHandler.getSettings()
+  const setting = AuthHandler.getSettings();
   const initialkeepOpen = setting.keepBatchWiseStockOpen
     ? setting.keepBatchWiseStockOpen
     : false;
@@ -164,7 +164,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     recordsAfterPagingAndSorting,
     recordsAfterAndSorting,
   } = useTable(records, headcells, filterFn);
-  console.log(Config.batch);
+  console.log(Config().batch);
   if (useBatch == "Yes") {
     let found = headcells.find((item) => item.id == "batch");
     if (!found) {
@@ -184,7 +184,7 @@ export default function ExpiryReport({ title = "Expiry Report" }) {
     if (useBatch == "Yes") batchWiseStock = "Yes";
     console.log(batchWiseStock);
     let query = `&startDate=${filter.startDate}&endDate=${filter.endDate}&yearCode=${user.currentYearCode}&branchCode=${user.currentBranchCode}&useBatch=${batchWiseStock}`;
-    const url = Config.stockReport + query;
+    const url = Config().stockReport + query;
     const handleErr = (err) => {
       setNotify(NotifyMsg(4));
     };

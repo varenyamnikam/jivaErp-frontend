@@ -34,7 +34,7 @@ class AuthHandler {
   static login(usrCode, usrPassword, usrCompanyCode, callback) {
     console.log(Config().loginUrl);
     axios
-      .post("http://localhost:3001/api/login", {
+      .post(Config().loginUrl, {
         usrCode: usrCode,
         usrPassword: usrPassword,
         usrCompanyCode: usrCompanyCode,

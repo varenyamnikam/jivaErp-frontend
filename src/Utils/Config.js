@@ -3,8 +3,7 @@ import AuthHandler from "./AuthHandler";
 
 const Config = () => {
   const PORT = process.env.PORT ? process.env.PORT : "3001";
-  const url =
-    "https://648345bdf49167220c26838b--calm-moonbeam-0e9488.netlify.app";
+  const url = "https://backend-4u9g.onrender.com";
 
   const getUrlWithQuery = (endpoint) => url + endpoint + AuthHandler.getQuery();
 

@@ -137,7 +137,7 @@ export default function ReuseMaster(props) {
       return newRecords;
     },
   };
-  const url = Config[route] + query;
+  const url = Config()[route] + query;
   const handleErr = (err) => {
     setNotify(NotifyMsg(4));
     console.error(err);

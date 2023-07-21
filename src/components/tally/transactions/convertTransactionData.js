@@ -85,6 +85,7 @@ export default function DownloadTransactionTallyXml(data) {
   function deliveryRefVou(vou) {
     let found = voucher.find((item) => item.vouNo == vou.refNo);
     if (found && (found.docCode == "DC" || found.docCode == "GR")) return found;
+    else if (vou.docCode == "DC" || vou.docCode == "GR") return vou;
     else return null;
   }
   function orderRefVou(deliveryVou, vou) {

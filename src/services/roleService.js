@@ -15,6 +15,7 @@ function refreshToken(response) {
   console.log(token);
 }
 function timeOutErr(error) {
+  console.log(error.response);
   if (error.response.status == 440) {
     alert("session timed out!");
     window.location = "/";

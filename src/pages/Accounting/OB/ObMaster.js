@@ -92,7 +92,7 @@ const initialAccounts = {
   userCompanyCode: "",
 };
 export default function AcMaster({ title = "Opening Balance" }) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = AuthHandler.getUser()
   const { getD } = DateCalc(user);
   const userDate = new Date(
     JSON.parse(localStorage.getItem("user")).defaultYearStart

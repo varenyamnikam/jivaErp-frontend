@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import AuthHandler from "../Utils/AuthHandler";
 import axios from "axios";
 import Config from "../Utils/Config";
+import { axiosPost } from "../services/roleService";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiFormLabel-root": {
@@ -233,39 +234,31 @@ export default function UnusedAutosuggest(props) {
       const user = JSON.parse(localStorage.getItem("user"));
       const userCode = user.userCode;
       const userCompanyCode = user.userCompanyCode;
-      const useBatch = JSON.parse(
-        localStorage.getItem("adm_softwareSettings")
-      ).userBatchNo;
-      const query = `?userCompanyCode=${userCompanyCode}&userCode=${userCode}&yearCode=${user.defaultYearCode}&branchCode=${user.defaultBranchCode}&acCode=${value.partyCode}`;
-      const token = AuthHandler.getLoginToken();
-      console.log(query);
-      axios
-        .post(
-          Config().stockReport,
-          {
-            userCompanyCode: userCompanyCode,
-            userCode: userCode,
-            yearCode: user.defaultYearCode,
-            branchCode: user.defaultBranchCode,
+
+      const handleRes = (res) => {
+        console.log(res.data.stock);
+        if (res.data)
+          setToolTip({
             prodCode: value.prodCode,
-          },
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((res) => {
-          console.log(res.data.stock);
-          if (res.data)
-            setToolTip({
-              prodCode: value.prodCode,
-              stock: ` ${String(res.data.stock)}`,
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+            stock: ` ${String(res.data.stock)}`,
+          });
+      };
+      const handleErr = (err) => {
+        console.log(err);
+      };
+      axiosPost(
+        Config().stockReport,
+        {
+          userCompanyCode: userCompanyCode,
+          userCode: userCode,
+          yearCode: user.defaultYearCode,
+          branchCode: user.defaultBranchCode,
+          prodCode: value.prodCode,
+        },
+        handleRes,
+        handleErr,
+        () => {}
+      );
     }
   }
 

@@ -194,14 +194,18 @@ export default function Settings() {
       <section className="content">
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12}>
-            <Grid container style={{ pading: "20px" }}>
-              <Profile setNotify={setNotify} />
-            </Grid>
-          </Grid>
-          <Grid item xs={12} sm={12}>
             <div className="card">
               <div className="card-body">
                 <section className="content">
+                  <Grid item xs={12} sm={12}>
+                    <Grid
+                      container
+                      style={{ padding: "20px", marginTop: "20px" }}
+                    >
+                      <Profile setNotify={setNotify} />
+                    </Grid>
+                  </Grid>
+
                   <Grid container spacing={2}>
                     <Grid item sm={6} xs={12}>
                       <Controls.RadioGroup

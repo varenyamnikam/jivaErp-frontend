@@ -20,6 +20,7 @@ import {
 import useTable from "../../../../components/useTable";
 import DeleteIconOutline from "@mui/icons-material/DeleteOutline";
 import StaticDatePickerLandscape from "../../../../components/calendarLandscape";
+import { NotifyMsg } from "../../../../components/notificationMsg";
 const menuRightsItems = [
   { id: "Y", title: "Y" },
   { id: "N", title: "N" },
@@ -142,38 +143,24 @@ export default function GstForm(props) {
     updateGstInDb(newValue, newrecord, msg);
   };
   function updateGstInDb(input, newrecord, msg) {
-    const token = AuthHandler.getLoginToken();
     if (!values.prodCode) {
       console.log(input, newrecord);
       setValues(input);
       setRecords(newrecord);
       setPopup(false);
     } else {
-      axios
-        .patch(
-          // Config().addUser,
-          Config().prodMaster,
-          input,
-          {
-            headers: {
-              authorization: "Bearer" + token,
-            },
-          }
-        )
-        .then((response) => {
-          setPopup(false);
-          console.log(newrecord);
-          setInput(input);
-          setRecords(newrecord);
-          setNotify(msg);
-        })
-        .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Unable to connect to servers",
-            type: "warning",
-          });
-        });
+      const handleRes = (response) => {
+        setPopup(false);
+        console.log(newrecord);
+        setInput(input);
+        setRecords(newrecord);
+        setNotify(msg);
+      };
+      const handleErr = (error) => {
+        setNotify(NotifyMsg(4));
+      };
+
+      roleService.axiosPatch(Config().prodMaster, input, handleRes, handleErr);
     }
   }
   function getDate(dateString) {

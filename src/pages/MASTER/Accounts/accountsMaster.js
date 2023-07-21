@@ -33,7 +33,6 @@ import MuiSkeleton from "../../../components/skeleton";
 import UnusedAutosuggest from "../../../components/unusedautosuggest";
 import { NotifyMsg } from "../../../components/notificationMsg";
 import SmartAutosuggest from "../../../components/smartAutoSuggest";
-
 const statusItems = [
   { id: "Active", title: "Active" },
   { id: "Inactive", title: "Inactive" },

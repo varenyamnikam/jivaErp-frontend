@@ -122,7 +122,7 @@ export default function AcMaster({ title = "Contra Voucher" }) {
   const headCells = [
     { id: "VOUCHER NO", label: "VOUCHER NO", feild: "vouNo" },
     { id: "Account", label: "Account", feild: "acName" },
-    { id: "Date", label: "Date", feild: "vouDate" },
+    { id: "Date", label: "Date", feild: "getDate" },
     { id: "Debit", label: "Debit", feild: "debit", align: "right" },
     { id: "Credit", label: "Credit", feild: "credit", align: "right" },
     { id: "Edit", label: "Edit", feild: "" },
@@ -205,16 +205,17 @@ export default function AcMaster({ title = "Contra Voucher" }) {
   if (loading) {
     const handleRes = (res) => {
       // console.log(res.data);
-
-      if (res.data.mst_accounts !== 0) {
-        setAccounts(res.data.mst_accounts);
+      const acc = res.data.mst_accounts;
+      console.log(res.data);
+      if (acc !== 0) {
+        setAccounts(acc);
       }
       let temp = res.data.inv_voucher;
       if (temp.length !== 0) {
         temp = temp.map((item) => ({
           ...item,
-          acName: getName(item.acCode, res.data.mst_accounts),
-          vouDate: roleService.date(item.vouDate),
+          acName: getName(item.acCode, acc),
+          getDate: roleService.date(item.vouDate),
           debit: Math.abs(item.debit),
           credit: Math.abs(item.credit),
         }));

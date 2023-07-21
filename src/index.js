@@ -73,6 +73,7 @@ import OutstandingReport from "./pages/Report/outstandingReport";
 import ProdTypeMaster from "./pages/MASTER/Products/prodTypeMaster";
 import ProductCompanyMaster from "./pages/MASTER/Products/prodCompanyMaster";
 import StockConversionMaster from "./pages/Stock/transaction/stockConversionMaster";
+import Tally from "./pages/Admin/tally/tally";
 import jQuery from "jquery";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -105,6 +106,10 @@ root.render(
         <Route
           path="/Admin/SoftwareSetting"
           element={<PrivateRouteNew Page={<Settings />} />}
+        />
+        <Route
+          path="/Admin/Tally"
+          element={<PrivateRouteNew Page={<Tally />} />}
         />
         <Route
           exact

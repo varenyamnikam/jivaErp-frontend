@@ -41,6 +41,8 @@ import ClearIcon from "@mui/icons-material/Clear";
 import GstForm from "./gstForm";
 import Filter from "../../../../components/filterButton";
 import { NotifyMsg } from "../../../../components/notificationMsg";
+import prodConversnFn from "../../../../components/tally/master/productTally";
+import DownloadTallyXml from "../../../../components/tally/master/convertMasterData";
 const headCells = [
   { id: "Code", label: "CODE" },
   { id: "name", label: "NAME" },
@@ -148,7 +150,16 @@ export default function ProductMaster(props) {
     subTitle: "",
   });
   const [loading, setLoading] = useState(true);
+  ////tally/////
+  const { convertProdToXml, convertUomToXml, convertItemGrpToXml, wrapperXml } =
+    prodConversnFn;
+  const dataAndFnArr = [
+    { data: unitNames, fn: convertUomToXml },
+    { data: prodType, fn: convertItemGrpToXml },
+    { data: records, fn: convertProdToXml },
+  ];
 
+  //////////////////////////
   // const [count, setCount] = useState(records[records.length - 1].branchCode);
   const classes = useStyles();
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
@@ -182,7 +193,7 @@ export default function ProductMaster(props) {
 
     roleService.axiosGet(url, handleRes, handleErr, () => {});
   }
-
+  console.log(prodConversnFn);
   console.log(records, unitNames, prodCompany, prodType);
   function onDelete(item) {
     setConfirmDialog({
@@ -375,6 +386,7 @@ export default function ProductMaster(props) {
                               handleClick={() => {
                                 setValues(item);
                                 setButtonPopup(true);
+                                DownloadTallyXml(dataAndFnArr, wrapperXml);
                               }}
                             />
                             <Controls.DeleteButton

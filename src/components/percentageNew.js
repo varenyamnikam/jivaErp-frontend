@@ -68,13 +68,13 @@ export default function Percent(props) {
     console.log(net, amt);
     var per = (net / amt) * 100;
     console.log(per);
-    return per;
+    return Number(per.toFixed(2));
   }
   function amtOfPercent(per, amt) {
     console.log(per, amt);
     var net = (per / 100) * amt;
     console.log(net);
-    return net;
+    return Number(net.toFixed(2));
   }
   const handleKeyPress = (event) => {
     if (event.key === "-" || event.key === "+") {
@@ -85,7 +85,11 @@ export default function Percent(props) {
     amt = amt - sub;
     return amt;
   }
-  console.log(props);
+  // console.log(
+  //   "value[name1]=>",
+  //   value[name1],
+  //   amtOfPercent(Number(value[name2]), Number(value[name3]))
+  // );
 
   if (
     value[name3] &&
@@ -93,11 +97,11 @@ export default function Percent(props) {
     Number(value[name1]) !==
       amtOfPercent(Number(value[name2]), Number(value[name3]))
   ) {
-    console.log(
-      value[name1],
-      value[name2],
-      amtOfPercent(Number(value[name2]), Number(value[name3]))
-    );
+    // console.log(
+    //   value[name1],
+    //   value[name2],
+    //   amtOfPercent(Number(value[name2]), Number(value[name3]))
+    // );
 
     setValue({
       ...value,
@@ -110,11 +114,11 @@ export default function Percent(props) {
     Number(value[name2]) !==
       percentOfAmt(Number(value[name1]), Number(value[name3]))
   ) {
-    console.log(
-      value[name1],
-      value[name2],
-      percentOfAmt(Number(value[name1]), Number(value[name3]))
-    );
+    // console.log(
+    //   value[name1],
+    //   value[name2],
+    //   percentOfAmt(Number(value[name1]), Number(value[name3]))
+    // );
 
     setValue({
       ...value,
@@ -132,7 +136,7 @@ export default function Percent(props) {
           type={"number"}
           style={{ borderTopLeftRadius: "0px", borderBottomLeftRadius: "0px" }}
           name={name2}
-          value={String(value[name2]).replace(/(\.\d{2})\d+$/, "$1")}
+          value={value[name2]}
           onChange={(e) => {
             onChange(e);
             setPriority(name2);
@@ -168,7 +172,7 @@ export default function Percent(props) {
           onKeyPress={handleKeyPress}
           label={label}
           name={name1}
-          value={String(value[name1]).replace(/(\.\d{2})\d+$/, "$1")}
+          value={value[name1]}
           onChange={(e) => {
             onChange(e);
             setPriority(name1);

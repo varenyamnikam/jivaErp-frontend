@@ -49,6 +49,7 @@ import FilterForm from "./generalFilterForm";
 import Filter from "../../components/filterButton";
 import { NotifyMsg } from "../../components/notificationMsg";
 import validateParty from "./validateParty";
+import DownloadTransactionTallyXml from "../../components/tally/transactions/convertTransactionData";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -254,7 +255,7 @@ export default function ReuseMaster(props) {
       if (po.length !== 0) {
         setReference(po);
       }
-      const gr = vouchers
+      const voucherData = vouchers
         .filter((item) => item.docCode == docCode)
         .map((item) => {
           return {
@@ -264,8 +265,8 @@ export default function ReuseMaster(props) {
           };
         });
 
-      gr.length !== 0
-        ? setRecords(gr)
+      voucherData.length !== 0
+        ? setRecords(voucherData)
         : setRecords([{ ...initialValues, vouNo: "" }]);
     };
     roleService.axiosGet(url, handleRes, handleErr, () => {});

@@ -185,16 +185,16 @@ export default function AcMaster(props) {
 
   if (loading) {
     const handleRes = (res) => {
-      // console.log(res.data);
-
-      if (res.data.mst_accounts !== 0) {
-        setAccounts(res.data.mst_accounts);
+      console.log(res.data);
+      const acc = res.data.mst_accounts;
+      if (acc !== 0) {
+        setAccounts(acc);
       }
       let temp = res.data.inv_voucher;
       if (temp.length !== 0) {
         temp = temp.map((item) => ({
           ...item,
-          acName: getName(item.acCode, res.data.mst_accounts),
+          acName: getName(item.acCode, acc),
           debit: Math.abs(item.debit),
           credit: Math.abs(item.credit),
           getDate: roleService.date(item.vouDate),

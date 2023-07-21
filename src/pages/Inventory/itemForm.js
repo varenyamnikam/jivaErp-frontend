@@ -231,17 +231,17 @@ export default function GeneralItemForm(props) {
     setInput({ ...input, netAmount: Math.round(k) });
   }
   console.log(batchList, itemList);
-  if (
-    Number(input.roundOff).toFixed(2) !==
-    (k.toFixed(2) - Math.round(k)).toFixed(2)
-  ) {
-    setInput({ ...input, roundOff: (k.toFixed(2) - Math.round(k)).toFixed(2) });
+  if (input.roundOff !== Number((Math.round(k) - k).toFixed(2))) {
+    setInput({
+      ...input,
+      roundOff: Number((Math.round(k) - k).toFixed(2)),
+    });
   }
 
   function rnd(no) {
-    return Number(no)
-      .toFixed(2)
-      .replace(/(\.0+|0+)$/, "");
+    return Number(no);
+    // .toFixed(2)
+    // .replace(/(\.0+|0+)$/, "");
   }
 
   const handleChange = (e) => {

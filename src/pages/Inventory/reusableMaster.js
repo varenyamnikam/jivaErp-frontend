@@ -50,6 +50,8 @@ import Filter from "../../components/filterButton";
 import { NotifyMsg } from "../../components/notificationMsg";
 import validateParty from "./validateParty";
 import DownloadTransactionTallyXml from "../../components/tally/transactions/convertTransactionData";
+import MyComponent from "../../components/whatsapp/generatePdf";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     margin: theme.spacing(5),
@@ -687,6 +689,23 @@ export default function ReuseMaster(props) {
                                       setopen={setPrint}
                                       printPopup={print}
                                     />
+                                  </Controls.ActionButton>{" "}
+                                  <Controls.ActionButton>
+                                    <MyComponent
+                                      key={i}
+                                      values={values}
+                                      setValues={setValues}
+                                      item={item}
+                                      voucherItems={common.voucherItems}
+                                      adress={common.adress}
+                                      accounts={common.accounts}
+                                      products={common.products}
+                                      payTerms={common.payTerms}
+                                      getEntry={getEntry}
+                                      setopen={setPrint}
+                                      printPopup={print}
+                                      setNotify={setNotify}
+                                    />{" "}
                                   </Controls.ActionButton>
                                 </>
                               ) : (

@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import ReactToPrint from "react-to-print";
-import ComponentToPrint from "./componentToPrint";
+import ComponentToPrint from "./printInvoice/componentToPrint";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import {

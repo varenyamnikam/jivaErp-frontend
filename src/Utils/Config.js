@@ -3,8 +3,8 @@ import AuthHandler from "./AuthHandler";
 
 const Config = () => {
   const PORT = process.env.PORT ? process.env.PORT : "3001";
-  const url = "https://backend-4u9g.onrender.com";
-  // const url = "http://localhost:3001";
+  // const url = "https://backend-4u9g.onrender.com";
+  const url = "http://localhost:3001";
 
   const getUrlWithQuery = (endpoint) => url + endpoint + AuthHandler.getQuery();
 
@@ -59,6 +59,7 @@ const Config = () => {
   const trialBalance = getUrlWithQuery("/api/trialBalance");
   const stockConversion = getUrlWithQuery("/api/inv_stockConversion");
   const tally = getUrlWithQuery("/api/tally");
+  const whatsapp = getUrlWithQuery("/api/whatsapp");
 
   return {
     loginUrl,
@@ -112,6 +113,7 @@ const Config = () => {
     trialBalance,
     stockConversion,
     tally,
+    whatsapp,
   };
 };
 

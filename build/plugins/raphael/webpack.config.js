@@ -37,5 +37,8 @@ module.exports = function (env) {
         buffer: require.resolve("buffer/"),
       },
     },
+    node: {
+      fs: "empty",
+    },
   };
 };

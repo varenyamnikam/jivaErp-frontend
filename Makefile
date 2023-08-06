@@ -1,7 +1,7 @@
 deploy:
 	git add .
 	set /p commit_msg="Enter commit message: "
-	git commit -m "$$commit_msg"
+	git commit -m "%commit_msg%"
 	git push origin main
 
 build:

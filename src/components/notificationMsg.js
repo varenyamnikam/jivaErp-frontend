@@ -55,6 +55,12 @@ export function NotifyMsg(code, callback = () => {}) {
     message: "Out of Stock",
     type: "warning",
   };
+  const whatsapp = {
+    isOpen: true,
+    message: "Pdf sent successFully",
+    type: "success",
+  };
+
   console.log(code);
   //stockConversion
   //transaction
@@ -67,5 +73,6 @@ export function NotifyMsg(code, callback = () => {}) {
   else if (code === 7) return editMsg;
   else if (code === 8) return deleteMsg;
   else if (code === 9) return stockReducedMsg;
+  else if (code === 10) return whatsapp;
   else return emptyMsg;
 }

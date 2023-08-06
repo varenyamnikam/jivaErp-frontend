@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core";
 import PrintIcon from "@mui/icons-material/Print";
 import { useReactToPrint } from "react-to-print";
-import ComponentToPrint from "./componentToPrint";
+import ComponentToPrint from "./printInvoice/componentToPrint";
 import AuthHandler from "../Utils/AuthHandler";
 const useStyles = makeStyles((theme) => ({
   table: {

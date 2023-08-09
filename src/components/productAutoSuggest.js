@@ -139,73 +139,76 @@ export default function UnusedAutosuggest(props) {
       }
     });
   }
-  if (value[code1]) {
-    let currentItem = { gst: [] };
-    options2.map((item) => {
-      if (value[code1] == item[code2] && value[name1] == item[name2]) {
-        currentItem = item;
-      }
-    });
-    if (currentItem.gst.length != 0) {
-      console.log(currentItem, currentItem.gst);
-      const gstInfo = findCurrentGst(currentItem.gst);
-      console.log(gstInfo);
-      let partyStateCode = adress.find(
-        (item) => item.acCode == input.partyCode && Number(item.addressNo) == 1
-      );
-      partyStateCode = partyStateCode ? partyStateCode.stateCode : "0";
-      const companyStateCode = Number(
-        JSON.parse(localStorage.getItem("user")).stateCode
-      );
-      const insideOfMaharashtra =
-        Number(companyStateCode) == Number(partyStateCode);
-      const igst = String(Number(gstInfo.cgst) + Number(gstInfo.sgst));
+  function setGst() {
+    if (value[code1]) {
+      let currentItem = { gst: [] };
+      options2.map((item) => {
+        if (value[code1] == item[code2] && value[name1] == item[name2]) {
+          currentItem = item;
+        }
+      });
+      if (currentItem.gst.length != 0) {
+        console.log(currentItem, currentItem.gst);
+        const gstInfo = findCurrentGst(currentItem.gst);
+        console.log(gstInfo);
+        let partyStateCode = adress.find(
+          (item) =>
+            item.acCode == input.partyCode && Number(item.addressNo) == 1
+        );
+        partyStateCode = partyStateCode ? partyStateCode.stateCode : "0";
+        const companyStateCode = Number(
+          JSON.parse(localStorage.getItem("user")).stateCode
+        );
+        const insideOfMaharashtra =
+          Number(companyStateCode) == Number(partyStateCode);
+        const igst = String(Number(gstInfo.cgst) + Number(gstInfo.sgst));
 
-      console.log(
-        companyStateCode,
-        partyStateCode,
-        !partyStateCode,
-        insideOfMaharashtra,
-        value,
-        Number(value.cgstP),
-        Number(gstInfo.cgst),
-        Number(value.sgstP),
-        Number(gstInfo.sgst),
-        Number(value.cessP),
-        Number(gstInfo.cess),
-        Number(value.cgstP) !== Number(gstInfo.cgst),
-        Number(value.sgstP) !== Number(gstInfo.sgst),
-        Number(value.cessP) !== Number(gstInfo.cess),
-        "finally=>",
-        Number(value.cgstP) !== Number(gstInfo.cgst) &&
-          Number(value.sgstP) !== Number(gstInfo.sgst) &&
+        console.log(
+          companyStateCode,
+          partyStateCode,
+          !partyStateCode,
+          insideOfMaharashtra,
+          value,
+          Number(value.cgstP),
+          Number(gstInfo.cgst),
+          Number(value.sgstP),
+          Number(gstInfo.sgst),
+          Number(value.cessP),
+          Number(gstInfo.cess),
+          Number(value.cgstP) !== Number(gstInfo.cgst),
+          Number(value.sgstP) !== Number(gstInfo.sgst),
           Number(value.cessP) !== Number(gstInfo.cess),
-        !companyStateCode,
-        !partyStateCode
-      );
-      if (
-        (insideOfMaharashtra || Number(partyStateCode) == 0) &&
-        (Number(value.cgstP) !== Number(gstInfo.cgst) ||
-          Number(value.sgstP) !== Number(gstInfo.sgst) ||
-          Number(value.cessP) !== Number(gstInfo.cess))
-      ) {
-        setValue({
-          ...value,
-          cgstP: gstInfo.cgst,
-          sgstP: gstInfo.sgst,
-          cessP: gstInfo.cess,
-        });
-      }
-      if (
-        !insideOfMaharashtra &&
-        Number(partyStateCode) !== 0 &&
-        (value.igstP !== igst || value.cessP !== gstInfo.cess)
-      ) {
-        setValue({
-          ...value,
-          igstP: igst,
-          cessP: gstInfo.cess,
-        });
+          "finally=>",
+          Number(value.cgstP) !== Number(gstInfo.cgst) &&
+            Number(value.sgstP) !== Number(gstInfo.sgst) &&
+            Number(value.cessP) !== Number(gstInfo.cess),
+          !companyStateCode,
+          !partyStateCode
+        );
+        if (
+          (insideOfMaharashtra || Number(partyStateCode) == 0) &&
+          (Number(value.cgstP) !== Number(gstInfo.cgst) ||
+            Number(value.sgstP) !== Number(gstInfo.sgst) ||
+            Number(value.cessP) !== Number(gstInfo.cess))
+        ) {
+          setValue({
+            ...value,
+            cgstP: gstInfo.cgst,
+            sgstP: gstInfo.sgst,
+            cessP: gstInfo.cess,
+          });
+        }
+        if (
+          !insideOfMaharashtra &&
+          Number(partyStateCode) !== 0 &&
+          (value.igstP !== igst || value.cessP !== gstInfo.cess)
+        ) {
+          setValue({
+            ...value,
+            igstP: igst,
+            cessP: gstInfo.cess,
+          });
+        }
       }
     }
   }
@@ -278,6 +281,7 @@ export default function UnusedAutosuggest(props) {
           cessP: "",
           igstP: "",
         });
+        setGst();
         console.log("onchange" + newValue, prod);
       }
     }

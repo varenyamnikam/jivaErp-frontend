@@ -491,11 +491,13 @@ export default function AccountMaster() {
                   style={{ display: "flex", justifyContent: "flex-end" }}
                 >
                   <Controls.Button
+                    size="medium"
                     text="Reset"
                     color="default"
                     onClick={() => {}}
                   />{" "}
                   <Controls.Button
+                    size="medium"
                     type="submit"
                     text="Submit"
                     onClick={handleSubmit}

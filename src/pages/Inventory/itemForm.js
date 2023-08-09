@@ -42,6 +42,7 @@ import * as roleService from "../../services/roleService";
 import { NotifyMsg } from "../../components/notificationMsg";
 
 let initialHeadCells = [
+  { id: "Sr No", label: "Sr No" },
   { id: "Product", label: "Product" },
   { id: "Quantity", label: "Quantity" },
   { id: "Rate", label: "Rate" },
@@ -717,8 +718,9 @@ export default function GeneralItemForm(props) {
               <Table sx={{ minHeight: 500 }}>
                 <TblHead />
                 <TableBody>
-                  {recordsAfterPagingAndSorting().map((item) => (
+                  {recordsAfterPagingAndSorting().map((item, i) => (
                     <TableRow key={item._id}>
+                      <TableCell>{i + 1}</TableCell>
                       <TableCell>{getProdName(item.prodCode)}</TableCell>
                       <TableCell align="right">{item.qty}</TableCell>
                       <TableCell align="right">{item.rate}</TableCell>

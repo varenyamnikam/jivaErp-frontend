@@ -102,12 +102,12 @@ export default function Generalform(props) {
     if (validate()) {
       let x;
       setValues(input);
-      x = records.find((item) => item.acGroupCode == input.acGroupCode);
+      x = records.find((item) => item.acCode == input.acCode && item.acCode);
       const url = Config().accounts;
       const handleErr = (err) => {
         setNotify(NotifyMsg(4));
       };
-
+      console.log(records, input);
       if (!x) {
         const handleRes = (response) => {
           console.log("hi....", response.data.values);
@@ -117,7 +117,6 @@ export default function Generalform(props) {
           setSubmit(true);
           changeTab();
         };
-
         roleService.axiosPut(url, input, handleRes, handleErr, () => {});
       } else {
         const handleRes = (response) => {
@@ -130,7 +129,6 @@ export default function Generalform(props) {
           setSubmit(true);
           changeTab();
         };
-
         roleService.axiosPatch(url, input, handleRes, handleErr, () => {});
       }
     }

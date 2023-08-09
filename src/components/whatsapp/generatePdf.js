@@ -70,7 +70,7 @@ const PdfGenerator = (props) => {
         axios
           .post(Config().whatsapp, formData, {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "multipart/form-data", //dont
               authorization: token,
             },
           })
@@ -92,7 +92,7 @@ const PdfGenerator = (props) => {
         const a = document.createElement("a");
         a.href = url;
         a.download = fileName;
-        // a.click();
+        a.click();
         URL.revokeObjectURL(url);
       },
     });

@@ -95,7 +95,6 @@ const ComponentToPdf = React.forwardRef((props, ref) => {
           padding: "20px",
           width: "610px",
           fontSize: "8px",
-          backgroundColor: "red",
         }}
         spacing={2}
       >

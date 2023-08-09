@@ -18,7 +18,7 @@ import { Grid } from "@mui/material";
 import "./print.css";
 const useStyles = makeStyles((theme) => ({
   table: {
-    width: "100%",
+    // width: "100%",
     "& thead th": {
       // fontWeight: "600",
       border: "2px solid rgba(0,0,0,0.2)",
@@ -53,6 +53,9 @@ const useStyles = makeStyles((theme) => ({
     left: 0,
     width: "100%",
   },
+  subscript: {
+    fontSize: "0.7em",
+  },
   center: { alignItems: "center", justifyContent: "flex-end" },
   page: {
     pageBreakAfter: "always",
@@ -84,6 +87,7 @@ export default function Components(props) {
   }
   function getParty(values) {
     const party = accounts.filter((item) => item.acCode == values.partyCode);
+    console.log(party[0]);
     return party[0];
   }
   function getItems(values) {
@@ -178,7 +182,8 @@ export default function Components(props) {
     sgstArr = RemoveDuplicates(arr, "sgstP");
     igstArr = RemoveDuplicates(arr, "igstP");
     console.log({ c: cgstArr, s: sgstArr, i: igstArr });
-    return { c: cgstArr, s: sgstArr, i: igstArr };
+    const maxRows = Math.max(cgstArr.length, sgstArr.length, igstArr.length);
+    return { c: cgstArr, s: sgstArr, i: igstArr, maxRows: maxRows };
   }
   function geth(arr) {
     if (arr.length) {
@@ -191,9 +196,7 @@ export default function Components(props) {
     }
   }
   function rnd(no) {
-    return Number(no)
-      .toFixed(2)
-      .replace(/(\.0+|0+)$/, "");
+    return Number(no).toFixed(2);
   }
 
   const Header = () => {
@@ -238,17 +241,19 @@ export default function Components(props) {
           >
             <h5> From</h5>
           </Grid>
-          <h4>{company.companyName}</h4>
+          <span style={{ color: "black", display: "block" }}>
+            {company.companyName}
+          </span>
           <span>{company.adressLine1}</span>, <span>{company.adressLine2}</span>
           ,
           <span>
             {company.district}-{company.pinCode}
           </span>
-          ,{" "}
+          ,
           <span>
             {company.stateName}({company.stateCode})
           </span>
-          ,{" "}
+          ,
           <span>
             {company.countryName}({company.countryCode})
           </span>
@@ -257,7 +262,7 @@ export default function Components(props) {
           <br></br>
           <span>Email: {company.email}</span>
           <br></br>
-          <span>GST In: {company.gstInNo}</span>
+          <span>GST No: {company.gstInNo}</span>
         </Grid>
         <Grid Item sm={4} xs={4}>
           <Grid
@@ -268,11 +273,13 @@ export default function Components(props) {
           >
             <h5>Bill To</h5>
           </Grid>
-          <h4>{getParty(values) && getParty(values).acName}</h4>
+          <span style={{ color: "black", display: "block" }}>
+            {getParty(values) && getParty(values).acName}
+          </span>
           {getAd && (
             <>
-              <span>{getAd(values).addressLine1}</span>,{" "}
-              <span>{getAd(values).addressLine2}</span>,{" "}
+              <span>{getAd(values).addressLine1}</span>,
+              <span>{getAd(values).addressLine2}</span>,
               {partyAdress.districtName && (
                 <span> {partyAdress.districtName}, </span>
               )}
@@ -282,15 +289,19 @@ export default function Components(props) {
               <br />
               {partyAdress.stateName && (
                 <span>
-                  {" "}
-                  {partyAdress.stateName}({partyAdress.stateCode}),{" "}
+                  {partyAdress.stateName}({partyAdress.stateCode}),
                 </span>
               )}
               {partyAdress.countryName && (
                 <span>
-                  {" "}
-                  {partyAdress.countryName}({partyAdress.countryCode}),{" "}
+                  {partyAdress.countryName}({partyAdress.countryCode}),
                 </span>
+              )}
+              {getParty(values) && getParty(values).gstNo && (
+                <>
+                  <br></br>
+                  <span>GST No: {getParty(values).gstNo}, </span>
+                </>
               )}
             </>
           )}
@@ -304,11 +315,13 @@ export default function Components(props) {
           >
             <h5> Ship To</h5>
           </Grid>
-          <h4>{getParty(values) && getParty(values).acName}</h4>
+          <span style={{ color: "black", display: "block" }}>
+            {getParty(values) && getParty(values).acName}
+          </span>
           {partyAdress && (
             <>
-              <span>{getAd(values).addressLine1}</span>,{" "}
-              <span>{getAd(values).addressLine2}</span>,{" "}
+              <span>{getAd(values).addressLine1}</span>,
+              <span>{getAd(values).addressLine2}</span>,
               {partyAdress.districtName && (
                 <span> {partyAdress.districtName}, </span>
               )}
@@ -318,15 +331,19 @@ export default function Components(props) {
               <br />
               {partyAdress.stateName && (
                 <span>
-                  {" "}
-                  {partyAdress.stateName}({partyAdress.stateCode}),{" "}
+                  {partyAdress.stateName}({partyAdress.stateCode}),
                 </span>
               )}
               {partyAdress.countryName && (
                 <span>
-                  {" "}
-                  {partyAdress.countryName}({partyAdress.countryCode}),{" "}
+                  {partyAdress.countryName}({partyAdress.countryCode}),
                 </span>
+              )}
+              {getParty(values) && getParty(values).gstNo && (
+                <>
+                  <br></br>
+                  <span>GST No: {getParty(values).gstNo}, </span>
+                </>
               )}
             </>
           )}
@@ -337,6 +354,7 @@ export default function Components(props) {
 
   const TableComponent = () => {
     const tableHeaders = [
+      { label: "Sr No" },
       { label: "Product", align: "left" },
       { label: "Quantity", align: "right" },
       { label: "Rate", align: "right" },
@@ -344,7 +362,6 @@ export default function Components(props) {
       { label: "Discount", align: "right" },
       { label: "G.S.T", align: "right" },
     ];
-
     return (
       <Grid Item sm={12} xs={12}>
         <Table style={{ padding: "20px" }} className={classes.table}>
@@ -354,7 +371,10 @@ export default function Components(props) {
                 <TableCell
                   key={index}
                   align={header.align}
-                  style={{ backgroundColor: "white" }}
+                  colSpan={header.label === "Sr No" ? 1 : "auto"}
+                  style={{
+                    backgroundColor: "white",
+                  }}
                 >
                   {header.label}
                 </TableCell>
@@ -374,14 +394,15 @@ export default function Components(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {getItems(values).map((item) => (
+            {getItems(values).map((item, index) => (
               <TableRow className={classes.table}>
+                <TableCell className={classes.table}>{index + 1}</TableCell>
                 <TableCell className={classes.table}>
                   <div style={{ display: "flex" }}>
                     {getProdName(item.prodCode)}
                   </div>
                   {settings.userBatchNo === "Yes" && (
-                    <div>
+                    <div className={classes.subscript}>
                       {item.batchList.map((batch, i) => (
                         <span key={i}>
                           {batch.batchNo}-{batch.sell} (
@@ -391,72 +412,63 @@ export default function Components(props) {
                       ))}
                     </div>
                   )}
-                </TableCell>
-                <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>{item.qty}</div>
-                </TableCell>
-                <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>{Number(item.rate)}</div>
-                </TableCell>
-                <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>{Number(item.qr)}</div>
-                </TableCell>
-                <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>
-                    ({rnd(item.disPer)}%) {rnd(Number(item.discount))}
-                  </div>
-                </TableCell>
-                <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ marginRight: "10px" }}>
-                        (
-                        {rnd(
-                          Number(item.cgstP) +
-                            Number(item.sgstP) +
-                            Number(item.igstP)
-                        )}
-                        %)
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        {rnd(
-                          Number(item.cgst) +
-                            Number(item.sgst) +
-                            Number(item.igst)
-                        )}
-                      </div>
+                  {settings.useSerialNo === "Yes" && (
+                    <div className={classes.subscript}>
+                      Sn No-{item.serialNo}
                     </div>
+                  )}
+                </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {rnd(item.qty)}
+                </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {rnd(item.rate)}
+                </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {rnd(item.qr)}
+                </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {rnd(Number(item.discount))}
+                  <div className={classes.subscript}>({rnd(item.disPer)}%)</div>
+                </TableCell>
+                <TableCell className={classes.table} align="right">
+                  {rnd(
+                    Number(item.cgst) + Number(item.sgst) + Number(item.igst)
+                  )}
+                  <div className={classes.subscript}>
+                    (
+                    {rnd(
+                      Number(item.cgstP) +
+                        Number(item.sgstP) +
+                        Number(item.igstP)
+                    )}
+                    %)
                   </div>
                 </TableCell>
                 {settings.useCessitem === "Yes" && (
                   <TableCell className={classes.table} align="right">
-                    <div style={{ display: "flex" }}>
-                      ({rnd(item.cessP)}%) {rnd(item.cess)}
+                    {rnd(item.cess)}
+                    <div className={classes.subscript}>
+                      ({rnd(item.cessP)}%)
                     </div>
                   </TableCell>
                 )}
                 <TableCell className={classes.table} align="right">
-                  <div style={{ display: "flex" }}>
-                    {Number(item.itemAmount)}
-                  </div>
+                  {Number(item.itemAmount)}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
-        </Table>{" "}
+        </Table>
       </Grid>
     );
   };
 
   const FooterComponent = () => {
+    const taxObj = getTax(values);
     return (
       <>
-        <Grid Item sm={12} style={{ alignSelf: "flex-end", flexGrow: 1 }}>
+        <Grid Item sm={12} style={{ alignSelf: "flex-end" }}>
           <Grid container spacing={1}>
             <Grid Item xs={12}>
               <h3> Payment term: {getPay(values.paymentTermsCode)}</h3>
@@ -465,68 +477,44 @@ export default function Components(props) {
               Item
               xs={6}
               style={{
-                display: "flex",
-                justifyContent: "center",
                 paddingRight: "20px",
               }}
             >
               <Table className={classes.table}>
-                {" "}
                 <TableHead>
                   <TableRow>
                     <TableCell className={classes.table}>CGST</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {getTax(values).c.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        className={classes.table}
-                        align="right"
-                        variant="body"
-                      >
-                        {Number(item.cgstP)}% - {rnd(Number(item.cgst))}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Table className={classes.table}>
-                {" "}
-                <TableHead>
-                  <TableRow>
                     <TableCell className={classes.table}>SGST</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {getTax(values).s.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        className={classes.table}
-                        align="right"
-                        variant="body"
-                      >
-                        {Number(item.sgstP)}% - {rnd(Number(item.sgst))}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Table className={classes.table}>
-                <TableHead>
-                  <TableRow>
                     <TableCell className={classes.table}>IGST</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {getTax(values).i.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        className={classes.table}
-                        align="right"
-                        variant="body"
-                      >
-                        {Number(item.igstP)}% - {rnd(Number(item.igst))}
+                  {[...new Array(taxObj.maxRows)].map((item, i) => (
+                    <TableRow key={i}>
+                      <TableCell className={classes.table} align="right">
+                        {taxObj.c[i] && (
+                          <>
+                            {Number(taxObj.c[i].cgstP)}%&nbsp;-&nbsp;
+                            {rnd(Number(taxObj.c[i].cgst))}
+                          </>
+                        )}
+                      </TableCell>
+                      <TableCell className={classes.table} align="right">
+                        {taxObj.s[i] && (
+                          <>
+                            {Number(taxObj.s[i].sgstP)}%&nbsp;-&nbsp;
+                            {rnd(Number(taxObj.s[i].sgst))}
+                          </>
+                        )}
+                      </TableCell>
+
+                      <TableCell className={classes.table} align="right">
+                        {taxObj.i[i] && (
+                          <>
+                            {Number(taxObj.i[i].igstP)}%&nbsp;-&nbsp;
+                            {rnd(Number(taxObj.i[i].igst))}
+                          </>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -543,48 +531,51 @@ export default function Components(props) {
               }}
             >
               <Table className={classes.table}>
-                <TableRow>
-                  <TableCell className={classes.table} align="right">
-                    Subtotal{" "}
-                  </TableCell>
-                  <TableCell className={classes.table} align="right">
-                    {values.itemTotal}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table} align="right">
-                    Discount ({Number(values.billDisPer)})
-                  </TableCell>
-                  <TableCell className={classes.table} align="right">
-                    {rnd(Number(values.billDis))}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table} align="right">
-                    TCS{" "}
-                  </TableCell>
-                  <TableCell className={classes.table} align="right">
-                    {" "}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table} align="right">
-                    Roundoff{" "}
-                  </TableCell>
-                  <TableCell className={classes.table} align="right">
-                    {" "}
-                    {Number(values.roundOff)}{" "}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table} align="right">
-                    Net Amount{" "}
-                  </TableCell>
-                  <TableCell className={classes.table} align="right">
-                    {" "}
-                    {Number(values.netAmount)}
-                  </TableCell>
-                </TableRow>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className={classes.table} align="right">
+                      Subtotal
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      {values.itemTotal}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className={classes.table} align="right">
+                      Discount ({Number(values.billDisPer)})
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      {rnd(Number(values.billDis))}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table} align="right">
+                      TCS
+                    </TableCell>
+                    <TableCell
+                      className={classes.table}
+                      align="right"
+                    ></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table} align="right">
+                      Roundoff
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      {Number(values.roundOff)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table} align="right">
+                      <strong>Net Amount</strong>
+                    </TableCell>
+                    <TableCell className={classes.table} align="right">
+                      <strong>{Number(values.netAmount)}</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               </Table>
             </Grid>
             <Grid
@@ -593,13 +584,15 @@ export default function Components(props) {
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                fontWeight: 700,
                 margin: "20px",
               }}
             >
-              <h5>
-                {company.declaration && <>Declaration {company.declaration}</>}
-              </h5>
+              {company.declaration && (
+                <div>
+                  <div style={{ color: "black" }}>Declaration</div>
+                  {company.declaration}
+                </div>
+              )}
               <h5>For {company.companyName}</h5>
             </Grid>
             <Grid
@@ -612,7 +605,6 @@ export default function Components(props) {
               style={{
                 display: "flex",
                 justifyContent: "flex-end",
-                fontWeight: 700,
                 margin: "20px",
               }}
             >

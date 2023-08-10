@@ -235,7 +235,7 @@ export default function Generalform(props) {
             onChange={handleChange}
             // error={errors.stateCode}
           />
-        </Grid>{" "}
+        </Grid>
         <Grid item xs={12} sm={3}>
           <Controls.Input
             name="bankName"
@@ -293,7 +293,7 @@ export default function Generalform(props) {
             onChange={handleChange}
             // error={errors.stateCode}
           />
-        </Grid>{" "}
+        </Grid>
         <Grid item xs={12} sm={12}>
           <Divider
             variant="middle"
@@ -332,7 +332,7 @@ export default function Generalform(props) {
                 options={firmTypeOptions}
                 error={errors.firmType}
               />
-            </Grid>{" "}
+            </Grid>
             <Grid item xs={12} sm={3}>
               <Controls.Input
                 name="creditDays"
@@ -391,7 +391,7 @@ export default function Generalform(props) {
               </Button>
             </Grid>
           </>
-        )}{" "}
+        )}
         <Grid item xs={5} style={{ display: "flex", justifyContent: "center" }}>
           <Controls.RadioGroup
             name="acStatus"
@@ -401,7 +401,7 @@ export default function Generalform(props) {
             items={statusItems}
             error={errors.acStatus}
           />
-        </Grid>{" "}
+        </Grid>
         <Grid
           item
           xs={12}
@@ -409,7 +409,6 @@ export default function Generalform(props) {
           style={{ display: "flex", justifyContent: "flex-end" }}
         >
           <div>
-            {" "}
             <Button
               variant={submit ? "text" : "contained"} // color="success"
               onClick={(e) => {

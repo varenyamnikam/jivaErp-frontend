@@ -183,7 +183,7 @@ export default function GeneralItemForm(props) {
     });
     return temp;
   }
-  if (item.prodCode && headCells[1].label !== `Quantity (${y})`)
+  if (item.prodCode && headCells[2].label !== `Quantity (${y})`)
     setHeadCells(function () {
       return headCells.map((item) => {
         if (item.label == "Quantity") {

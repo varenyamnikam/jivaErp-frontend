@@ -77,7 +77,8 @@ const initialValues = {
   debit: "",
   credit: "",
   narration: "",
-  refType: "",
+  refType: "",    refNo: "",
+
   vouStatus: "",
   checkNo: "",
   favouringName: "",

@@ -165,7 +165,9 @@ export default function GeneralItemForm(props) {
     setItem({ ...item, itemAmount: parseFloat(Final()).toFixed(2) });
   }
   const generalAccName = common.accounts
-    .filter((item) => item.preFix == "G")
+    .filter(
+      (item) => item.acGroupCode == "A1016" || item.acGroupCode == "A1018"
+    )
     .map((item) => item.acName);
   const newNo = Number(itemList[itemList.length - 1].vouSrNo) + 1;
   let y = "";
@@ -821,8 +823,8 @@ export default function GeneralItemForm(props) {
         </Grid>
         <Grid item xs={12} sm={5} className={classes.input}>
           <SmartAutoSuggest
-            name1="agentName"
-            code1="agentCode"
+            name1="paymentThruName"
+            code1="paymentThruCode"
             name2="acName"
             code2="acCode"
             label="Payment Through"

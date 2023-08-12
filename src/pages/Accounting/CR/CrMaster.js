@@ -20,6 +20,8 @@ export default function BR() {
     credit: "",
     narration: "",
     refType: "",
+    refNo: "",
+
     vouStatus: "",
     checkNo: "",
     favouringName: "",

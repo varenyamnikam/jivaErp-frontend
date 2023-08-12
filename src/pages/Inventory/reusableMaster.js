@@ -40,7 +40,7 @@ import MuiSkeleton from "../../components/skeleton";
 import ClearIcon from "@mui/icons-material/Clear";
 import DcFilterForm from "./D.C/dcFilterForm";
 import GeneralForm from "./reusableForm";
-import DcValues from "./D.C/DcValues";
+import allInitialValues from "./initialValues";
 import Excel from "../../components/useExcel";
 import Print from "../../components/print";
 import PrintOne from "../../components/newPrintOne";
@@ -103,7 +103,7 @@ export default function ReuseMaster(props) {
 
   let query = `&date=${new Date()}&useBatch=${useBatch}&yearStart=${
     user.yearStartDate
-  }`;
+  }&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
   const {
     initialAc,
     initialVouItem,
@@ -111,7 +111,7 @@ export default function ReuseMaster(props) {
     initialPayValues,
     initialProdValues,
     initialCommonValues,
-  } = DcValues();
+  } = allInitialValues();
 
   const initialFilterValues = {
     ...initialValues,
@@ -339,7 +339,7 @@ export default function ReuseMaster(props) {
 
   const handleSubmit = async (input, itemList) => {
     let vouExists = records.find((item) => item.vouNo == input.vouNo);
-
+    console.log(input, itemList);
     if (validateParty(input, errors, setErrors, setNotify, vouExists)) {
       console.log("before");
       const batchQuery = `&vouNo=${input.vouNo}&useBatch=${useBatch}&branchCode=${user.currentBranchCode}&yearCode=${user.currentYearCode}`;
@@ -432,7 +432,7 @@ export default function ReuseMaster(props) {
                 input: input,
                 itemList: finalItemList,
               };
-              console.log(url);
+              console.log(url, obj);
               roleService.axiosPut(url, obj, handleRes, handleErr);
             } else {
               const handleRes = (response) => {

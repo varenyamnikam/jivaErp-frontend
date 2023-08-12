@@ -128,6 +128,10 @@ export default function UnusedAutosuggest(props) {
           ...value,
           [code1]: item[code2],
         });
+        setGst({
+          ...value,
+          [code1]: item[code2],
+        });
       }
     });
   }
@@ -139,14 +143,15 @@ export default function UnusedAutosuggest(props) {
       }
     });
   }
-  function setGst() {
-    if (value[code1]) {
+  function setGst(valueObj = value) {
+    if (valueObj[code1]) {
       let currentItem = { gst: [] };
       options2.map((item) => {
-        if (value[code1] == item[code2] && value[name1] == item[name2]) {
+        if (valueObj[code1] == item[code2] && valueObj[name1] == item[name2]) {
           currentItem = item;
         }
       });
+      console.log(currentItem);
       if (currentItem.gst.length != 0) {
         console.log(currentItem, currentItem.gst);
         const gstInfo = findCurrentGst(currentItem.gst);
@@ -168,43 +173,54 @@ export default function UnusedAutosuggest(props) {
           partyStateCode,
           !partyStateCode,
           insideOfMaharashtra,
-          value,
-          Number(value.cgstP),
+          valueObj,
+          Number(valueObj.cgstP),
           Number(gstInfo.cgst),
-          Number(value.sgstP),
+          Number(valueObj.sgstP),
           Number(gstInfo.sgst),
-          Number(value.cessP),
+          Number(valueObj.cessP),
           Number(gstInfo.cess),
-          Number(value.cgstP) !== Number(gstInfo.cgst),
-          Number(value.sgstP) !== Number(gstInfo.sgst),
-          Number(value.cessP) !== Number(gstInfo.cess),
+          Number(valueObj.cgstP) !== Number(gstInfo.cgst),
+          Number(valueObj.sgstP) !== Number(gstInfo.sgst),
+          Number(valueObj.cessP) !== Number(gstInfo.cess),
           "finally=>",
-          Number(value.cgstP) !== Number(gstInfo.cgst) &&
-            Number(value.sgstP) !== Number(gstInfo.sgst) &&
-            Number(value.cessP) !== Number(gstInfo.cess),
+          Number(valueObj.cgstP) !== Number(gstInfo.cgst) &&
+            Number(valueObj.sgstP) !== Number(gstInfo.sgst) &&
+            Number(valueObj.cessP) !== Number(gstInfo.cess),
           !companyStateCode,
           !partyStateCode
         );
+        console.log(
+          (insideOfMaharashtra || Number(partyStateCode) == 0) &&
+            (Number(valueObj.cgstP) !== Number(gstInfo.cgst) ||
+              Number(valueObj.sgstP) !== Number(gstInfo.sgst) ||
+              Number(valueObj.cessP) !== Number(gstInfo.cess))
+        );
         if (
           (insideOfMaharashtra || Number(partyStateCode) == 0) &&
-          (Number(value.cgstP) !== Number(gstInfo.cgst) ||
-            Number(value.sgstP) !== Number(gstInfo.sgst) ||
-            Number(value.cessP) !== Number(gstInfo.cess))
+          (Number(valueObj.cgstP) !== Number(gstInfo.cgst) ||
+            Number(valueObj.sgstP) !== Number(gstInfo.sgst) ||
+            Number(valueObj.cessP) !== Number(gstInfo.cess))
         ) {
           setValue({
-            ...value,
+            ...valueObj,
             cgstP: gstInfo.cgst,
             sgstP: gstInfo.sgst,
             cessP: gstInfo.cess,
           });
         }
+        console.log(
+          !insideOfMaharashtra &&
+            Number(partyStateCode) !== 0 &&
+            (valueObj.igstP !== igst || valueObj.cessP !== gstInfo.cess)
+        );
         if (
           !insideOfMaharashtra &&
           Number(partyStateCode) !== 0 &&
-          (value.igstP !== igst || value.cessP !== gstInfo.cess)
+          (valueObj.igstP !== igst || valueObj.cessP !== gstInfo.cess)
         ) {
           setValue({
-            ...value,
+            ...valueObj,
             igstP: igst,
             cessP: gstInfo.cess,
           });
@@ -281,7 +297,6 @@ export default function UnusedAutosuggest(props) {
           cessP: "",
           igstP: "",
         });
-        setGst();
         console.log("onchange" + newValue, prod);
       }
     }

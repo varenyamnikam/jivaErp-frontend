@@ -20,6 +20,8 @@ export default function JV() {
     credit: "",
     narration: "",
     refType: "",
+    refNo: "",
+
     vouStatus: "",
     checkNo: "",
     favouringName: "",

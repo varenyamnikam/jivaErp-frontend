@@ -185,7 +185,7 @@ export default function AcMaster(props) {
 
   if (loading) {
     const handleRes = (res) => {
-      console.log(res.data);
+      console.log(res);
       const acc = res.data.mst_accounts;
       if (acc !== 0) {
         setAccounts(acc);
@@ -207,7 +207,7 @@ export default function AcMaster(props) {
 
       loading && setLoading(false);
     };
-    roleService.axiosGet(url, handleRes, handleErr, () => {});
+    roleService.axiosGet(url, handleRes, handleErr);
   }
 
   function onDelete(item) {

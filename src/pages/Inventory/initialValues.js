@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import AuthHandler from "../../../Utils/AuthHandler";
-export default function DcValues() {
+import AuthHandler from "../../Utils/AuthHandler";
+export default function allInitialValues() {
   const user = AuthHandler.getUser();
   const initialValues = {
     vouNo: " ",
-    branchCode: user.defaultBranchCode,
-    docCode: "GR",
-    finYear: user.defaultYearCode,
+    branchCode: user ? user.defaultBranchCode : "0000",
+    docCode: "",
+    finYear: user ? user.defaultYearCode : "0000",
     vno: "",
     manualNo: "",
     vouDate: new Date(),
@@ -40,7 +40,7 @@ export default function DcValues() {
     returnCash: "",
   };
 
-  const vouItems = {
+  const initialVouItem = {
     vouNo: "X",
     vouSrNo: "",
     prodCode: "",
@@ -135,20 +135,22 @@ export default function DcValues() {
   };
   const initialCommonValues = {
     accounts: [initialAc],
-    records: [initialValues],
-    voucherItems: [vouItems],
+    voucherItems: [initialVouItem],
     adress: [initialAdress],
     payTerms: [initialPayValues],
     products: [initialProdValues],
   };
+
   const docOptions = ["DC", "QT", "GR", "SI"];
+  const initialVouValues = initialValues;
   return {
     initialValues,
-    vouItems,
+    initialVouItem,
     initialAc,
     initialAdress,
     initialPayValues,
     initialProdValues,
     initialCommonValues,
+    initialVouValues,
   };
 }

@@ -402,7 +402,11 @@ export default function AcMaster(props) {
                           {headcells.map((headcell) => (
                             <TableCell className={classes.tableStyle}>
                               {headcell.label !== "Edit" ? (
-                                item[headcell.feild]
+                                item[headcell.feild] ? (
+                                  item[headcell.feild]
+                                ) : (
+                                  ""
+                                )
                               ) : (
                                 <>
                                   <Controls.LoadingActionButton

@@ -15,6 +15,7 @@ import Controls from "./controls/Controls";
 import PrintIcon from "@mui/icons-material/Print";
 import { Grid } from "@mui/material";
 import { add } from "date-fns";
+import * as roleService from "../services/roleService";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -258,19 +259,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   }
   const settings = JSON.parse(localStorage.getItem("adm_softwareSettings"));
   let company = JSON.parse(reactLocalStorage.get("company"));
-  function getDate(code) {
-    const date = new Date(code);
-    const zeroPad = (num, places) => String(num).padStart(places, "0");
-
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(zeroPad(date.getMonth() + 1, 2)) +
-      "/" +
-      // String(date.getFullYear()).slice(-2)
-      String(date.getFullYear())
-    );
-  }
   console.log(getTheme());
   function geth(arr) {
     if (arr.length) {
@@ -292,16 +280,6 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
   );
   const center = { display: "flex", justifyContent: "center" };
   const right = { display: "flex", justifyContent: "flex-end" };
-  function getDate(code) {
-    const date = new Date(code);
-    return (
-      String(date.getDate()) +
-      "/" +
-      String(date.getMonth() + 1) +
-      "/" +
-      String(date.getFullYear()).slice(-2)
-    );
-  }
 
   return (
     <>
@@ -328,7 +306,7 @@ const ComponentToPrint = React.forwardRef((props, ref) => {
             <h3>{`${title} No. ${values.vouNo}`}</h3>
           </Grid>
           <Grid Item xs={6} sm={6} style={center}>
-            <h3>Date: {values.getDate()}</h3>
+            <h3>Date: {roleService.date(values.vouDate)}</h3>
           </Grid>
           <Grid Item xs={12} sm={12} style={{ ...center }}>
             <Grid

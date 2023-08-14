@@ -79,7 +79,6 @@ const initialAccounts = {
   creditAmount: "",
   panNo: "",
   aadharNo: "",
-  gstNo: "",
   seedLicenNo: "",
   bankName: "",
   ifscCode: "",

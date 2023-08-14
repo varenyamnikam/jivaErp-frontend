@@ -297,10 +297,10 @@ export default function Components(props) {
                   {partyAdress.countryName}({partyAdress.countryCode}),
                 </span>
               )}
-              {getParty(values) && getParty(values).gstNo && (
+              {getAd(values) && getAd(values).gstNo && (
                 <>
                   <br></br>
-                  <span>GST No: {getParty(values).gstNo}, </span>
+                  <span>GST No: {getAd(values).gstNo}, </span>
                 </>
               )}
             </>
@@ -339,10 +339,10 @@ export default function Components(props) {
                   {partyAdress.countryName}({partyAdress.countryCode}),
                 </span>
               )}
-              {getParty(values) && getParty(values).gstNo && (
+              {getAd(values) && getAd(values).gstNo && (
                 <>
                   <br></br>
-                  <span>GST No: {getParty(values).gstNo}, </span>
+                  <span>GST No: {getAd(values).gstNo}, </span>
                 </>
               )}
             </>

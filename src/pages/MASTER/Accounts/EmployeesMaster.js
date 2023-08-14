@@ -16,7 +16,6 @@ const initialValues = {
   creditAmount: "0",
   panNo: "",
   aadharNo: "",
-  gstNo: "",
   seedLicenNo: "",
   bankName: "",
   ifscCode: "",

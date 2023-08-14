@@ -80,7 +80,9 @@ export default function AcForm(props) {
     (item) =>
       item.acGroupCode === (bankValues.docCode[0] == "B" ? "A1016" : "A1018")
   );
-  const others = accounts.filter((item) => item.preFix !== "G");
+  const others = accounts.filter(
+    (item) => item.acGroupCode !== "A1016" || item.acGroupCode !== "A1018"
+  );
 
   const bankOptions = banks.map((item) => item.acName);
   const otherOptions = others.map((item) => item.acName);

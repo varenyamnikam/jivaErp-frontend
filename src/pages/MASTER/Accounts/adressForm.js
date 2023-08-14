@@ -220,7 +220,7 @@ export default function Adressform(props) {
             error={errors.pincode}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={2}>
           <Controls.Input
             name="mobileno"
             label="Mobile No"
@@ -228,7 +228,16 @@ export default function Adressform(props) {
             onChange={handleChange}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={2}>
+          <Controls.Input
+            name="gstNo"
+            label="Gst No"
+            value={input.gstNo}
+            onChange={handleChange}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={2}>
           <Controls.Input
             name="contactNo"
             label="Contact No"

@@ -423,7 +423,14 @@ export default function AcGlGroup() {
                     label="Group Type"
                     value={values}
                     setValue={setValues}
-                    options={["Asset", "Laibality", "Income"]}
+                    options={[
+                      "Asset",
+                      "Laibality",
+                      "Income",
+                      "Expense",
+                      "Purchase",
+                      "Sale",
+                    ]}
                     error={errors.groupType}
                   />
                 </Grid>{" "}

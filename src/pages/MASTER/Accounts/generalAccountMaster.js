@@ -106,6 +106,7 @@ const initialAdress = {
   talukaName: "",
   villageName: "",
   pincode: "",
+  gstNo: "",
   email: "",
   mobileno: "",
   contactNo: "",

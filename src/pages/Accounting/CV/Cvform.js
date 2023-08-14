@@ -87,12 +87,12 @@ export default function AcForm(props) {
   const useBatch = JSON.parse(
     localStorage.getItem("adm_softwareSettings")
   ).userBatchNo;
-  const banks = accounts.filter((item) => item.preFix == "G");
-  const others = accounts.filter((item) => item.preFix !== "G");
+  const banks = accounts.filter(
+    (item) => item.acGroupCode == "A1016" || item.acGroupCode == "A1018"
+  );
 
   const bankOptions = banks.map((item) => item.acName);
 
-  const otherOptions = others.map((item) => item.acName);
   console.log(bankValues, otherValues);
   const token = AuthHandler.getLoginToken();
   const userCode = localStorage.getItem("userCode");

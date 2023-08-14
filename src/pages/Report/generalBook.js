@@ -89,8 +89,8 @@ export default function BankBook({ docCode1, docCode2 }) {
     { id: "A.C Code", label: "A.C Code", feild: "acCode" },
     { id: "A.C Name", label: "A.C Name", feild: "acName" },
     { id: "Narration", label: "Narration", feild: "narration" },
-    { id: "Debit", label: "Payment", feild: "debit" },
-    { id: "Credit", label: "Reciept", feild: "credit" },
+    { id: "Debit", label: "Reciept", feild: "debit" },
+    { id: "Credit", label: "Payment", feild: "credit" },
     {
       id: "Balance",
       label: "Balance",

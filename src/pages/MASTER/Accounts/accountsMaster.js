@@ -94,7 +94,6 @@ const initialValues = {
   creditAmount: "",
   panNo: "",
   aadharNo: "",
-  gstNo: "",
   seedLicenNo: "",
   bankName: "",
   ifscCode: "",
@@ -444,7 +443,7 @@ export default function AccountMaster() {
                 <Grid item sm={6} xs={12}>
                   <Controls.Input
                     name="acName"
-                    label=" Name"
+                    label="Name"
                     value={values.acName}
                     onChange={handleInputChange}
                     error={errors.acName}

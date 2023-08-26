@@ -181,7 +181,7 @@ export default function Generalform(props) {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="acCode"
             label="Code"
@@ -191,16 +191,7 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Controls.Input
-            name="acName"
-            label="Name"
-            value={input.acName}
-            onChange={handleChange}
-            error={errors.acName}
-          />
-        </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="acRegMob"
             label="Reg. Mobile no."
@@ -209,7 +200,27 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={2}>
+        <Grid item sm={6} xs={6}>
+          <UnusedAutosuggest
+            name="acGroupName"
+            label="A C Group "
+            value={input}
+            setValue={setInput}
+            options={acGroupOptions}
+            error={errors.acGroupName}
+          />
+        </Grid>
+
+        <Grid item xs={6} sm={6}>
+          <Controls.Input
+            name="acName"
+            label="Name"
+            value={input.acName}
+            onChange={handleChange}
+            error={errors.acName}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="panNo"
             label="PAN No"
@@ -218,7 +229,7 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="aadharNo"
             label="Aadhar No"
@@ -227,16 +238,7 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
-          <Controls.Input
-            name="gstNo"
-            label="GST Number"
-            value={input.gstNo}
-            onChange={handleChange}
-            // error={errors.stateCode}
-          />
-        </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={6} sm={6}>
           <Controls.Input
             name="bankName"
             label="Bank Name"
@@ -245,7 +247,8 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="bankAcNo"
             label="Bank A/c No"
@@ -254,7 +257,7 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="ifscCode"
             label="IFSC Code"
@@ -265,7 +268,7 @@ export default function Generalform(props) {
         </Grid>
         {values.preFix != "E" && (
           <>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={6} sm={6}>
               <Controls.Input
                 name="propritorName"
                 label="Propritor Name"
@@ -274,7 +277,7 @@ export default function Generalform(props) {
                 // error={errors.stateCode}
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={6} sm={3}>
               <Controls.Input
                 name="tradeName"
                 label="Trade Name"
@@ -285,7 +288,7 @@ export default function Generalform(props) {
             </Grid>
           </>
         )}
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={6} sm={3}>
           <Controls.Input
             name="seedLicenNo"
             label="Seed Licen No"
@@ -294,14 +297,8 @@ export default function Generalform(props) {
             // error={errors.stateCode}
           />
         </Grid>
-        <Grid item xs={12} sm={12}>
-          <Divider
-            variant="middle"
-            color="blue"
-            sx={{ borderBottomWidth: 2 }}
-          />
-        </Grid>
-        <Grid item sm={4} xs={12}>
+
+        <Grid item sm={6} xs={6}>
           <UnusedAutosuggest
             name="acType"
             label="A C Type "
@@ -311,29 +308,9 @@ export default function Generalform(props) {
             error={errors.acType}
           />
         </Grid>
-        <Grid item sm={4} xs={12}>
-          <UnusedAutosuggest
-            name="acGroupName"
-            label="A C Group "
-            value={input}
-            setValue={setInput}
-            options={acGroupOptions}
-            error={errors.acGroupName}
-          />
-        </Grid>
         {values.preFix != "E" && (
           <>
-            <Grid item sm={4} xs={12}>
-              <UnusedAutosuggest
-                name="firmType"
-                label="Firm type"
-                value={input}
-                setValue={setInput}
-                options={firmTypeOptions}
-                error={errors.firmType}
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={6} sm={3}>
               <Controls.Input
                 name="creditDays"
                 label="Credit Days"
@@ -342,13 +319,24 @@ export default function Generalform(props) {
                 // error={errors.stateCode}
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={6} sm={3}>
               <Controls.Input
                 name="creditAmount"
                 label="Credit Limit (Amount)"
                 value={input.creditAmount}
                 onChange={handleChange}
                 // error={errors.stateCode}
+              />
+            </Grid>
+
+            <Grid item sm={4} xs={3}>
+              <UnusedAutosuggest
+                name="firmType"
+                label="Firm type"
+                value={input}
+                setValue={setInput}
+                options={firmTypeOptions}
+                error={errors.firmType}
               />
             </Grid>
           </>
@@ -404,7 +392,7 @@ export default function Generalform(props) {
         </Grid>
         <Grid
           item
-          xs={12}
+          xs={6}
           sm={12}
           style={{ display: "flex", justifyContent: "flex-end" }}
         >

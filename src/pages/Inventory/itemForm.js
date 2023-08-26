@@ -317,6 +317,7 @@ export default function GeneralItemForm(props) {
         ...item,
         vouSrNo: newNo,
         vouNo: input.vouNo,
+        docCode: input.docCode,
         batchList: batchList,
       };
       console.log(vouItem);

@@ -138,11 +138,6 @@ export default function AcMaster({ title = "Opening Balance" }) {
     { feild: "acName", label: "Party Name" },
     { feild: "vouNo", label: "Voucher No" },
   ];
-  const userCode = localStorage.getItem("userCode");
-  const userCompanyCode = localStorage.getItem("userCompanyCode");
-  const useBatch = JSON.parse(
-    localStorage.getItem("adm_softwareSettings")
-  ).userBatchNo;
   let query = `&date=${new Date()}`;
   const initialFilterFn = {
     fn: (items) => {

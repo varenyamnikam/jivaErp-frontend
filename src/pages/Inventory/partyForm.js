@@ -298,12 +298,17 @@ export default function CustomerForm(props) {
                         .filter((item) => item.vouNo == input.refNo)
                         .map((item) => {
                           delete item._id;
-                          item.docCode = input.docCode;
-                          item.vouNo = input.vouNo;
+                          // item.docCode = input.docCode;
+                          // item.vouNo = input.vouNo;
                           return item;
                         });
 
-                      console.log("refInput", refInput);
+                      console.log(
+                        "refInput",
+                        refInput,
+                        refItemList,
+                        common.voucherItems
+                      );
                       delete refInput._id;
                       refInput &&
                         setInput({

@@ -1,6 +1,7 @@
 import React from "react";
 import Headerpart from "./headerpart";
 import Sidemenu from "./sidemenu";
+import ShortCutKeys from "./shortcutKeys";
 function MainComponent({ page }) {
   console.log(page);
   return (
@@ -41,7 +42,7 @@ function MainComponent({ page }) {
         <link
           rel="stylesheet"
           href="plugins/summernote/summernote-bs4.min.css"
-        />
+        />{" "}
         <div className="wrapper">
           <Headerpart />
           <Sidemenu />
@@ -54,6 +55,7 @@ function MainComponent({ page }) {
           <aside className="control-sidebar control-sidebar-dark"></aside>
         </div>
       </div>
+      <ShortCutKeys />
     </>
   );
 }

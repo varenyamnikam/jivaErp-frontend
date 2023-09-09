@@ -6,6 +6,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import Circle from "../circularProgress";
 import React, { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
 
 const Featured = () => {
   const [percentage, setPercentage] = useState(0);
@@ -21,38 +22,47 @@ const Featured = () => {
   return (
     <div className="featured">
       <div className="top">
-        <h1 className="title">Total Revenue</h1>
+        <h1 className="title">Orders completed</h1>
         <MoreVertIcon fontSize="small" />
       </div>
       <div className="bottom">
+        <div className="chartsContainer">
         <div className="featuredChart">
+          <Typography style={{marginBottom:"20px"}}>Sales Order</Typography>
           <CircularProgressbar value={percentage} text={`${percentage}%`} />
         </div>
-        <p className="title">Total sales made today</p>
-        <p className="amount">$420</p>
-        <p className="desc">
-          Previous transactions processing. Last payments may not be included.
-        </p>
+        <div className="featuredChart">
+        <Typography style={{marginBottom:"20px"}} >Purchase Order</Typography>
+          <CircularProgressbar value={20} text={`${20}%`} />
+        </div></div>
+
         <div className="summary">
           <div className="item">
             <div className="itemTitle">Target</div>
             <div className="itemResult negative">
               <KeyboardArrowDownIcon fontSize="small" />
-              <div className="resultAmount">$12.4k</div>
+              <div className="resultAmount">12</div>
             </div>
           </div>
           <div className="item">
-            <div className="itemTitle">Last Week</div>
+            <div className="itemTitle">Completed</div>
             <div className="itemResult positive">
               <KeyboardArrowUpOutlinedIcon fontSize="small" />
-              <div className="resultAmount">$12.4k</div>
+              <div className="resultAmount">10</div>
             </div>
           </div>
           <div className="item">
-            <div className="itemTitle">Last Month</div>
+            <div className="itemTitle">Target</div>
             <div className="itemResult positive">
               <KeyboardArrowUpOutlinedIcon fontSize="small" />
-              <div className="resultAmount">$12.4k</div>
+              <div className="resultAmount">9</div>
+            </div>
+          </div>
+          <div className="item">
+            <div className="itemTitle">Completed</div>
+            <div className="itemResult positive">
+              <KeyboardArrowUpOutlinedIcon fontSize="small" />
+              <div className="resultAmount">9</div>
             </div>
           </div>
         </div>

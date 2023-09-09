@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import Home from "./home/Home";
 import Config from "../Utils/Config";
 import AuthHandler from "../Utils/AuthHandler";
+import { FcCalendar } from "react-icons/fc";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import { IconButton } from "@material-ui/core";
+
 const Dashboard = (props) => {
   console.log(Config().homeUrl);
   let userCompanyCode = AuthHandler.getUser().userCompanyCode;
@@ -18,9 +22,26 @@ const Dashboard = (props) => {
       <section className="content">
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">&nbsp;</h3>
+            {" "}
+            <FcCalendar
+              style={{
+                height: "24px",
+                width: "24px",
+              }}
+            />{" "}
+            From 01/04/2023 to 9/9/2023
+            <IconButton
+              size="small"
+              onClick={() => {
+                // setButtonPopup(true);
+              }}
+              style={{
+                boxShadow: "none",
+              }}
+            >
+              <ChangeCircleIcon />
+            </IconButton>
           </div>
-
           <div className="card-body">
             <Home />
           </div>

@@ -12,7 +12,9 @@
 
     .title {
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 500;    display: flex;
+      align-items: center;
+  
     }
   }
 
@@ -23,10 +25,19 @@
     align-items: center;
     justify-content: center;
     gap: 15px;
-
-    .featuredChart {
-      width: 100px;
-      height: 100px;
+    .chartsContainer{
+      width:100%;
+      display :flex;
+      justify-content: space-around;
+      .featuredChart {
+        width: 125px;
+        height: 200px;
+        display: flex;
+        flex-direction: column; /* Stack content vertically */
+        align-items: center; /* Center items horizontally */
+        text-align: center; /* Center text within the container */  
+      }
+  
     }
 
     .title {

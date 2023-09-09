@@ -33,6 +33,7 @@
     "html-to-image": "^1.11.11",
     "html-to-jsx": "^0.0.4",
     "interweave": "^13.0.0",
+    "keyboardjs": "^2.7.0",
     "lodash": "^4.17.21",
     "lottie-web": "^5.10.2",
     "mdb-ui-kit": "^6.1.0",

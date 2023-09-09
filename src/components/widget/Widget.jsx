@@ -11,7 +11,6 @@ const Widget = ({ type }) => {
   let data;
 
   //temporary
-  const amount = 100;
   const diff = 20;
   function onClick(e) {
     const data = e.target.getAttribute("value");
@@ -23,9 +22,10 @@ const Widget = ({ type }) => {
     // }
   }
   switch (type) {
-    case "user":
+    case "payment":
       data = {
-        title: "USER",
+        amount:100,
+        title: "PAYMENTS",
         isMoney: true,
         color: { backgroundColor: "#faa9ac" },
         link: "/Admin/UserMaster",
@@ -41,14 +41,13 @@ const Widget = ({ type }) => {
       };
 
       break;
-    case "order":
+    case "purchase":
       data = {
-        title: "ORDERS",
-        isMoney: false,
-        // link: "View all orders",
+        amount:100,
+        title: "PURCHASE",
+        isMoney: true,
+        link: "/PurchaseReport/PVReport",
         color: { backgroundColor: "#fffa6a" },
-
-        link: "ORDERS",
         icon: (
           <ShoppingCartOutlinedIcon
             className="icon"
@@ -61,13 +60,13 @@ const Widget = ({ type }) => {
       };
 
       break;
-    case "earning":
+    case "sale":
       data = {
-        title: "EARNINGS",
+        amount:100,
+        title: "SALE",
         isMoney: true,
-        // link: "View net earnings",
         color: { backgroundColor: "#75ec7f" },
-        link: "EARNINGS",
+        link: "/SaleReport/SaleRegister",
         icon: (
           <MonetizationOnOutlinedIcon
             className="icon"
@@ -79,12 +78,13 @@ const Widget = ({ type }) => {
         ),
       };
       break;
-    case "balance":
+    case "receipt":
       data = {
-        title: "BALANCE",
+        amount:100,
+        title: "RECIEPT",
         isMoney: true,
         color: { backgroundColor: "#88fff9" },
-        link: "BALANCE",
+        link: "/Admin/UserMaster",
         icon: (
           <AccountBalanceWalletOutlinedIcon
             className="icon"
@@ -102,7 +102,7 @@ const Widget = ({ type }) => {
 
   return (
     <Link
-      to="/Admin/UserMaster"
+      to={data.link}
       className="widget"
       value={data.title}
       onClick={onClick}
@@ -132,7 +132,7 @@ const Widget = ({ type }) => {
           style={{ display: "flex", justifyContent: "center" }}
         >
           <span className="counter">
-            {data.isMoney && "$"} {amount}
+            {data.isMoney && "₹" } {data.amount}
           </span>
         </Grid>
       </Grid>

@@ -9,8 +9,8 @@ const Config = () => {
   const getUrlWithQuery = (endpoint) => url + endpoint + AuthHandler.getQuery();
 
   const loginUrl = getUrlWithQuery("/api/login");
+  const dashboardUrl = getUrlWithQuery("/api/dashboard");
   const register = getUrlWithQuery("/api/register");
-  const homeUrl = getUrlWithQuery("/api/home");
   const userUrl = getUrlWithQuery("/api/adm_userrole");
   const userRightsUrl = getUrlWithQuery("/api/adm_userrights");
   const showRights = getUrlWithQuery("/api/post_userrights");
@@ -64,7 +64,7 @@ const Config = () => {
   return {
     loginUrl,
     register,
-    homeUrl,
+    dashboardUrl,
     userUrl,
     userRightsUrl,
     showRights,

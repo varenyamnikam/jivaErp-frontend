@@ -1,122 +1,121 @@
-import React, { useMemo } from "react";
-import ReactDOM from "react-dom";
+import React, { PureComponent } from "react";
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
-  Cell,
-  Text,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
+import { makeStyles } from "@material-ui/core";
 
-const blues = [
-  ["#457AA6"],
-  ["#457AA6", "#E3EBF2"],
-  ["#264F73", "#457AA6", "#E3EBF2"],
-  ["#264F73", "#457AA6", "#A2BBD2", "#E3EBF2"],
-  ["#1A334A", "#264F73", "#457AA6", "#A2BBD2", "#E3EBF2"],
+const useStyles = makeStyles((theme) => ({
+  tooltip: {
+    backgroundColor: "#fff",
+    border: "1px solid #ccc",
+    padding: "5px",
+    maxWidth: "200px",
+  },
+}));
+
+const shortenString = (str) => {
+  if (str.length > 7) {
+    return str.slice(0, 7) + "...";
+  }
+  return str;
+};
+
+const fakeData = [
+  {
+    name: "Page ABCDEFGHIGKLMONOP",
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    name: "Page B",
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    name: "Page C",
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    name: "Page D",
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    name: "Page E",
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+  {
+    name: "Page F",
+    uv: 2390,
+    pv: 3800,
+    amt: 2500,
+  },
+  {
+    name: "Page G",
+    uv: 3490,
+    pv: 4300,
+    amt: 2100,
+  },
 ];
 
-const getColor = (length, index) => {
-  if (length <= blues.length) {
-    return blues[length - 1][index];
-  }
+export default function HorizontalBar({ data }) {
+  const clases = useStyles();
+  let shortNameData = data.map((item) => ({
+    fullName: item.name,
+    shortName: shortenString(item.name),
+    ...item,
+  }));
+  console.log(shortNameData);
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active) {
+      const fullName = payload[0].payload.name; // Get the full name
+      const spent = payload[0].payload.spent; // Get the full name
 
-  return blues[blues.length - 1][index % blues.length];
-};
+      return (
+        <div className={clases.tooltip}>
+          <p>{`Customer: ${fullName}`}</p>
+          <p style={{ color: "#82ca9d" }}>{`Spent: ${spent}`}</p>
+        </div>
+      );
+    }
 
-const YAxisLeftTick = ({ y, payload: { value } }) => {
-  return (
-    <Text x={0} y={y} textAnchor="start" verticalAnchor="middle" scaleToFit>
-      {value}
-    </Text>
-  );
-};
-
-let ctx;
-
-const measureText14HelveticaNeue = (text) => {
-  if (!ctx) {
-    ctx = document.createElement("canvas").getContext("2d");
-    ctx.font = "14px 'Helvetica Neue";
-  }
-
-  return ctx.measureText(text).width;
-};
-
-const BAR_AXIS_SPACE = 10;
-const data = [
-  { name: "Page A", pv: 240 },
-  { name: "B", pv: 2210 },
-  { name: "C", pv: 2300 },
-  { name: "Page D", pv: 2000 },
-  { name: "Zero", pv: 0 },
-  { name: "Hi", pv: 123 },
-  { name: "Bye", pv: 2091 },
-];
-
-export const HorizontalBar = ({
-  data = [
-    { name: "Page A", pv: 240 },
-    { name: "B", pv: 2210 },
-    { name: "C", pv: 2300 },
-    { name: "Page D", pv: 2000 },
-    { name: "Zero", pv: 0 },
-    { name: "Hi", pv: 123 },
-    { name: "Bye", pv: 2091 },
-  ],
-  xKey = "name",
-  yKey = "pv",
-}) => {
-  const maxTextWidth = useMemo(
-    () =>
-      data.reduce((acc, cur) => {
-        const value = cur[yKey];
-        const width = measureText14HelveticaNeue(value.toLocaleString());
-        if (width > acc) {
-          return width;
-        }
-        return acc;
-      }, 0),
-    [data, yKey]
-  );
+    return null;
+  };
 
   return (
-    <ResponsiveContainer width={"100%"} height={50 * data.length} debounce={50}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart
-        data={data}
+        width={500}
+        height={300}
+        data={shortNameData}
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
         layout="vertical"
-        margin={{ left: 10, right: maxTextWidth + (BAR_AXIS_SPACE - 8) }}
       >
-        <XAxis hide axisLine={false} type="number" />
-        <YAxis
-          yAxisId={0}
-          dataKey={xKey}
-          type="category"
-          axisLine={false}
-          tickLine={false}
-          tick={YAxisLeftTick}
-        />
-        <YAxis
-          orientation="right"
-          yAxisId={1}
-          dataKey={yKey}
-          type="category"
-          axisLine={false}
-          tickLine={false}
-          tickFormatter={(value) => value.toLocaleString()}
-          mirror
-          tick={{
-            transform: `translate(${maxTextWidth + BAR_AXIS_SPACE}, 0)`,
-          }}
-        />
-        <Bar dataKey={yKey} minPointSize={2} barSize={32}>
-          {data.map((d, idx) => {
-            return <Cell key={d[xKey]} fill={getColor(data.length, idx)} />;
-          })}
-        </Bar>
+        <CartesianGrid strokeDasharray="3 3" />
+        <YAxis dataKey="shortName" type="category" /> <XAxis />
+        <Tooltip content={<CustomTooltip />} />
+        <Bar dataKey="spent" fill="#82ca9d" />
       </BarChart>
     </ResponsiveContainer>
   );
-};
+}

@@ -9,39 +9,81 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { makeStyles } from "@material-ui/core";
 
-const data = [
+const useStyles = makeStyles((theme) => ({
+  tooltip: {
+    backgroundColor: "#fff",
+    border: "1px solid #ccc",
+    padding: "5px",
+    maxWidth: "200px",
+  },
+}));
+
+const shortenString = (str) => {
+  if (str.length > 9) {
+    return str.slice(0, 9) + "...";
+  }
+  return str;
+};
+
+const fakeData = [
   {
-    name: "Product A",
-    uv: 4000,
+    name: "Page ABCDEFGHIGKLMONOP",
+    qr: 4000,
   },
   {
     name: "Product B",
-    uv: 3000,
+    qr: 3000,
   },
   {
     name: "Product C",
-    uv: 2000,
+    qr: 2000,
   },
   {
     name: "Product D",
-    uv: 2780,
+    qr: 2780,
   },
   {
     name: "Product E",
-    uv: 1890,
+    qr: 1890,
   },
 ];
 
-const VerticalBar = () => {
+const VerticalBar = ({ data, xKey, yKey, barColor }) => {
+  let shortNameData = data
+    .sort((a, b) => a[yKey] - b[yKey])
+    .map((item) => ({
+      fullName: item[xKey],
+      shortName: shortenString(item[xKey]),
+      ...item,
+    }));
+  console.log(shortNameData);
+  const clases = useStyles();
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active) {
+      const fullName = payload[0].payload[yKey]; // Get the full[xKey]
+      const sold = payload[0].payload[xKey]; // Get the full[xKey]
+
+      return (
+        <div className={clases.tooltip}>
+          <p>{`${yKey}: ${fullName}`}</p>
+          <p style={{ color: barColor }}>{`${xKey}: ${sold}`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data}>
+      <BarChart data={shortNameData}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis dataKey="fullName" />
         <YAxis />
-        <Tooltip />
-        <Bar dataKey="uv" fill="#8884d8" />
+        <Tooltip content={<CustomTooltip />} />
+        <Bar dataKey={yKey} fill={barColor} />
       </BarChart>
     </ResponsiveContainer>
   );

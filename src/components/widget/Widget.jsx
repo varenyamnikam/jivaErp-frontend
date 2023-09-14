@@ -5,16 +5,23 @@ import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalance
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { Route, Redirect } from "react-router-dom";
-import Config from "../../Utils/Config"; import { Link, NavLink } from "react-router-dom";
+import Config from "../../Utils/Config";
+import { Link, NavLink } from "react-router-dom";
 import { Grid } from "@mui/material";
-const Widget = ({ type }) => {
+
+function numberWithCommas(number) {
+  // Use toLocaleString to add commas as thousands separators
+  return Math.abs(number).toLocaleString();
+}
+
+const Widget = ({ type, value }) => {
   let data;
 
   //temporary
   const diff = 20;
   function onClick(e) {
     const data = e.target.getAttribute("value");
-    localStorage.setItem("screenCode","User Master");
+    localStorage.setItem("screenCode", "User Master");
     console.log(e.target, data);
     // if (data == "USER") {
     //   window.location = "/Admin/UserMaster";
@@ -24,7 +31,7 @@ const Widget = ({ type }) => {
   switch (type) {
     case "payment":
       data = {
-        amount:100,
+        amount: value,
         title: "PAYMENTS",
         isMoney: true,
         color: { backgroundColor: "#faa9ac" },
@@ -43,7 +50,7 @@ const Widget = ({ type }) => {
       break;
     case "purchase":
       data = {
-        amount:100,
+        amount: value,
         title: "PURCHASE",
         isMoney: true,
         link: "/PurchaseReport/PVReport",
@@ -62,7 +69,7 @@ const Widget = ({ type }) => {
       break;
     case "sale":
       data = {
-        amount:100,
+        amount: value,
         title: "SALE",
         isMoney: true,
         color: { backgroundColor: "#75ec7f" },
@@ -80,7 +87,7 @@ const Widget = ({ type }) => {
       break;
     case "receipt":
       data = {
-        amount:100,
+        amount: value,
         title: "RECIEPT",
         isMoney: true,
         color: { backgroundColor: "#88fff9" },
@@ -114,17 +121,7 @@ const Widget = ({ type }) => {
             {data.icon} {data.title}
           </span>
         </Grid>
-        <Grid
-          Item
-          xs={3}
-          sm={3}
-          style={{ display: "flex", justifyContent: "flex-end" }}
-        >
-          <div className="percentage positive">
-            <KeyboardArrowUpIcon />
-            {diff} %
-          </div>
-        </Grid>
+
         <Grid
           Item
           xs={12}
@@ -132,7 +129,7 @@ const Widget = ({ type }) => {
           style={{ display: "flex", justifyContent: "center" }}
         >
           <span className="counter">
-            {data.isMoney && "₹" } {data.amount}
+            {data.isMoney && "₹"} {numberWithCommas(data.amount)}
           </span>
         </Grid>
       </Grid>

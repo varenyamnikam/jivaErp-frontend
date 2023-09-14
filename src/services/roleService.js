@@ -113,6 +113,7 @@ export function axiosPut(url, data, responseFn, errFn, finalFn = () => {}) {
     .then((response) => {
       responseFn(response);
       refreshToken(response);
+      console.log(response);
     })
     .catch((error) => {
       console.log(error);

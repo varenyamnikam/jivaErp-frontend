@@ -9,47 +9,48 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "January", Sale:1700,Purchase: 1200 },
-  { name: "February", Sale:1600,Purchase: 2100 },
-  { name: "March", Sale:800,Purchase: 800 },
-  { name: "April", Sale:2100,Purchase: 1600 },
-  { name: "May", Sale:900,Purchase: 900 },
-  { name: "June", Sale:500,Purchase: 1700 },
+const fakeData = [
+  { month: "January", sale: 1700, purchase: 1200 },
+  { month: "February", sale: 1600, purchase: 2100 },
+  { month: "March", sale: 800, purchase: 800 },
+  { month: "April", sale: 2100, purchase: 1600 },
+  { month: "May", sale: 900, purchase: 900 },
+  { month: "June", sale: 500, purchase: 1700 },
 ];
 
-const Chart = ({ aspect, title }) => {
+const Chart = ({ aspect, title, data }) => {
   return (
     <div className="chart">
       <div className="title">{title}</div>
       <ResponsiveContainer width="100%" aspect={aspect}>
         <AreaChart data={data}>
           <defs>
-          <linearGradient id="gradientSale" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="gradientSale" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#75ec7f" stopOpacity={0.8} />
               <stop offset="95%" stopColor="#75ec7f" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="gradientPurchase" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#fffa6a" stopOpacity={0.8} />
               <stop offset="95%" stopColor="#fffa6a" stopOpacity={0} />
-            </linearGradient>          </defs>
-          <XAxis dataKey="name" stroke="gray" />
+            </linearGradient>{" "}
+          </defs>
+          <XAxis dataKey="month" stroke="gray" />
           <YAxis />
           <CartesianGrid strokeDasharray="3 3" className="chartGrid" />
           <Tooltip />
           <Area
             type="monotone"
-            dataKey="Purchase"
+            dataKey="purchase"
             stroke="#fffa6a"
             fillOpacity={1}
-            fill="url(#gradientPurchase)"  
+            fill="url(#gradientPurchase)"
           />
           <Area
             type="monotone"
-            dataKey="Sale"
+            dataKey="sale"
             stroke="#75ec7f"
             fillOpacity={1}
-            fill="url(#gradientSale)"  
+            fill="url(#gradientSale)"
           />
         </AreaChart>
       </ResponsiveContainer>

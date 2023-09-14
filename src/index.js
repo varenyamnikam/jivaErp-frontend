@@ -381,7 +381,6 @@ root.render(
           path="/AccountingReport/DayBook"
           element={<PrivateRouteNew Page={<DayBook />} />}
         />
-        OutstandingReport
         <Route
           exact
           path="/AccountingReport/OutstandingReport"

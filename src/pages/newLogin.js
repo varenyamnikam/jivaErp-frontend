@@ -40,10 +40,16 @@ import bg1 from "../components/images/bg-1.jpg";
 import JivaLogo from "../components/images/JivaLogo.png";
 
 const theme = createTheme();
-// alert("First few login attempts may fail due to sleeping backend service");
 
 export default function SignIn() {
   let history = useNavigate();
+  const [showAlert, setShowAlert] = useState(true);
+
+  useEffect(() => {
+    alert("First few login attempts may fail due to sleeping backend service");
+
+    setShowAlert(false);
+  }, []);
   // window.onunload = function () {
   //   window.scrollTo(0, 50);
   // };
@@ -79,7 +85,7 @@ export default function SignIn() {
   const [state, setState] = useState({
     usrCode: "1001",
     usrPassword: "1001",
-    btnDisabled: true,
+    btnDisabled: false,
     usrCompanyCode: "1022",
     loginStatus: 0,
   });

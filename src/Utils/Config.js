@@ -3,8 +3,8 @@ import AuthHandler from "./AuthHandler";
 
 const Config = () => {
   const PORT = process.env.PORT ? process.env.PORT : "3001";
-  // const url = "https://backend-4u9g.onrender.com";
-  const url = "http://localhost:3001";
+  const url = "https://backend-4u9g.onrender.com";
+  // const url = "http://localhost:3001";
 
   const getUrlWithQuery = (endpoint) => url + endpoint + AuthHandler.getQuery();
 

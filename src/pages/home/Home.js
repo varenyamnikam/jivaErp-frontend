@@ -23,7 +23,7 @@ const Home = ({ startDate, endDate, loading, setLoading }) => {
     payment: 0,
     receipt: 0,
     purcAndSaleGraph: [],
-    topProds: [],
+    topProds: [{ name: "", sold: "" }],
     topCustomers: [],
     latestVouDocs: [],
   });

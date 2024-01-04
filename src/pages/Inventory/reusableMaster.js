@@ -77,6 +77,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(189, 189, 3, 0.103)",
   },
 }));
+
 export default function ReuseMaster(props) {
   const { docCode, title, initialValues, route } = props;
   const headCellsData = [

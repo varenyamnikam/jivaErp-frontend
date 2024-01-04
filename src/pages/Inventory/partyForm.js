@@ -224,6 +224,31 @@ export default function CustomerForm(props) {
       return ["QT", "SO"];
     } else return [""];
   }
+
+  function handleRefButtonClick() {
+    const refInput = reference.find((item) => item.vouNo == input.refNo);
+    const refItemList = common.voucherItems
+      .filter((item) => item.vouNo == input.refNo)
+      .map((item) => {
+        delete item._id;
+        // item.docCode = input.docCode;
+        // item.vouNo = input.vouNo;
+        return item;
+      });
+
+    console.log("refInput", refInput, refItemList, common.voucherItems);
+    delete refInput._id;
+    refInput &&
+      setInput({
+        ...refInput,
+        vouNo: input.vouNo,
+        vouDate: input.vouDate,
+        docCode: input.docCode,
+        refNo: input.refNo,
+        refType: input.refType,
+      });
+    refItemList.length !== 0 && setItemList(refItemList);
+  }
   return (
     <>
       <Grid
@@ -290,37 +315,7 @@ export default function CustomerForm(props) {
                 <Grid item xs={12} sm={8} className={classes.input}>
                   <ButtonAutosuggest
                     style={{ width: "100%", borderRadius: "0px" }}
-                    onClick={() => {
-                      const refInput = reference.find(
-                        (item) => item.vouNo == input.refNo
-                      );
-                      const refItemList = common.voucherItems
-                        .filter((item) => item.vouNo == input.refNo)
-                        .map((item) => {
-                          delete item._id;
-                          // item.docCode = input.docCode;
-                          // item.vouNo = input.vouNo;
-                          return item;
-                        });
-
-                      console.log(
-                        "refInput",
-                        refInput,
-                        refItemList,
-                        common.voucherItems
-                      );
-                      delete refInput._id;
-                      refInput &&
-                        setInput({
-                          ...refInput,
-                          vouNo: input.vouNo,
-                          vouDate: input.vouDate,
-                          docCode: input.docCode,
-                          refNo: input.refNo,
-                          refType: input.refType,
-                        });
-                      refItemList.length !== 0 && setItemList(refItemList);
-                    }}
+                    onClick={handleRefButtonClick}
                     name="refNo"
                     label="Ref No"
                     value={input}

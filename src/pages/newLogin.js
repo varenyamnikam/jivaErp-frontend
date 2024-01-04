@@ -38,45 +38,9 @@ import "../index.css";
 import "../components/css/style.css";
 import bg1 from "../components/images/bg-1.jpg";
 import JivaLogo from "../components/images/JivaLogo.png";
-import Notification from "../components/Notification";
-import finalLogin from "../components/finalLogin";
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  padding: "10px",
-
-  // height: 60,
-  // lineHeight: "60px",
-}));
-const customItem = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-
-  // height: 60,
-  // lineHeight: "60px",
-}));
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="http://www.jivasoftware.com/">
-        JIVA SOFTWARE (OPC) PRIVATE LIMITED
-      </Link>
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const theme = createTheme();
+// alert("First few login attempts may fail due to sleeping backend service");
 
 export default function SignIn() {
   let history = useNavigate();
@@ -113,10 +77,10 @@ export default function SignIn() {
   });
 
   const [state, setState] = useState({
-    usrCode: "",
-    usrPassword: "",
+    usrCode: "1001",
+    usrPassword: "1001",
     btnDisabled: true,
-    usrCompanyCode: "",
+    usrCompanyCode: "1022",
     loginStatus: 0,
   });
   console.log(state);
@@ -282,7 +246,6 @@ export default function SignIn() {
                       backgroundImage: `url(${bg1})`,
                     }}
                   ></div>
-
                   <div className="login-wrap p-4 p-md-5">
                     <Grid container>
                       <Grid
@@ -306,6 +269,7 @@ export default function SignIn() {
                         <Grid container>
                           <Grid item xs={12}>
                             <TextField
+                              value={state.usrCode}
                               margin="normal"
                               required
                               fullWidth
@@ -325,6 +289,7 @@ export default function SignIn() {
                           </Grid>
                           <Grid item xs={12}>
                             <TextField
+                              value={state.usrPassword}
                               margin="normal"
                               required
                               fullWidth
@@ -345,6 +310,7 @@ export default function SignIn() {
                           </Grid>
                           <Grid item xs={12}>
                             <TextField
+                              value={state.usrCompanyCode}
                               margin="normal"
                               required
                               fullWidth

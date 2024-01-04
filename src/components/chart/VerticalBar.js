@@ -62,6 +62,7 @@ const VerticalBar = ({ data, xKey, yKey, barColor }) => {
   const clases = useStyles();
   const CustomTooltip = ({ active, payload, label }) => {
     if (active) {
+      console.log("payload", payload);
       const fullName = payload[0].payload[yKey]; // Get the full[xKey]
       const sold = payload[0].payload[xKey]; // Get the full[xKey]
 

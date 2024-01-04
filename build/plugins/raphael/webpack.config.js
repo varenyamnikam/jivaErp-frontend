@@ -2,43 +2,39 @@
 
 const webpack = require("webpack");
 const fs = require("fs");
-const path = require("path");
-module.exports = function (env) {
-  let externals = [];
 
+module.exports = function (env) {
+  
+  let externals = [];
+  
   if (env && env.noDeps) {
-    console.log("Building version without deps");
+    console.log('Building version without deps');
     externals.push("eve");
   }
-
+  
   return {
-    entry: "./dev/raphael.amd.js",
+    entry: './dev/raphael.amd.js',
     output: {
       path: __dirname,
       filename: "raphael.js",
       libraryTarget: "umd",
-      library: "Raphael",
+      library: "Raphael"
     },
-
+    
     externals: externals,
-
+    
     plugins: [
       new webpack.BannerPlugin({
-        banner: fs.readFileSync("./dev/banner.txt", "utf8"),
+        banner: fs.readFileSync('./dev/banner.txt', 'utf8'),
         raw: true,
-        entryOnly: true,
-      }),
+        entryOnly: true
+      })
     ],
     resolve: {
       alias: {
-        eve: "eve-raphael/eve",
-      },
-      fallback: {
-        buffer: require.resolve("buffer/"),
-      },
-    },
-    node: {
-      fs: "empty",
-    },
+        "eve": "eve-raphael/eve"
+      }
+    }
   };
+  
 };

@@ -11,6 +11,15 @@
 
 This project is an Accounting and Financial Management ERP built using the MERN stack (MongoDB, Express.js, React, Node.js) along with Docker for containerization. It provides comprehensive solutions for managing financial transactions, ledgers, and business processes.
 
+## Pain points solved
+
+- 50% reduction in training time
+- One stop solution for all small business to meet accounting needs
+- Tally and whatsapp integration
+- Easily configurable to meet diffrent business needs
+
+
+
 ## Tech Stack
 
 - **MongoDB**: A NoSQL database used for storing and managing financial data. [Learn More](https://www.mongodb.com/)

@@ -23,7 +23,7 @@ const Chart = ({ aspect, title, data }) => {
     <div className="chart">
       <div className="title">{title}</div>
       <ResponsiveContainer width="100%" aspect={aspect}>
-        <AreaChart data={data}>
+        <AreaChart data={fakeData}>
           <defs>
             <linearGradient id="gradientSale" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#75ec7f" stopOpacity={0.8} />
